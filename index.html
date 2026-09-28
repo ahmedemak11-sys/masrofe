@@ -118,10 +118,14 @@ h2.sec .hint{font-family:var(--ff-body); font-size:12px; font-weight:400; color:
 
 /* hero */
 .hero{background:linear-gradient(160deg, var(--accent) 0%, color-mix(in srgb,var(--accent) 72%, #000) 100%);
-  color:#fff; border-radius:20px; padding:18px 18px 16px; box-shadow:var(--shadow); position:relative; overflow:hidden}
+  color:#fff; border-radius:20px; padding:18px 18px 16px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+  display:block; width:100%; text-align:right; border:0; font:inherit}
+.hero .cap{display:flex; align-items:center; gap:6px}
+.hero .heroedit{width:14px;height:14px;opacity:.75;flex:none}
+.hero:hover .heroedit{opacity:1}
 .hero::after{content:""; position:absolute; inset:auto -40px -70px auto; width:190px; height:190px;
   border-radius:50%; background:rgba(255,255,255,.07)}
-.hero .cap{font-size:12px; opacity:.85; letter-spacing:.04em}
+.hero .cap{font-size:12.5px; opacity:.88}
 .hero .big{font-family:var(--ff-display); font-weight:700; font-size:34px; line-height:1.15; margin-top:4px; letter-spacing:-.02em}
 .hero .cur{font-size:16px; opacity:.8; font-weight:500}
 .hero .split{display:flex; gap:10px; margin-top:16px; position:relative; z-index:1}
@@ -130,10 +134,12 @@ h2.sec .hint{font-family:var(--ff-body); font-size:12px; font-weight:400; color:
 .hero .qt .v{font-family:var(--ff-display); font-weight:600; font-size:16px; margin-top:1px}
 
 /* tiles */
-.tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
-.tile{background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:11px 12px}
-.tile .k{font-size:11.5px; color:var(--muted); display:flex; align-items:center; gap:5px}
-.tile .v{font-family:var(--ff-display); font-weight:600; font-size:17px; margin-top:3px; letter-spacing:-.01em}
+.tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; align-items:stretch}
+.tile{background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:11px 12px;
+  display:flex; flex-direction:column; justify-content:space-between; min-height:74px}
+.tile .k{font-size:11.5px; color:var(--muted); display:flex; align-items:center; gap:5px; line-height:1.35}
+.tile .k span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.tile .v{font-family:var(--ff-display); font-weight:600; font-size:17px; margin-top:6px; letter-spacing:-.01em}
 .tile .v.up{color:var(--up)} .tile .v.down{color:var(--down)}
 .tile .k svg{width:13px;height:13px;flex:none}
 .ftrow{display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--muted)}
@@ -175,8 +181,10 @@ h2.sec .hint{font-family:var(--ff-body); font-size:12px; font-weight:400; color:
 .bud:last-child{border-bottom:0}
 .bud .hd{display:flex; align-items:center; gap:10px; margin-bottom:9px}
 .bud .nm{font-weight:500}
-.bud .rt{margin-inline-start:auto; text-align:left; font-size:12.5px; color:var(--muted)}
-.bud .rt b{font-family:var(--ff-display); font-size:14px; color:var(--ink); font-weight:600}
+.bud .rt{margin-inline-start:auto; text-align:left; font-size:12.5px; color:var(--muted); line-height:1.3; flex:none}
+.bud .rt b{font-family:var(--ff-display); font-size:15px; color:var(--ink); font-weight:600; display:block; font-variant-numeric:tabular-nums}
+.bud .rt small{font-size:11.5px; white-space:nowrap; font-variant-numeric:tabular-nums}
+.bud .nm{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .bud .ft{display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:7px; gap:8px}
 
 /* pills */
@@ -227,10 +235,12 @@ h2.sec .hint{font-family:var(--ff-body); font-size:12px; font-weight:400; color:
   background:var(--surface-2); color:var(--ink); font-size:15px}
 .inp:focus{outline:none; border-color:var(--accent); background:var(--surface)}
 input.inp[type=number]{direction:ltr; text-align:right; font-variant-numeric:tabular-nums}
+.inp.big{font-family:var(--ff-display); font-size:26px; font-weight:700; padding:14px; letter-spacing:-.01em}
+.inp.big::placeholder{font-weight:600; opacity:.35}
 input.inp[type=date]{direction:ltr; text-align:right}
 textarea.inp{resize:vertical; min-height:62px}
 .segs{display:flex; gap:6px; background:var(--surface-2); padding:4px; border-radius:13px; border:1px solid var(--line)}
-.segs button{flex:1; border:0; background:transparent; padding:9px; border-radius:10px; font-weight:600; font-size:14px; color:var(--muted)}
+.segs button{flex:1; border:0; background:transparent; padding:9px 4px; border-radius:10px; font-weight:600; font-size:13.5px; color:var(--muted); white-space:nowrap}
 .segs button[aria-pressed="true"]{background:var(--surface); color:var(--ink); box-shadow:var(--shadow-sm)}
 .segs button[aria-pressed="true"][data-v="income"]{color:var(--up)}
 .segs button[aria-pressed="true"][data-v="expense"]{color:var(--down)}
@@ -314,9 +324,9 @@ details.more summary::-webkit-details-marker{display:none}
 .ob .obhead p{margin:0 auto; max-width:38ch; color:var(--muted); font-size:13.5px; line-height:1.6}
 
 /* toast */
-.toast{position:fixed; bottom:calc(150px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%) translateY(10px);
+.toast{position:fixed; top:calc(12px + env(safe-area-inset-top,0px)); left:50%; transform:translateX(-50%) translateY(-12px);
   background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:12px; font-size:13.5px; font-weight:500;
-  z-index:60; opacity:0; transition:.2s; pointer-events:none; box-shadow:var(--shadow); max-width:90vw}
+  z-index:70; opacity:0; transition:.2s; pointer-events:none; box-shadow:var(--shadow); max-width:calc(100vw - 32px); text-align:center}
 .toast.on{opacity:1; transform:translateX(-50%)}
 
 .statusline{display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--muted); padding:14px 2px 0; justify-content:center}
@@ -411,7 +421,9 @@ const P = {
   tUp: '<path d="M4 16.2 9 11.2l3.4 3.4L20 7"/><path d="M15 7h5v5"/>',
   tDown: '<path d="M4 7.8 9 12.8l3.4-3.4L20 17"/><path d="M15 17h5v-5"/>',
   x: '<path d="M6.4 6.4 17.6 17.6"/><path d="M17.6 6.4 6.4 17.6"/>',
-  coins: '<ellipse cx="12" cy="6.8" rx="7" ry="2.9"/><path d="M5 6.8v4.6c0 1.6 3.1 2.9 7 2.9s7-1.3 7-2.9V6.8"/><path d="M5 11.4V16c0 1.6 3.1 2.9 7 2.9s7-1.3 7-2.9v-4.6"/>',
+  coins: '<circle cx="9.4" cy="9.4" r="5.6"/><path d="M14.6 6.1a5.6 5.6 0 0 1 0 11.1 5.6 5.6 0 0 1-3.2-1"/><path d="M9.4 7.1v4.6"/><path d="M7.6 8.2h2.6a1.3 1.3 0 0 1 0 2.6H8.4"/>',
+  scale: '<path d="M12 4.2v15.6"/><path d="M6.4 6.6h11.2"/><path d="M8.6 6.9 5.4 13h6.4z"/><path d="M15.4 6.9 12.2 13h6.4z"/><path d="M8.4 19.8h7.2"/>',
+  percent: '<circle cx="8.2" cy="8.2" r="2.6"/><circle cx="15.8" cy="15.8" r="2.6"/><path d="M18.4 5.6 5.6 18.4"/>',
   bolt: '<path d="M13.2 3 5.6 14h5.6l-1 7 7.6-11h-5.6z"/>',
   clock: '<circle cx="12" cy="12" r="8.6"/><path d="M12 7.2V12l3.4 2"/>',
   pie: '<path d="M12 3.4a8.6 8.6 0 1 0 8.6 8.6H12z"/><path d="M14.6 2.2a8.6 8.6 0 0 1 7.2 7.2h-7.2z"/>',
@@ -549,6 +561,13 @@ function spendByCat(mk) {
   return m;
 }
 const budgetTotal = () => state.categories.reduce((s, c) => s + (+c.limit || 0), 0);
+function savingCapacity() {
+  const inc = +state.settings.income || 0;
+  if (inc <= 0) return 0;
+  const bt = budgetTotal();
+  const spend = bt > 0 ? bt : totalsOf(mkShift(thisMK(), -1)).exp;
+  return Math.max(0, inc - spend);
+}
 function monthClock(mk) {
   const dim = daysIn(mk), cur = thisMK();
   if (mk < cur) return { dim: dim, day: dim, left: 0, past: true, future: false };
@@ -569,23 +588,53 @@ function projected(mk) {
   if (ck.day < 1) return exp;
   return exp / ck.day * ck.dim;
 }
+/* goal.mode: "deadline" = لحد تاريخ | "monthly" = مبلغ ثابت | "percent" = نسبة من الدخل */
+function goalMode(g) { return g.mode || (g.deadline ? "deadline" : "monthly"); }
 function goalStatus(g) {
-  const today = todayISO();
-  const left = Math.max(0, (+g.target || 0) - (+g.saved || 0));
-  const mLeft = g.deadline ? Math.max(0, monthsBetween(today, g.deadline)) : 0;
-  const dLeft = g.deadline ? Math.max(0, daysBetween(today, g.deadline)) : 0;
-  const need = g.deadline ? (mLeft > 0 ? left / mLeft : left) : (+g.monthly || 0);
-  const pct = g.target > 0 ? clamp((g.saved || 0) / g.target * 100, 0, 100) : 0;
-  let expected = 0;
-  if (g.deadline && g.startedAt) {
+  const today = todayISO(), mode = goalMode(g);
+  const target = +g.target || 0, saved = +g.saved || 0;
+  const left = Math.max(0, target - saved);
+  const inc = +state.settings.income || 0;
+
+  let need = 0, deadline = g.deadline || "", etaMonths = 0;
+  if (mode === "percent") need = inc * (+g.pct || 0) / 100;
+  else if (mode === "monthly") need = +g.monthly || 0;
+
+  if (mode === "deadline") {
+    const m = deadline ? Math.max(0, monthsBetween(today, deadline)) : 0;
+    need = m > 0 ? left / m : left;
+    etaMonths = m;
+  } else {
+    etaMonths = need > 0 ? Math.ceil(left / need) : 0;
+    deadline = need > 0 && left > 0 ? mkShift(thisMK(), etaMonths) + "-01" : "";
+  }
+
+  const mLeft = deadline ? Math.max(0, monthsBetween(today, deadline)) : etaMonths;
+  const dLeft = deadline ? Math.max(0, daysBetween(today, deadline)) : 0;
+  const pct = target > 0 ? clamp(saved / target * 100, 0, 100) : 0;
+
+  let expected = 0, gap = 0;
+  if (mode === "deadline" && g.deadline && g.startedAt) {
     const totalD = Math.max(1, daysBetween(g.startedAt, g.deadline));
     const goneD = clamp(daysBetween(g.startedAt, today), 0, totalD);
-    expected = (+g.target || 0) * goneD / totalD;
+    expected = target * goneD / totalD;
+    gap = saved - expected;
+  } else if (g.startedAt) {
+    const monthsGone = Math.max(0, monthsBetween(g.startedAt, today));
+    expected = Math.min(target, need * monthsGone);
+    gap = saved - expected;
   }
-  const gap = (g.saved || 0) - expected;
   const done = left <= 0;
-  return { left: left, mLeft: mLeft, dLeft: dLeft, need: need, perDay: dLeft > 0 ? left / dLeft : 0, pct: pct, expected: expected, gap: gap, done: done, late: !done && g.deadline && dLeft === 0 };
+  return {
+    mode: mode, left: left, mLeft: mLeft, dLeft: dLeft, need: need,
+    perDay: dLeft > 0 ? left / dLeft : (need > 0 ? need / 30 : 0),
+    pct: pct, expected: expected, gap: gap, done: done,
+    eta: etaMonths, etaDate: deadline,
+    stuck: !done && need <= 0,
+    late: !done && mode === "deadline" && !!g.deadline && dLeft === 0
+  };
 }
+function goalsMonthlyTotal() { return state.goals.reduce((s, g) => { const st = goalStatus(g); return s + (st.done ? 0 : st.need); }, 0); }
 
 /* ---------- insights engine ---------- */
 function insights(mk) {
@@ -650,8 +699,19 @@ function insights(mk) {
     const st = goalStatus(g);
     if (st.done) { push("good", "خلصت هدف « " + g.name + " »", "وصلت لـ " + money2(g.target) + ". مبروك — تقدر تقفل الهدف أو تزوّد المبلغ.", "check"); return; }
     if (st.late) { push("crit", "معاد « " + g.name + " » عدى", "لسه ناقص " + money2(st.left) + ". غيّر المعاد أو زوّد المبلغ الشهري.", "alert"); return; }
-    if (st.gap < -1 && g.deadline) push("warn", "متأخر في « " + g.name + " »", "المفروض يكون معاك " + money2(st.expected) + " دلوقتي، ومعاك " + money2(g.saved || 0) + ". حوّش " + money2(st.need) + " الشهر ده عشان تلحق.", "flag");
+    if (st.stuck) { push("warn", "هدف « " + g.name + " » من غير خطة", "ناقصك " + money2(st.left) + " ومفيش مبلغ شهري محدد. افتح الهدف وحدّد مبلغ أو نسبة من دخلك.", "flag"); return; }
+    if (st.gap < -1) push("warn", "متأخر في « " + g.name + " »", "المفروض يكون معاك " + money2(st.expected) + " دلوقتي، ومعاك " + money2(g.saved || 0) + ". حوّش " + money2(st.need) + " الشهر ده عشان تلحق.", "flag");
   });
+
+  // goals vs capacity
+  const gNeed = goalsMonthlyTotal();
+  if (gNeed > 0) {
+    const cap = savingCapacity();
+    if (gNeed > cap * 1.02)
+      push("crit", "أهدافك أكبر من قدرتك على الادخار", "أهدافك محتاجة " + money2(gNeed) + " كل شهر، وقدرتك الحالية " + money2(cap) + ". قلّل حدود الصرف بـ " + money2(gNeed - cap) + " أو مدّ معاد هدف منهم.", "scale");
+    else if (cap > 0)
+      push("good", "أهدافك في حدود قدرتك", "محتاج " + money2(gNeed) + " شهرياً وقدرتك " + money2(cap) + " — فاضل " + money2(cap - gNeed) + ".", "check");
+  }
 
   // 8. biggest single expense
   const mt = txOfMonth(mk).filter(t => t.type === "expense").sort((a, b) => b.amount - a.amount)[0];
@@ -785,7 +845,7 @@ function sparkMonth(mk) {
   const last = pts[pts.length - 1];
   let bl = "";
   if (bt > 0) bl = '<line x1="' + pL + '" x2="' + (W - pR) + '" y1="' + Y(bt).toFixed(1) + '" y2="' + Y(bt).toFixed(1) + '" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>' +
-    '<text x="' + (W - pR) + '" y="' + (Y(bt) - 6).toFixed(1) + '" text-anchor="end" fill="var(--muted)" style="font:500 10.5px var(--ff-body)">الميزانية ' + nf(bt, 0) + "</text>";
+    '<text x="' + pL + '" y="' + (Y(bt) - 7).toFixed(1) + '" text-anchor="start" fill="var(--muted)" style="font:500 11px var(--ff-body)" direction="ltr">' + nf(bt, 0) + "</text>";
   return '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="تراكم الصرف خلال الشهر">' +
     '<defs><linearGradient id="gspark" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".28"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>' +
     '<path d="' + area + '" fill="url(#gspark)"/>' +
@@ -820,13 +880,13 @@ function viewHome() {
   const mk = state.ui.mk, T = totalsOf(mk), B = balanceNow(), ck = monthClock(mk), al = allowance(mk), bt = budgetTotal();
   const ins = insights(mk);
   let h = "";
-  const greet = state.settings.name ? "أهلاً " + esc(state.settings.name) : "رصيدك دلوقتي";
-  h += '<div class="hero"><div class="cap">' + greet + '</div><div class="big">' + nf(B.total) + ' <span class="cur">' + esc(state.settings.currency) + "</span></div>" +
-    '<div class="split"><div class="qt"><div class="k">متاح للصرف</div><div class="v">' + nf(B.free) + '</div></div><div class="qt"><div class="k">محجوز للأهداف</div><div class="v">' + nf(B.locked) + "</div></div></div></div>";
+  const greet = state.settings.name ? "أهلاً " + esc(state.settings.name) + " — معاك دلوقتي" : "معاك دلوقتي";
+  h += '<button class="hero" data-act="editBalance"><div class="cap">' + greet + ico("edit", "heroedit") + '</div><div class="big">' + nf(B.total) + ' <span class="cur">' + esc(state.settings.currency) + "</span></div>" +
+    '<div class="split"><div class="qt"><div class="k">متاح للصرف</div><div class="v">' + nf(B.free) + '</div></div><div class="qt"><div class="k">محجوز للأهداف</div><div class="v">' + nf(B.locked) + "</div></div></div></button>";
 
-  h += '<div class="tiles" style="margin-top:14px"><div class="tile"><div class="k">' + ico("up") + 'دخل الشهر</div><div class="v up">' + nf(T.inc) + '</div></div>' +
-    '<div class="tile"><div class="k">' + ico("down") + 'مصروف الشهر</div><div class="v down">' + nf(T.exp) + '</div></div>' +
-    '<div class="tile"><div class="k">' + ico("coins") + 'الفرق</div><div class="v ' + (T.net >= 0 ? "up" : "down") + '">' + nf(T.net) + "</div></div></div>";
+  h += '<div class="tiles" style="margin-top:14px"><div class="tile"><div class="k">' + ico("up") + '<span>دخل الشهر</span></div><div class="v up">' + nf(T.inc) + '</div></div>' +
+    '<div class="tile"><div class="k">' + ico("down") + '<span>مصروف الشهر</span></div><div class="v down">' + nf(T.exp) + '</div></div>' +
+    '<div class="tile"><div class="k">' + ico("coins") + '<span>الفرق</span></div><div class="v ' + (T.net >= 0 ? "up" : "down") + '">' + nf(T.net) + "</div></div></div>";
 
   if (al && !ck.past && !ck.future) {
     h += '<div style="margin-top:12px"><div class="allow"><div class="ic">' + ico(al.over ? "alert" : "clock") + "</div><div><div class=\"v\">" +
@@ -898,7 +958,7 @@ function viewTx() {
   h += '<div class="card list">';
   Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(d => {
     const day = groups[d], net = day.reduce((s, t) => s + (t.type === "income" ? t.amount : -t.amount), 0);
-    h += '<div class="daygroup"><span>' + dayLabel(d) + '</span><span class="tot">' + (net >= 0 ? "+" : "−") + nf(Math.abs(net)) + "</span></div>" + day.map(txRow).join("");
+    h += '<div class="daygroup"><span>' + dayLabel(d) + '</span><span class="tot"><span class="num">' + (net >= 0 ? "+" : "−") + nf(Math.abs(net)) + "</span></span></div>" + day.map(txRow).join("");
   });
   return h + "</div>";
 }
@@ -929,7 +989,7 @@ function viewBudget() {
     else badge = pill("good", "تمام");
     return '<button class="bud" style="display:block;width:100%;text-align:right;background:transparent;border-inline:0;border-top:0;cursor:pointer" data-act="editCat" data-id="' + c.id + '">' +
       '<div class="hd">' + catDot(c, 34) + '<span class="nm">' + esc(c.name) + "</span>" + badge +
-      '<span class="rt"><b>' + nf(sp) + "</b>" + (lim > 0 ? " / " + nf(lim) : "") + "</span></div>" +
+      '<span class="rt"><b>' + nf(sp) + "</b><small>" + (lim > 0 ? "الحد " + nf(lim) : "من غير حد") + "</small></span></div>" +
       (lim > 0 ? '<div class="bar thin"><i class="' + progClass(p) + '" style="width:' + clamp(p, 0, 100) + '%"></i></div>' +
         '<div class="ft"><span>' + (sp > lim ? "عديت الحد" : "فاضل " + nf(lim - sp)) + "</span><span>" + (pr ? "متوقع " + nf(pr) : "") + "</span></div>"
         : '<div class="ft" style="margin-top:0"><span>اتصرف ' + nf(sp) + " الشهر ده — حدّد حد عشان نقدر ننبهك</span></div>") + "</button>";
@@ -937,35 +997,46 @@ function viewBudget() {
   return h;
 }
 
+const MODE_LABEL = { deadline: "لحد معاد", monthly: "مبلغ شهري", percent: "نسبة من الدخل" };
 function viewGoals() {
   const B = balanceNow(), inc = +state.settings.income || 0, bt = budgetTotal();
-  const cap = inc > 0 ? inc - (bt > 0 ? bt : totalsOf(mkShift(thisMK(), -1)).exp) : 0;
+  const cap = savingCapacity(), need = goalsMonthlyTotal();
+  const pctOfInc = inc > 0 ? cap / inc * 100 : 0;
   let h = '<div class="card pad">' +
     '<div class="lbl">قدرتك على الادخار شهرياً</div>' +
-    '<div style="font-family:var(--ff-display);font-weight:700;font-size:24px;letter-spacing:-.02em;color:' + (cap > 0 ? "var(--up)" : "var(--ink)") + '">' + nf(Math.max(0, cap)) + ' <span style="font-size:14px;font-weight:500;color:var(--muted)">' + esc(state.settings.currency) + "</span></div>" +
-    '<p class="sub" style="margin:7px 0 0">' + (inc > 0 ? "الحساب: دخلك الشهري (" + nf(inc) + ") ناقص " + (bt > 0 ? "إجمالي حدود الصرف (" + nf(bt) + ")" : "مصاريف الشهر اللي فات (" + nf(totalsOf(mkShift(thisMK(), -1)).exp) + ")") + "."
-      : "حدّد دخلك الشهري في الإعدادات عشان نحسبلك قد إيه تقدر تحوّش.") + "</p>" +
-    '<div class="btnrow" style="margin-top:13px"><button class="btn pri" data-act="newGoal">' + ico("plus") + "هدف ادخار جديد</button></div></div>";
+    '<div class="row" style="align-items:baseline;gap:8px"><div style="font-family:var(--ff-display);font-weight:700;font-size:26px;letter-spacing:-.02em;color:' + (cap > 0 ? "var(--up)" : "var(--ink)") + '">' + nf(cap) + '</div><span style="font-size:14px;font-weight:500;color:var(--muted)">' + esc(state.settings.currency) + "</span>" +
+    (inc > 0 ? '<span style="margin-inline-start:auto">' + pill(pctOfInc >= (+state.settings.savePct || 0) ? "good" : "warn", Math.round(pctOfInc) + "% من دخلك") + "</span>" : "") + "</div>" +
+    '<p class="sub" style="margin:8px 0 0">' + (inc > 0 ? "دخلك الشهري " + nf(inc) + " ناقص " + (bt > 0 ? "إجمالي حدود الصرف " + nf(bt) : "مصاريف الشهر اللي فات " + nf(totalsOf(mkShift(thisMK(), -1)).exp)) + "."
+      : "حدّد دخلك الشهري في الإعدادات عشان نحسبلك قد إيه تقدر تحوّش.") + "</p>";
+  if (need > 0) {
+    const okCap = need <= cap * 1.02;
+    h += '<hr class="sep" style="margin:13px 0"><div class="ftrow"><span>أهدافك محتاجة شهرياً</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(need) + "</b></div>" +
+      '<div class="bar" style="margin-top:9px"><i class="' + (okCap ? "ok" : "over") + '" style="width:' + clamp(cap > 0 ? need / cap * 100 : 100, 0, 100) + '%"></i></div>' +
+      '<p class="sub" style="margin:8px 0 0">' + (okCap ? "في حدود قدرتك — فاضل " + money2(Math.max(0, cap - need)) + " كل شهر." : "أكتر من قدرتك بـ " + money2(need - cap) + ". قلّل حدود الصرف أو مدّ معاد هدف.") + "</p>";
+  }
+  h += '<div class="btnrow" style="margin-top:14px"><button class="btn pri block" data-act="newGoal">' + ico("plus") + "هدف ادخار جديد</button></div></div>";
 
   if (!state.goals.length) {
-    return h + '<div class="card" style="margin-top:14px"><div class="empty"><div class="eic">' + ico("tabTarget") + "</div><h4>ابدأ أول خطة ادخار</h4><p>اكتب المبلغ اللي عايز توصله والمعاد، والتطبيق هيحسبلك المبلغ الشهري واليومي المطلوب، ويقولك إنت في السكة ولا متأخر.</p></div></div>";
+    return h + '<div class="card" style="margin-top:14px"><div class="empty"><div class="eic">' + ico("tabTarget") + "</div><h4>ابدأ أول خطة ادخار</h4>" +
+      "<p>تقدر تحوّش بتلات طرق: <b>مبلغ ثابت</b> كل شهر، أو <b>نسبة من دخلك</b>، أو تحدّد <b>معاد</b> والتطبيق يحسب المبلغ المطلوب لوحده.</p></div></div>";
   }
   h += '<h2 class="sec">أهدافك<span class="hint">محجوز من رصيدك: ' + nf(B.locked) + "</span></h2><div class=\"card\">";
   h += state.goals.map(g => {
-    const st = goalStatus(g);
-    const col = st.done ? "var(--good)" : st.late ? "var(--crit)" : st.gap < -1 ? "var(--warn)" : "var(--accent)";
+    const st = goalStatus(g), cur = esc(state.settings.currency);
+    const col = st.done ? "var(--good)" : st.late || st.stuck ? "var(--crit)" : st.gap < -1 ? "var(--warn)" : "var(--accent)";
     let plan;
     if (st.done) plan = "وصلت للهدف بالكامل. تقدر تصرفه أو تزوّد المبلغ المستهدف.";
-    else if (g.deadline && st.mLeft > 0) plan = "عشان توصل لـ <b>" + nf(g.target) + "</b> قبل " + fmtDate(g.deadline) + "، لازم تحوّش <b>" + nf(st.need) + " " + esc(state.settings.currency) + "</b> كل شهر — يعني حوالي <b>" + nf(st.perDay) + "</b> في اليوم على مدار " + st.dLeft + " يوم.";
-    else if (g.deadline) plan = "فاضل " + st.dLeft + " يوم وناقصك <b>" + nf(st.left) + "</b> — يعني <b>" + nf(st.perDay) + "</b> في اليوم.";
-    else plan = "ناقصك <b>" + nf(st.left) + "</b>. بمبلغ <b>" + nf(g.monthly || 0) + "</b> شهرياً هتوصل خلال <b>" + (g.monthly > 0 ? Math.ceil(st.left / g.monthly) : "؟") + "</b> شهر.";
-    let badge = st.done ? pill("good", "خلص") : st.late ? pill("crit", "المعاد عدى") : st.gap < -1 ? pill("warn", "متأخر " + nf(-st.gap)) : pill("good", "في السكة");
+    else if (st.stuck) plan = "ناقصك <b>" + nf(st.left) + "</b> بس مفيش مبلغ شهري محدد. دوس « عدّل » وحدّد مبلغ أو نسبة.";
+    else if (st.mode === "deadline") plan = "عشان توصل لـ <b>" + nf(g.target) + "</b> قبل " + fmtDate(g.deadline) + "، حوّش <b>" + nf(st.need) + " " + cur + "</b> كل شهر — حوالي <b>" + nf(st.perDay) + "</b> في اليوم على مدار " + nf(st.dLeft) + " يوم.";
+    else if (st.mode === "percent") plan = "بتحوّش <b>" + nf(g.pct) + "%</b> من دخلك = <b>" + nf(st.need) + " " + cur + "</b> كل شهر. ناقصك " + nf(st.left) + "، يعني هتوصل خلال <b>" + nf(st.eta) + "</b> شهر — حوالي " + fmtDate(st.etaDate) + ".";
+    else plan = "بتحوّش <b>" + nf(st.need) + " " + cur + "</b> كل شهر. ناقصك " + nf(st.left) + "، يعني هتوصل خلال <b>" + nf(st.eta) + "</b> شهر — حوالي " + fmtDate(st.etaDate) + ".";
+    const badge = st.done ? pill("good", "خلص") : st.late ? pill("crit", "المعاد عدى") : st.stuck ? pill("crit", "محتاج خطة") : st.gap < -1 ? pill("warn", "متأخر " + nf(-st.gap)) : pill("good", "في السكة");
     return '<div class="goal"><div class="ringwrap">' + ring(st.pct, col) +
       '<div style="flex:1;min-width:0"><div class="gname">' + esc(g.name) + "</div>" +
-      '<div class="gmeta">' + nf(g.saved || 0) + " من " + nf(g.target) + " " + esc(state.settings.currency) + (g.deadline ? " · " + fmtDate(g.deadline) : "") + "</div>" +
-      '<div style="margin-top:6px">' + badge + "</div></div></div>" +
+      '<div class="gmeta">' + nf(g.saved || 0) + " من " + nf(g.target) + " " + cur + "</div>" +
+      '<div class="chips" style="margin-top:7px">' + badge + pill("flat", MODE_LABEL[st.mode] + (st.mode === "percent" ? " " + nf(g.pct) + "%" : "")) + "</div></div></div>" +
       '<div class="plan">' + plan + "</div>" +
-      '<div class="btnrow" style="margin-top:10px"><button class="btn pri" data-act="contrib" data-id="' + g.id + '">' + ico("plus") + 'ضيف مبلغ</button>' +
+      '<div class="btnrow" style="margin-top:10px"><button class="btn pri" style="flex:1" data-act="contrib" data-id="' + g.id + '">' + ico("plus") + 'ضيف مبلغ</button>' +
       '<button class="btn" data-act="editGoal" data-id="' + g.id + '">' + ico("edit") + "عدّل</button></div></div>";
   }).join("") + "</div>";
   return h;
@@ -987,9 +1058,9 @@ function viewStats() {
   const big = list.slice().sort((a, b) => b.amount - a.amount)[0];
   const divDays = ck.past ? ck.dim : Math.max(1, ck.day);
   h += '<h2 class="sec">أرقام سريعة</h2><div class="tiles">' +
-    '<div class="tile"><div class="k">' + ico("clock") + 'متوسط اليوم</div><div class="v">' + nf(T.exp / divDays) + "</div></div>" +
-    '<div class="tile"><div class="k">' + ico("tabList") + 'عدد الحركات</div><div class="v">' + list.length + "</div></div>" +
-    '<div class="tile"><div class="k">' + ico("tUp") + 'أعلى يوم</div><div class="v">' + (topDay ? nf(topDay[1]) : "0") + "</div></div></div>";
+    '<div class="tile"><div class="k">' + ico("clock") + '<span>متوسط اليوم</span></div><div class="v">' + nf(T.exp / divDays) + "</div></div>" +
+    '<div class="tile"><div class="k">' + ico("tabList") + '<span>عدد الحركات</span></div><div class="v">' + list.length + "</div></div>" +
+    '<div class="tile"><div class="k">' + ico("tUp") + '<span>أعلى يوم</span></div><div class="v">' + (topDay ? nf(topDay[1]) : "0") + "</div></div></div>";
   if (topDay || big) h += '<p class="sub" style="margin:9px 2px 0">' +
     (topDay ? "أعلى يوم صرف كان " + dayLabel(topDay[0]) + " بمبلغ " + money2(topDay[1]) + ". " : "") +
     (big ? "أكبر حركة: " + money2(big.amount) + " في " + esc(catById(big.catId).name) + "." : "") + "</p>";
@@ -1003,7 +1074,7 @@ function viewStats() {
     h += '<h2 class="sec">مقارنة بـ ' + mkLabel(mkShift(mk, -1)) + "</h2><div class=\"card list\">" + mov.map(m =>
       '<div class="item" style="cursor:default">' + catDot(m.c, 34) +
       '<span style="flex:1"><span class="nm">' + esc(m.c.name) + '</span><span class="mt" style="display:block">' + nf(m.b) + " ← " + nf(m.a) + "</span></span>" +
-      '<span class="amt" style="color:' + (m.d > 0 ? "var(--down)" : "var(--up)") + '">' + (m.d > 0 ? "+" : "−") + nf(Math.abs(m.d)) + "</span></div>").join("") + "</div>";
+      '<span class="amt" style="color:' + (m.d > 0 ? "var(--down)" : "var(--up)") + '"><span class="num">' + (m.d > 0 ? "+" : "−") + nf(Math.abs(m.d)) + "</span></span></div>").join("") + "</div>";
   }
   h += '<div id="aiSlot"></div>';
   return h;
@@ -1099,9 +1170,9 @@ function sheetTx(id) {
     '<div class="segs" style="margin-bottom:14px">' +
     '<button data-act="txType" data-v="expense" aria-pressed="' + (type === "expense") + '">مصروف</button>' +
     '<button data-act="txType" data-v="income" aria-pressed="' + (type === "income") + '">دخل</button></div>' +
-    '<div class="field"><label for="txAmt">المبلغ</label><input class="inp" id="txAmt" type="number" inputmode="decimal" step="0.01" value="' + (t ? t.amount : "") + '" placeholder="0"></div>' +
+    '<div class="field"><label for="txAmt">المبلغ</label><input class="inp big" id="txAmt" type="number" inputmode="decimal" step="0.01" value="' + (t ? t.amount : "") + '" placeholder="0"></div>' +
     '<div class="keypad" style="margin:-6px 0 14px">' + [10, 25, 50, 100, 200, 500, 1000, "مسح"].map(v =>
-      '<button data-act="quick" data-v="' + v + '">' + (v === "مسح" ? "مسح" : "+" + v) + "</button>").join("") + "</div>" +
+      '<button data-act="quick" data-v="' + v + '">' + (v === "مسح" ? "مسح" : '<span class="num">+' + v + "</span>") + "</button>").join("") + "</div>" +
     '<div class="field"><label>البند</label><div class="chips" id="txCats"></div></div>' +
     '<div class="field"><label for="txDate">التاريخ</label><input class="inp" id="txDate" type="date" value="' + (t ? t.date : todayISO()) + '" max="' + todayISO() + '"></div>' +
     '<div class="field"><label for="txNote">ملاحظة (اختياري)</label><input class="inp" id="txNote" value="' + esc(t ? t.note || "" : "") + '" placeholder="مثلاً: أكل الشغل"></div>' +
@@ -1144,16 +1215,67 @@ function repaintPick(boxId, val) { const b = el(boxId); if (!b) return; b.queryS
 
 function sheetGoal(id) {
   const g = id ? state.goals.find(x => x.id === id) : null;
+  const mode = g ? goalMode(g) : "monthly";
+  const modes = [["monthly", "مبلغ شهري"], ["percent", "نسبة %"], ["deadline", "لحد معاد"]];
   const body =
     '<div class="field"><label for="gName">اسم الهدف</label><input class="inp" id="gName" value="' + esc(g ? g.name : "") + '" placeholder="مثلاً: لابتوب جديد"></div>' +
-    '<div class="field"><label for="gTarget">المبلغ المستهدف</label><input class="inp" id="gTarget" type="number" inputmode="decimal" value="' + (g ? g.target : "") + '" placeholder="0"></div>' +
+    '<div class="field"><label for="gTarget">المبلغ المستهدف</label><input class="inp big" id="gTarget" type="number" inputmode="decimal" value="' + (g ? g.target : "") + '" placeholder="0"></div>' +
     '<div class="field"><label for="gSaved">معاك منه كام دلوقتي؟</label><input class="inp" id="gSaved" type="number" inputmode="decimal" value="' + (g ? g.saved || 0 : 0) + '"></div>' +
-    '<div class="field"><label for="gDate">عايز توصله إمتى؟ (اختياري)</label><input class="inp" id="gDate" type="date" value="' + (g && g.deadline ? g.deadline : "") + '" min="' + todayISO() + '"></div>' +
-    '<div class="field"><label for="gMonthly">أو حدّد مبلغ شهري ثابت</label><input class="inp" id="gMonthly" type="number" inputmode="decimal" value="' + (g ? g.monthly || 0 : 0) + '"></div>' +
-    '<p class="sub" style="margin:-4px 0 14px">لو حطيت معاد، هنحسب المبلغ الشهري لوحدنا ونقولك إنت في السكة ولا لأ.</p>' +
+    '<div class="field"><label>هتحوّش إزاي؟</label><div class="segs">' +
+    modes.map(m => '<button data-act="goalMode" data-v="' + m[0] + '" aria-pressed="' + (mode === m[0]) + '">' + m[1] + "</button>").join("") + "</div></div>" +
+    '<div class="field" id="fMonthly"><label for="gMonthly">المبلغ الشهري</label><input class="inp" id="gMonthly" type="number" inputmode="decimal" value="' + (g ? g.monthly || 0 : 0) + '" placeholder="0"></div>' +
+    '<div class="field" id="fPercent"><label for="gPct">نسبة من دخلك الشهري %</label><input class="inp" id="gPct" type="number" inputmode="decimal" min="1" max="90" value="' + (g && g.pct ? g.pct : 10) + '">' +
+    '<div class="chips" style="margin-top:8px">' + [5, 10, 15, 20, 25, 30].map(v => '<button class="chip" data-act="pctQuick" data-v="' + v + '"><span class="num">' + v + "%</span></button>").join("") + "</div></div>" +
+    '<div class="field" id="fDeadline"><label for="gDate">عايز توصله إمتى؟</label><input class="inp" id="gDate" type="date" value="' + (g && g.deadline ? g.deadline : "") + '" min="' + todayISO() + '"></div>' +
+    '<div class="card pad" id="gPreview" style="margin-bottom:14px"></div>' +
     '<div class="btnrow"><button class="btn pri" style="flex:1" data-act="saveGoal" data-id="' + (id || "") + '">' + ico("check") + "حفظ الخطة</button>" +
     (id ? '<button class="btn danger" data-act="delGoal" data-id="' + id + '">' + ico("trash") + "حذف</button>" : "") + "</div>";
-  openSheet(g ? "تعديل الخطة" : "خطة ادخار جديدة", body);
+  openSheet(g ? "تعديل الخطة" : "خطة ادخار جديدة", body, () => {
+    el("sheet").dataset.gmode = mode;
+    paintGoalMode();
+    ["gTarget", "gSaved", "gMonthly", "gPct", "gDate"].forEach(k => { const n = el(k); if (n) n.addEventListener("input", goalPreview); });
+  });
+}
+function paintGoalMode() {
+  const sh = el("sheet"), m = sh.dataset.gmode;
+  sh.querySelectorAll('[data-act="goalMode"]').forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === m)));
+  el("fMonthly").hidden = m !== "monthly";
+  el("fPercent").hidden = m !== "percent";
+  el("fDeadline").hidden = m !== "deadline";
+  goalPreview();
+}
+function goalPreview() {
+  const box = el("gPreview"); if (!box) return;
+  const sh = el("sheet"), m = sh.dataset.gmode, cur = esc(state.settings.currency);
+  const draft = {
+    mode: m, target: parseFloat(el("gTarget").value) || 0, saved: parseFloat(el("gSaved").value) || 0,
+    monthly: parseFloat(el("gMonthly").value) || 0, pct: parseFloat(el("gPct").value) || 0,
+    deadline: el("gDate").value || "", startedAt: todayISO()
+  };
+  if (!(draft.target > 0)) { box.innerHTML = '<p class="sub" style="margin:0">اكتب المبلغ المستهدف وهنحسبلك الخطة على طول.</p>'; return; }
+  const st = goalStatus(draft), inc = +state.settings.income || 0, cap = savingCapacity();
+  const rows = [];
+  if (m === "percent" && inc <= 0) { box.innerHTML = '<p class="sub" style="margin:0">حدّد دخلك الشهري في الإعدادات الأول عشان نقدر نحسب النسبة.</p>'; return; }
+  if (st.need <= 0) { box.innerHTML = '<p class="sub" style="margin:0">حدّد المبلغ أو النسبة أو المعاد عشان نحسب الخطة.</p>'; return; }
+  rows.push(["هتحوّش كل شهر", nf(st.need) + " " + cur]);
+  rows.push(["يعني في اليوم", nf(st.need / 30) + " " + cur]);
+  if (m === "deadline") rows.push(["فاضل", nf(st.mLeft) + " شهر"]);
+  else rows.push(["هتوصل خلال", nf(st.eta) + " شهر" + (st.etaDate ? " — " + fmtDate(st.etaDate) : "")]);
+  if (m === "percent") rows.push(["النسبة من دخلك", nf(draft.pct) + "% من " + nf(inc)]);
+  box.innerHTML = rows.map((r, i) =>
+    '<div class="ftrow" style="padding:6px 0' + (i < rows.length - 1 ? ";border-bottom:1px solid var(--line)" : "") + '"><span>' + r[0] + '</span><span style="color:var(--ink);font-weight:600;font-family:var(--ff-display)">' + r[1] + "</span></div>").join("") +
+    (cap > 0 && st.need > cap ? '<div style="margin-top:10px">' + pill("warn", "أكتر من قدرتك (" + nf(cap) + ") بـ " + nf(st.need - cap)) + "</div>" : "");
+}
+function sheetBalance() {
+  const B = balanceNow(), net = B.total - (+state.settings.startBalance || 0);
+  openSheet("معاك كام دلوقتي؟",
+    '<p class="sub" style="margin:0 0 14px">اكتب اللي معاك فعلاً دلوقتي (كاش + بنك + محفظة). التطبيق هيظبط الرصيد على الرقم ده من غير ما يلمس حركاتك.</p>' +
+    '<div class="field"><label for="balAmt">الرصيد الحالي</label><input class="inp big" id="balAmt" type="number" inputmode="decimal" value="' + Math.round(B.total * 100) / 100 + '"></div>' +
+    '<div class="card pad" style="margin-bottom:14px">' +
+    '<div class="ftrow" style="padding:5px 0;border-bottom:1px solid var(--line)"><span>محسوب من حركاتك</span><span style="color:var(--ink);font-weight:600"><span class="num">' + (net >= 0 ? "+" : "−") + nf(Math.abs(net)) + "</span></span></div>" +
+    '<div class="ftrow" style="padding:5px 0"><span>محجوز لأهداف الادخار</span><span style="color:var(--ink);font-weight:600">' + nf(B.locked) + "</span></div></div>" +
+    '<button class="btn pri block" data-act="saveBalance">' + ico("check") + "ظبّط الرصيد</button>",
+    () => setTimeout(() => { const a = el("balAmt"); if (a) { a.focus(); a.select(); } }, 60));
 }
 function sheetContrib(id) {
   const g = state.goals.find(x => x.id === id); if (!g) return;
@@ -1460,18 +1582,36 @@ document.addEventListener("click", (ev) => {
     case "suggest": suggestLimits(); break;
     case "newGoal": sheetGoal(); break;
     case "editGoal": sheetGoal(id); break;
+    case "goalMode": sh.dataset.gmode = v; paintGoalMode(); break;
+    case "pctQuick": { const n = el("gPct"); if (n) { n.value = v; goalPreview(); } break; }
     case "saveGoal": {
       const name = el("gName").value.trim(); if (!name) return toast("اكتب اسم الهدف");
       const target = parseFloat(el("gTarget").value) || 0; if (!(target > 0)) return toast("اكتب المبلغ المستهدف");
       const saved = Math.max(0, parseFloat(el("gSaved").value) || 0);
-      const deadline = el("gDate").value || "";
-      const monthly = Math.max(0, parseFloat(el("gMonthly").value) || 0);
-      if (id) { const g = state.goals.find(x => x.id === id); Object.assign(g, { name: name, target: target, saved: saved, deadline: deadline, monthly: monthly }); }
-      else state.goals.push({ id: uid("g"), name: name, target: target, saved: saved, deadline: deadline, monthly: monthly, startedAt: todayISO() });
+      const m = sh.dataset.gmode || "monthly";
+      const deadline = m === "deadline" ? (el("gDate").value || "") : "";
+      const monthly = m === "monthly" ? Math.max(0, parseFloat(el("gMonthly").value) || 0) : 0;
+      const pct = m === "percent" ? clamp(parseFloat(el("gPct").value) || 0, 0, 90) : 0;
+      if (m === "deadline" && !deadline) return toast("اختار المعاد اللي عايز توصل فيه");
+      if (m === "monthly" && !(monthly > 0)) return toast("اكتب المبلغ اللي هتحوّشه كل شهر");
+      if (m === "percent" && !(pct > 0)) return toast("اختار نسبة من دخلك");
+      if (m === "percent" && !(+state.settings.income > 0)) return toast("حدّد دخلك الشهري في الإعدادات الأول");
+      const data = { name: name, target: target, saved: saved, mode: m, deadline: deadline, monthly: monthly, pct: pct };
+      if (id) { const g = state.goals.find(x => x.id === id); Object.assign(g, data); }
+      else state.goals.push(Object.assign({ id: uid("g"), startedAt: todayISO() }, data));
       save("goals"); closeSheet(); render(); toast("الخطة اتحفظت");
       break;
     }
     case "delGoal": state.goals = state.goals.filter(g => g.id !== id); save("goals"); closeSheet(); render(); toast("اتمسح الهدف"); break;
+    case "editBalance": sheetBalance(); break;
+    case "saveBalance": {
+      const want = parseFloat(el("balAmt").value);
+      if (isNaN(want)) return toast("اكتب رقم");
+      const net = state.txs.reduce((s, t) => s + (t.type === "income" ? t.amount : -t.amount), 0);
+      state.settings.startBalance = want - net;
+      save("settings"); closeSheet(); render(); toast("الرصيد بقى " + money2(want));
+      break;
+    }
     case "contrib": sheetContrib(id); break;
     case "doContrib": {
       const amt = parseFloat(el("ctAmt").value); if (!(amt > 0)) return toast("اكتب مبلغ");
@@ -1547,6 +1687,8 @@ async function doReset() {
 /* ---------- boot ---------- */
 document.documentElement.setAttribute("dir", "rtl");
 document.documentElement.setAttribute("lang", "ar");
+el("fab").innerHTML = ico("plus");
+el("btnSettings").innerHTML = ico("gear");
 readLocal();
 render();
 connect();
