@@ -1,5 +1,5 @@
 /* مصروفي — service worker: يخلي التطبيق يفتح من غير نت */
-const CACHE = "masroufy-v3";
+const CACHE = "masroufy-v4";
 const CORE = [
   "./",
   "./index.html",
