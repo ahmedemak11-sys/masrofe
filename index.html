@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="مصروفي — تطبيق عربي لتتبع المصاريف وحدود الصرف وخطط الادخار. بيشتغل من غير نت وبياناتك على جهازك.">
+<meta name="description" content="مصروفي — تطبيق عربي لتتبع المصاريف وحدود الصرف والسلف وخطط الادخار. مقفول برمز وبصمة، وبيشتغل من غير نت.">
 <meta name="theme-color" content="#0D6470">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icons/icon-192.png">
@@ -154,7 +154,7 @@ h2.sec .hint{font-family:var(--ff-body); font-size:12px; font-weight:400; color:
 .allow .t{font-size:12px; color:var(--ink-2)}
 
 /* progress */
-.bar{height:8px; border-radius:99px; background:var(--track); overflow:hidden; position:relative}
+.bar{display:block; height:8px; border-radius:99px; background:var(--track); overflow:hidden; position:relative}
 .bar > i{display:block; height:100%; border-radius:99px; background:var(--accent); transition:width .35s ease}
 .bar.thin{height:6px}
 .bar > i.ok{background:var(--good)} .bar > i.warn{background:var(--warn)} .bar > i.over{background:var(--crit)}
@@ -329,6 +329,55 @@ details.more summary::-webkit-details-marker{display:none}
   z-index:70; opacity:0; transition:.2s; pointer-events:none; box-shadow:var(--shadow); max-width:calc(100vw - 32px); text-align:center}
 .toast.on{opacity:1; transform:translateX(-50%)}
 
+/* wallets */
+.wrail{display:flex; gap:9px; overflow-x:auto; padding-bottom:3px; scrollbar-width:none}
+.wrail::-webkit-scrollbar{display:none}
+.wcard{flex:0 0 auto; min-width:128px; background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:11px 12px; text-align:right; box-shadow:var(--shadow-sm)}
+.wcard:hover{border-color:var(--accent-line)}
+.wcard .wt{display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted)}
+.wcard .wt i{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;flex:none}
+.wcard .wt i svg{width:14px;height:14px}
+.wcard .wv{font-family:var(--ff-display); font-weight:600; font-size:17px; margin-top:7px; letter-spacing:-.01em}
+.wcard .wv.neg{color:var(--down)}
+.wcard.add{min-width:0; display:grid; place-items:center; color:var(--accent); border-style:dashed; padding-inline:16px}
+.wcard.add svg{width:20px;height:20px}
+
+/* period switcher */
+.psegs{display:flex; gap:5px; background:var(--surface); padding:4px; border-radius:13px; border:1px solid var(--line); margin-bottom:12px; box-shadow:var(--shadow-sm)}
+.psegs button{flex:1; border:0; background:transparent; padding:8px 4px; border-radius:10px; font-weight:600; font-size:13.5px; color:var(--muted); white-space:nowrap}
+.psegs button[aria-current="true"]{background:var(--accent-soft); color:var(--accent)}
+
+/* today strip */
+.today{display:flex; align-items:center; gap:12px; padding:13px 14px; border-radius:14px;
+  background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow-sm)}
+.today .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--surface-2);color:var(--accent)}
+.today .ic svg{width:21px;height:21px}
+.today .v{font-family:var(--ff-display); font-weight:700; font-size:20px; line-height:1.2}
+.today .t{font-size:12px; color:var(--muted); margin-top:1px}
+
+/* lock screen */
+.lockwrap{min-height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center;
+  padding:40px 4px; text-align:center; gap:4px}
+.lockwrap .lmark{width:62px;height:62px;border-radius:20px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;margin-bottom:14px;border:1px solid var(--accent-line)}
+.lockwrap .lmark svg{width:28px;height:28px}
+.lockwrap h1{font-family:var(--ff-display); font-size:21px; margin:0 0 5px; font-weight:700}
+.lockwrap p{margin:0 0 20px; color:var(--muted); font-size:13.5px; max-width:32ch}
+.dots{display:flex; gap:11px; margin-bottom:22px; min-height:15px}
+.dots i{width:13px;height:13px;border-radius:50%;background:var(--track);border:1px solid var(--line);transition:.15s}
+.dots i.on{background:var(--accent); border-color:var(--accent); transform:scale(1.08)}
+.dots.bad i{background:var(--crit); border-color:var(--crit); animation:shake .32s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media(prefers-reduced-motion:reduce){ .dots.bad i{animation:none} }
+.numpad{display:grid; grid-template-columns:repeat(3,1fr); gap:11px; width:min(280px,86vw); direction:ltr}
+.numpad button{aspect-ratio:1.5; border-radius:15px; border:1px solid var(--line); background:var(--surface);
+  font-family:var(--ff-display); font-size:21px; font-weight:600; color:var(--ink); box-shadow:var(--shadow-sm)}
+.numpad button:active{background:var(--surface-3)}
+.numpad button.alt{font-size:14px; color:var(--muted); background:transparent; box-shadow:none; border-color:transparent}
+.numpad button.alt svg{width:22px;height:22px}
+.numpad button.bio{color:var(--accent)}
+.lockerr{color:var(--down); font-size:13px; min-height:19px; margin-top:16px; font-weight:500}
+
 .statusline{display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--muted); padding:14px 2px 0; justify-content:center}
 .statusline .sd{width:7px;height:7px;border-radius:50%;background:var(--good)}
 .statusline .sd.local{background:var(--warn)}
@@ -427,7 +476,20 @@ const P = {
   bolt: '<path d="M13.2 3 5.6 14h5.6l-1 7 7.6-11h-5.6z"/>',
   clock: '<circle cx="12" cy="12" r="8.6"/><path d="M12 7.2V12l3.4 2"/>',
   pie: '<path d="M12 3.4a8.6 8.6 0 1 0 8.6 8.6H12z"/><path d="M14.6 2.2a8.6 8.6 0 0 1 7.2 7.2h-7.2z"/>',
-  flag: '<path d="M6 21V4"/><path d="M6 4.6h11l-2.2 3.8L17 12.2H6z"/>'
+  flag: '<path d="M6 21V4"/><path d="M6 4.6h11l-2.2 3.8L17 12.2H6z"/>',
+  safe: '<rect x="3.2" y="4.4" width="17.6" height="15.2" rx="2.6"/><circle cx="10.4" cy="12" r="3.4"/><path d="M10.4 8.6v1.2"/><path d="M17.2 9.4v5.2"/>',
+  bank: '<path d="M3.4 9.6 12 4.4l8.6 5.2"/><path d="M5.6 9.6v8.2"/><path d="M10 9.6v8.2"/><path d="M14 9.6v8.2"/><path d="M18.4 9.6v8.2"/><path d="M3.4 20.2h17.2"/>',
+  card: '<rect x="2.8" y="6" width="18.4" height="12.4" rx="2.6"/><path d="M2.8 10.2h18.4"/><path d="M6.4 14.6h3.4"/>',
+  phone: '<rect x="6.4" y="2.8" width="11.2" height="18.4" rx="2.6"/><path d="M10.4 18.4h3.2"/>',
+  swap: '<path d="M4.4 8.4h13.2"/><path d="M14.4 5.2 17.6 8.4l-3.2 3.2"/><path d="M19.6 15.6H6.4"/><path d="M9.6 12.4 6.4 15.6l3.2 3.2"/>',
+  lock: '<rect x="4.6" y="10.2" width="14.8" height="10.2" rx="2.6"/><path d="M8 10.2V7.6a4 4 0 0 1 8 0v2.6"/><circle cx="12" cy="15.3" r="1.2" fill="currentColor" stroke="none"/>',
+  finger: '<path d="M6.4 11.4a5.6 5.6 0 0 1 11.2 0v1.4"/><path d="M9.2 11.6a2.8 2.8 0 0 1 5.6 0v3.2a6 6 0 0 1-.7 2.8"/><path d="M12 11.8v3.6a9 9 0 0 1-1.4 4.8"/><path d="M17.4 15.2a11 11 0 0 1-1 4.4"/><path d="M7 16.4a8 8 0 0 0 .6-3"/><path d="M4.6 7.6A8.8 8.8 0 0 1 12 3.6c2 0 3.8.6 5.3 1.7"/>',
+  key: '<circle cx="8" cy="12" r="3.6"/><path d="M11.6 12h8.2"/><path d="M17 12v3"/><path d="M19.8 12v2.2"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.8v2.4"/><path d="M12 18.8v2.4"/><path d="M2.8 12h2.4"/><path d="M18.8 12h2.4"/><path d="m5.6 5.6 1.7 1.7"/><path d="m16.7 16.7 1.7 1.7"/><path d="m18.4 5.6-1.7 1.7"/><path d="m7.3 16.7-1.7 1.7"/>',
+  handOut: '<path d="M3.4 12.6a2 2 0 0 1 2.6-.4l2.4 1.6h3.2a1.4 1.4 0 0 1 0 2.8h-2.2"/><path d="M9.4 16.6h2.8l5-2.4a1.7 1.7 0 0 1 2 2.7l-4.8 3.4a3 3 0 0 1-1.8.6H6.6l-3.2-2.4"/><circle cx="15.4" cy="6.4" r="3.4"/><path d="M15.4 4.8v3.2"/>',
+  handIn: '<path d="M20.6 12.6a2 2 0 0 0-2.6-.4l-2.4 1.6h-3.2a1.4 1.4 0 0 0 0 2.8h2.2"/><path d="M14.6 16.6h-2.8l-5-2.4a1.7 1.7 0 0 0-2 2.7l4.8 3.4a3 3 0 0 0 1.8.6h6l3.2-2.4"/><circle cx="8.6" cy="6.4" r="3.4"/><path d="M8.6 4.8v3.2"/>',
+  users: '<circle cx="9" cy="8" r="3.4"/><path d="M3.4 20a5.6 5.6 0 0 1 11.2 0"/><path d="M15.6 5.2a3.4 3.4 0 0 1 0 6.4"/><path d="M17 14.8a5.6 5.6 0 0 1 3.6 5.2"/>',
+  split: '<path d="M4.4 5.6h4l7.2 12.8h4"/><path d="M15.6 5.6h4"/><path d="M4.4 18.4h4l2.6-4.6"/><path d="M17.4 3.4l2.4 2.2-2.4 2.2"/><path d="M17.4 16.2l2.4 2.2-2.4 2.2"/>'
 };
 function ico(n, cls) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (cls ? ' class="' + cls + '"' : "") + ">" + (P[n] || P.dots) + "</svg>"; }
 
@@ -452,31 +514,110 @@ const INCOME_CATS = [
 const ICON_CHOICES = ["food", "car", "home", "bill", "health", "bag", "fun", "book", "coins", "wallet", "gift", "spark", "flag", "dots"];
 const COLOR_CHOICES = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9"];
 
+const DEFAULT_WALLETS = [
+  { id: "w_cash", name: "معايا", icon: "wallet", color: "s3", opening: 0 },
+  { id: "w_home", name: "في البيت", icon: "safe", color: "s7", opening: 0 },
+  { id: "w_bank", name: "البنك", icon: "bank", color: "s1", opening: 0 }
+];
+const WALLET_ICONS = ["wallet", "safe", "bank", "card", "coins", "phone", "gift", "home"];
+
 const state = {
-  settings: { name: "", currency: "ج.م", startBalance: 0, income: 0, savePct: 15, onboarded: false, lastBackup: "" },
+  settings: { name: "", currency: "ج.م", income: 0, savePct: 15, onboarded: false, lastBackup: "" },
+  wallets: JSON.parse(JSON.stringify(DEFAULT_WALLETS)),
   categories: JSON.parse(JSON.stringify(DEFAULT_CATS)),
   txs: [],
+  debts: [],
   goals: [],
-  ui: { tab: "home", mk: thisMK(), filter: "all", q: "" }
+  ui: { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", q: "" }
 };
 
 /* ---------- storage ---------- */
 const LS = "masroufy.v1";
+const LS_LOCK = "masroufy.lock.v1";
 const Store = { db: null, mode: "local", warned: false };
+const Lock = { on: false, key: null, cfg: null, unlocked: false };
+
+function migrate(d) {
+  // رصيد ابتدائي قديم -> محفظة "معايا"
+  if (d.settings && d.settings.startBalance != null) {
+    const w = (d.wallets || state.wallets).find(x => x.id === "w_cash");
+    if (w && !w.opening) w.opening = +d.settings.startBalance || 0;
+    delete d.settings.startBalance;
+  }
+  (d.txs || []).forEach(t => { if (!t.walletId && t.type !== "transfer") t.walletId = "w_cash"; });
+  return d;
+}
+function applyData(d) {
+  if (!d) return false;
+  migrate(d);
+  if (d.settings) Object.assign(state.settings, d.settings);
+  if (Array.isArray(d.wallets) && d.wallets.length) state.wallets = d.wallets;
+  if (Array.isArray(d.categories) && d.categories.length) state.categories = d.categories;
+  if (Array.isArray(d.txs)) state.txs = d.txs;
+  if (Array.isArray(d.debts)) state.debts = d.debts;
+  if (Array.isArray(d.goals)) state.goals = d.goals;
+  return true;
+}
+function dataBundle() {
+  return { settings: state.settings, wallets: state.wallets, categories: state.categories, txs: state.txs, debts: state.debts, goals: state.goals };
+}
+
+/* ---- تشفير محلي: المفتاح مشتق من رمز القفل ---- */
+const te = new TextEncoder(), td = new TextDecoder();
+const b64 = (buf) => btoa(String.fromCharCode.apply(null, new Uint8Array(buf)));
+const unb64 = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const hasCrypto = () => !!(window.crypto && window.crypto.subtle);
+
+async function deriveKey(pin, saltB64, iter) {
+  const base = await crypto.subtle.importKey("raw", te.encode(pin), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: unb64(saltB64), iterations: iter || 210000, hash: "SHA-256" },
+    base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+async function encJSON(key, obj) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, te.encode(JSON.stringify(obj)));
+  return { iv: b64(iv), ct: b64(ct) };
+}
+async function decJSON(key, blob) {
+  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(blob.iv) }, key, unb64(blob.ct));
+  return JSON.parse(td.decode(pt));
+}
+function readLockCfg() {
+  try { const r = localStorage.getItem(LS_LOCK); return r ? JSON.parse(r) : null; } catch (_) { return null; }
+}
+function writeLockCfg(c) {
+  try { c ? localStorage.setItem(LS_LOCK, JSON.stringify(c)) : localStorage.removeItem(LS_LOCK); } catch (_) { }
+}
 
 function readLocal() {
   try {
     const raw = localStorage.getItem(LS); if (!raw) return false;
     const d = JSON.parse(raw);
-    if (d.settings) Object.assign(state.settings, d.settings);
-    if (Array.isArray(d.categories) && d.categories.length) state.categories = d.categories;
-    if (Array.isArray(d.txs)) state.txs = d.txs;
-    if (Array.isArray(d.goals)) state.goals = d.goals;
-    return true;
+    if (d && d.enc) return "encrypted";
+    return applyData(d);
   } catch (e) { return false; }
 }
+let localWriteChain = Promise.resolve();
 function writeLocal() {
-  try { localStorage.setItem(LS, JSON.stringify({ settings: state.settings, categories: state.categories, txs: state.txs, goals: state.goals })); } catch (e) { }
+  const snap = JSON.parse(JSON.stringify(dataBundle()));
+  localWriteChain = localWriteChain.then(async () => {
+    try {
+      if (Lock.on && Lock.key) {
+        const blob = await encJSON(Lock.key, snap);
+        localStorage.setItem(LS, JSON.stringify({ enc: 1, iv: blob.iv, ct: blob.ct }));
+      } else {
+        localStorage.setItem(LS, JSON.stringify(snap));
+      }
+    } catch (e) { }
+  });
+  return localWriteChain;
+}
+async function readLocalEncrypted(key) {
+  const raw = localStorage.getItem(LS); if (!raw) return false;
+  const d = JSON.parse(raw);
+  if (!d.enc) return applyData(d);
+  return applyData(await decJSON(key, d));
 }
 
 const dirty = new Set();
@@ -504,10 +645,16 @@ function flush() {
 function writeDoc(k) {
   const db = Store.db;
   if (k === "settings") return db.doc("app/settings").set(state.settings);
+  if (k === "wallets") return db.doc("app/wallets").set({ list: state.wallets });
   if (k === "categories") return db.doc("app/categories").set({ list: state.categories });
   if (k === "goals") return db.doc("app/goals").set({ list: state.goals });
+  if (k === "debts") return db.doc("app/debts").set({ list: state.debts });
   if (k.startsWith("m:")) { const mk = k.slice(2); return db.doc("months/" + mk).set({ mk: mk, txs: state.txs.filter(t => mkOf(t.date) === mk) }); }
   return Promise.resolve();
+}
+function saveAll() {
+  save("settings", "wallets", "categories", "goals", "debts");
+  [...new Set(state.txs.map(t => mkOf(t.date)))].forEach(mk => save("m:" + mk));
 }
 function degrade() {
   Store.db = null; Store.mode = "local";
@@ -521,21 +668,27 @@ async function connect() {
   if (!db) { Store.mode = "local"; renderStorageLine(); return; }
   Store.db = db; Store.mode = "cloud";
   try {
-    const [s, c, g, ms] = await Promise.all([
-      db.doc("app/settings").get(), db.doc("app/categories").get(), db.doc("app/goals").get(), db.collection("months").get()
+    const [s, w, c, g, dbt, ms] = await Promise.all([
+      db.doc("app/settings").get(), db.doc("app/wallets").get(), db.doc("app/categories").get(),
+      db.doc("app/goals").get(), db.doc("app/debts").get(), db.collection("months").get()
     ]);
     const hasCloud = s.exists || c.exists || (ms && ms.size > 0);
     if (hasCloud) {
-      if (s.exists) Object.assign(state.settings, s.data());
-      const cd = c.exists ? c.data() : null; if (cd && Array.isArray(cd.list) && cd.list.length) state.categories = cd.list;
-      const gd = g.exists ? g.data() : null; state.goals = gd && Array.isArray(gd.list) ? gd.list : [];
       const all = [];
       (ms.docs || []).forEach(d => { const v = d.data(); if (v && Array.isArray(v.txs)) all.push.apply(all, v.txs); });
-      state.txs = all;
+      const wd = w.exists ? w.data() : null, cd = c.exists ? c.data() : null,
+        gd = g.exists ? g.data() : null, dd = dbt.exists ? dbt.data() : null;
+      applyData({
+        settings: s.exists ? s.data() : null,
+        wallets: wd && Array.isArray(wd.list) ? wd.list : null,
+        categories: cd && Array.isArray(cd.list) ? cd.list : null,
+        goals: gd && Array.isArray(gd.list) ? gd.list : [],
+        debts: dd && Array.isArray(dd.list) ? dd.list : [],
+        txs: all
+      });
       writeLocal();
     } else if (state.settings.onboarded || state.txs.length) {
-      save("settings", "categories", "goals");
-      [...new Set(state.txs.map(t => mkOf(t.date)))].forEach(mk => save("m:" + mk));
+      saveAll();
     }
   } catch (e) { degrade(); }
   render(); renderStorageLine();
@@ -543,22 +696,95 @@ async function connect() {
 
 /* ---------- derived ---------- */
 const catById = (id) => state.categories.find(c => c.id === id) || INCOME_CATS.find(c => c.id === id) || { id: id, name: "غير محدد", icon: "dots", color: "s9", limit: 0 };
+const walletById = (id) => state.wallets.find(w => w.id === id) || { id: id, name: "غير محدد", icon: "wallet", color: "s9", opening: 0 };
 const txOfMonth = (mk) => state.txs.filter(t => mkOf(t.date) === mk);
-function totalsOf(mk) {
+
+/* نطاق زمني موحّد: يوم / شهر / سنة */
+function rangeOf(period, anchor) {
+  if (period === "day") return { from: anchor, to: anchor, label: dayLabel(anchor), days: 1, kind: "day" };
+  if (period === "year") return { from: anchor + "-01-01", to: anchor + "-12-31", label: "سنة " + anchor, days: (+anchor % 4 === 0 && (+anchor % 100 !== 0 || +anchor % 400 === 0)) ? 366 : 365, kind: "year" };
+  return { from: anchor + "-01", to: anchor + "-" + String(daysIn(anchor)).padStart(2, "0"), label: mkLabel(anchor), days: daysIn(anchor), kind: "month" };
+}
+function curRange() {
+  const u = state.ui;
+  return rangeOf(u.period, u.period === "day" ? u.day : u.period === "year" ? u.year : u.mk);
+}
+const inRange = (d, r) => d >= r.from && d <= r.to;
+function txIn(r) { return state.txs.filter(t => inRange(t.date, r)); }
+function totalsIn(r) {
   let inc = 0, exp = 0;
-  for (const t of state.txs) if (mkOf(t.date) === mk) { if (t.type === "income") inc += t.amount; else exp += t.amount; }
+  for (const t of state.txs) if (inRange(t.date, r)) { if (t.type === "income") inc += t.amount; else if (t.type === "expense") exp += t.amount; }
   return { inc: inc, exp: exp, net: inc - exp };
 }
-function balanceNow() {
-  let b = +state.settings.startBalance || 0;
-  for (const t of state.txs) b += t.type === "income" ? t.amount : -t.amount;
-  const saved = state.goals.reduce((s, g) => s + (g.saved || 0), 0);
-  return { total: b, free: b - saved, locked: saved };
-}
-function spendByCat(mk) {
+function totalsOf(mk) { return totalsIn(rangeOf("month", mk)); }
+function spendByCatIn(r) {
   const m = {};
-  for (const t of state.txs) if (t.type === "expense" && mkOf(t.date) === mk) m[t.catId] = (m[t.catId] || 0) + t.amount;
+  for (const t of state.txs) if (t.type === "expense" && inRange(t.date, r)) m[t.catId] = (m[t.catId] || 0) + t.amount;
   return m;
+}
+function spendByCat(mk) { return spendByCatIn(rangeOf("month", mk)); }
+function spentOnDay(iso) {
+  let s = 0;
+  for (const t of state.txs) if (t.type === "expense" && t.date === iso) s += t.amount;
+  return s;
+}
+/* ---------- سلف وديون ----------
+   dir: "out" = أنا سلفت حد (ليا عنده) | "in" = أنا استلفت (عليّ له)
+   الدين مش مصروف ولا دخل — فلوس نقلت مكان، فما بتدخلش تحليل الصرف.  */
+function debtPaid(d) { return (d.payments || []).reduce((s, p) => s + (+p.amount || 0), 0); }
+function debtLeft(d) { return Math.max(0, (+d.amount || 0) - debtPaid(d)); }
+function debtExtra(d) { return Math.max(0, debtPaid(d) - (+d.amount || 0)); }
+const debtOpen = (d) => !d.closedAt && debtLeft(d) > 0.004;
+function debtTotals() {
+  let out = 0, inn = 0, outAll = 0, innAll = 0;
+  state.debts.forEach(d => {
+    const left = d.closedAt ? 0 : debtLeft(d);
+    if (d.dir === "out") { out += left; outAll += +d.amount || 0; }
+    else { inn += left; innAll += +d.amount || 0; }
+  });
+  return { owedToMe: out, iOwe: inn, net: out - inn, countOut: state.debts.filter(d => d.dir === "out" && debtOpen(d)).length, countIn: state.debts.filter(d => d.dir === "in" && debtOpen(d)).length };
+}
+function debtPeople() {
+  const m = {};
+  state.debts.forEach(d => {
+    const k = (d.person || "").trim() || "من غير اسم";
+    if (!m[k]) m[k] = { person: k, out: 0, in: 0, items: [] };
+    const left = d.closedAt ? 0 : debtLeft(d);
+    m[k][d.dir === "out" ? "out" : "in"] += left;
+    m[k].items.push(d);
+  });
+  return Object.values(m).sort((a, b) => (b.out + b.in) - (a.out + a.in));
+}
+
+/* أرصدة المحافظ */
+function walletBalances() {
+  const m = {};
+  state.wallets.forEach(w => m[w.id] = +w.opening || 0);
+  for (const t of state.txs) {
+    if (t.type === "transfer") {
+      if (m[t.fromWallet] != null) m[t.fromWallet] -= t.amount;
+      if (m[t.toWallet] != null) m[t.toWallet] += t.amount;
+    } else if (m[t.walletId] != null) {
+      m[t.walletId] += t.type === "income" ? t.amount : -t.amount;
+    }
+  }
+  // الديون بتحرّك الكاش بس، مش المصاريف
+  for (const d of state.debts) {
+    const sign = d.dir === "out" ? -1 : 1;
+    if (m[d.walletId] != null) m[d.walletId] += sign * (+d.amount || 0);
+    (d.payments || []).forEach(p => {
+      const w = p.walletId || d.walletId;
+      if (m[w] != null) m[w] -= sign * (+p.amount || 0);
+    });
+  }
+  return m;
+}
+function balanceNow() {
+  const wb = walletBalances();
+  const b = state.wallets.reduce((s, w) => s + (wb[w.id] || 0), 0);
+  const saved = state.goals.reduce((s, g) => s + (g.saved || 0), 0);
+  const dt = debtTotals();
+  return { total: b, free: b - saved, locked: saved, byWallet: wb, debts: dt, net: b + dt.owedToMe - dt.iOwe };
 }
 const budgetTotal = () => state.categories.reduce((s, c) => s + (+c.limit || 0), 0);
 function savingCapacity() {
@@ -725,6 +951,22 @@ function insights(mk) {
     if (gap >= 3) push("warn", "بقالك " + gap + " يوم ما سجلتش حاجة", "الأرقام بتبقى مظبوطة لما تسجل أول بأول. سجّل اللي فات دلوقتي.", "clock");
   }
 
+  // سلف قديمة
+  const oldOut = state.debts.filter(d => d.dir === "out" && debtOpen(d) && daysBetween(d.date, todayISO()) >= 30)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  if (oldOut.length) {
+    const top = oldOut[0], age = daysBetween(top.date, todayISO());
+    push("warn", "سلفة قديمة عند " + top.person, "بقالها " + age + " يوم و" + money2(debtLeft(top)) + " لسه ما رجعتش" +
+      (oldOut.length > 1 ? " — وفي " + (oldOut.length - 1) + " سلفة تانية قديمة." : "."), "handOut");
+  }
+  const dT = debtTotals();
+  if (dT.iOwe > 0) {
+    const inc0 = +state.settings.income || 0;
+    if (inc0 > 0 && dT.iOwe > inc0 * 0.3)
+      push("crit", "الديون اللي عليك كبيرة", "عليك " + money2(dT.iOwe) + " — يعني " + Math.round(dT.iOwe / inc0 * 100) + "% من دخل شهر. حطها في حسابك قبل ما تخطط للصرف.", "handIn");
+    else push("info", "عليك ديون للناس", "إجمالي " + money2(dT.iOwe) + " لـ " + dT.countIn + " حد. الفلوس دي في محفظتك بس مش بتاعتك.", "handIn");
+  }
+
   // 10. backup reminder
   const bAge = backupAgeDays();
   if (state.txs.length >= 8 && (bAge === null || bAge >= 21))
@@ -737,7 +979,157 @@ function insights(mk) {
   const order = { crit: 0, warn: 1, good: 2, info: 3 };
   return out.sort((a, b) => order[a.lv] - order[b.lv]);
 }
-/* ---------- ui helpers ---------- */
+/* ================= القفل: رمز + بصمة ================= */
+const LockUI = { entry: "", mode: "unlock", first: "", busy: false, bioAsked: false };
+
+function bioSupported() {
+  return !!(window.PublicKeyCredential && navigator.credentials && window.isSecureContext);
+}
+async function bioAvailable() {
+  if (!bioSupported()) return false;
+  try { return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }
+  catch (_) { return false; }
+}
+function rndB64(n) { return b64(crypto.getRandomValues(new Uint8Array(n))); }
+
+async function bioRegister() {
+  const userId = crypto.getRandomValues(new Uint8Array(16));
+  const cred = await navigator.credentials.create({
+    publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      rp: { name: "مصروفي" },
+      user: { id: userId, name: state.settings.name || "masroufy", displayName: state.settings.name || "مصروفي" },
+      pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
+      authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "preferred" },
+      timeout: 60000, attestation: "none"
+    }
+  });
+  if (!cred) throw new Error("no credential");
+  return b64(cred.rawId);
+}
+async function bioVerify(idB64) {
+  const res = await navigator.credentials.get({
+    publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials: idB64 ? [{ type: "public-key", id: unb64(idB64) }] : [],
+      userVerification: "required", timeout: 60000
+    }
+  });
+  return !!res;
+}
+
+/* تشغيل القفل: يشفّر البيانات بمفتاح مشتق من الرمز */
+async function enableLock(pin) {
+  const salt = rndB64(16), iter = 210000;
+  const key = await deriveKey(pin, salt, iter);
+  const check = await encJSON(key, { ok: 1 });
+  const cfg = { v: 1, salt: salt, iter: iter, check: check, bio: null };
+  Lock.on = true; Lock.key = key; Lock.cfg = cfg; Lock.unlocked = true;
+  writeLockCfg(cfg);
+  await writeLocal();
+}
+async function disableLock() {
+  Lock.on = false; Lock.key = null; Lock.cfg = null; Lock.unlocked = true;
+  writeLockCfg(null);
+  await writeLocal();
+}
+async function tryPin(pin) {
+  const cfg = Lock.cfg; if (!cfg) return false;
+  const key = await deriveKey(pin, cfg.salt, cfg.iter);
+  try { await decJSON(key, cfg.check); } catch (_) { return false; }
+  Lock.key = key; Lock.on = true;
+  try { await readLocalEncrypted(key); } catch (_) { }
+  Lock.unlocked = true;
+  return true;
+}
+/* البصمة: بتفك غلاف تاني للمفتاح متخزن على الجهاز */
+async function attachBio(pin) {
+  const credId = await bioRegister();
+  const salt = rndB64(16), devSecret = rndB64(32);
+  const devKey = await deriveKey(devSecret, salt, 120000);
+  const wrapped = await encJSON(devKey, { pin: pin });
+  Lock.cfg.bio = { id: credId, salt: salt, secret: devSecret, wrap: wrapped };
+  writeLockCfg(Lock.cfg);
+}
+async function unlockWithBio() {
+  const b = Lock.cfg && Lock.cfg.bio; if (!b) return false;
+  const ok = await bioVerify(b.id); if (!ok) return false;
+  const devKey = await deriveKey(b.secret, b.salt, 120000);
+  const { pin } = await decJSON(devKey, b.wrap);
+  return tryPin(pin);
+}
+function detachBio() {
+  if (Lock.cfg) { Lock.cfg.bio = null; writeLockCfg(Lock.cfg); }
+}
+
+function viewLock() {
+  const setup = LockUI.mode !== "unlock";
+  const title = LockUI.mode === "unlock" ? "افتح مصروفي"
+    : LockUI.mode === "set" ? "اختار رمز من 4 أرقام" : "اكتب الرمز تاني للتأكيد";
+  const sub = LockUI.mode === "unlock" ? "اكتب رمزك عشان تشوف بياناتك"
+    : LockUI.mode === "set" ? "الرمز ده بيقفل التطبيق وكمان بيشفّر بياناتك على الجهاز"
+      : "تأكيد بسيط عشان ما تنساش الرمز";
+  const bio = !setup && Lock.cfg && Lock.cfg.bio;
+  const keys = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  return '<div class="lockwrap"><div class="lmark">' + ico(setup ? "key" : "lock") + "</div>" +
+    "<h1>" + title + "</h1><p>" + sub + "</p>" +
+    '<div class="dots" id="lockDots">' + [0, 1, 2, 3].map(i => '<i class="' + (i < LockUI.entry.length ? "on" : "") + '"></i>').join("") + "</div>" +
+    '<div class="numpad">' + keys.map(k => '<button data-act="pinKey" data-v="' + k + '"><span class="num">' + k + "</span></button>").join("") +
+    (bio ? '<button class="alt bio" data-act="pinBio" aria-label="افتح بالبصمة">' + ico("finger") + "</button>"
+      : setup && LockUI.mode === "confirm" ? '<button class="alt" data-act="pinRestart">من الأول</button>' : '<button class="alt" disabled></button>') +
+    '<button data-act="pinKey" data-v="0"><span class="num">0</span></button>' +
+    '<button class="alt" data-act="pinDel" aria-label="مسح">' + ico("x") + "</button></div>" +
+    '<div class="lockerr" id="lockErr"></div>' +
+    (setup ? "" : '<button class="btn ghost" style="margin-top:16px" data-act="pinForgot">نسيت الرمز؟</button>') +
+    "</div>";
+}
+function paintDots(bad) {
+  const d = el("lockDots"); if (!d) return;
+  d.className = "dots" + (bad ? " bad" : "");
+  [...d.children].forEach((c, i) => c.className = i < LockUI.entry.length ? "on" : "");
+}
+function lockErr(msg) { const e = el("lockErr"); if (e) e.textContent = msg || ""; }
+
+async function pinPush(dig) {
+  if (LockUI.busy || LockUI.entry.length >= 4) return;
+  LockUI.entry += dig; paintDots(); lockErr("");
+  if (LockUI.entry.length < 4) return;
+  const pin = LockUI.entry;
+  LockUI.busy = true;
+  try {
+    if (LockUI.mode === "set") {
+      LockUI.first = pin; LockUI.entry = ""; LockUI.mode = "confirm";
+      render();
+    } else if (LockUI.mode === "confirm") {
+      if (pin !== LockUI.first) {
+        paintDots(true); lockErr("الرمزين مش زي بعض — جرّب تاني");
+        setTimeout(() => { LockUI.entry = ""; LockUI.first = ""; LockUI.mode = "set"; render(); }, 700);
+      } else {
+        await enableLock(pin);
+        LockUI.entry = ""; LockUI.mode = "unlock";
+        render();
+        toast("القفل اتفعّل");
+        offerBio();
+      }
+    } else {
+      const ok = await tryPin(pin);
+      if (ok) { LockUI.entry = ""; render(); connect(); }
+      else { paintDots(true); lockErr("الرمز غلط"); setTimeout(() => { LockUI.entry = ""; paintDots(); }, 550); }
+    }
+  } catch (e) { lockErr("حصلت مشكلة — جرّب تاني"); LockUI.entry = ""; paintDots(); }
+  LockUI.busy = false;
+}
+async function offerBio() {
+  if (LockUI.bioAsked) return; LockUI.bioAsked = true;
+  if (!(await bioAvailable())) return;
+  openSheet("تفتح بالبصمة؟",
+    '<p class="sub" style="margin:0 0 14px">بدل ما تكتب الرمز كل مرة، تقدر تفتح التطبيق ببصمتك أو بوش الجهاز. الرمز هيفضل شغال كطريقة احتياطية.</p>' +
+    '<div class="btnrow" style="flex-direction:column;align-items:stretch">' +
+    '<button class="btn pri block" data-act="bioOn">' + ico("finger") + "فعّل البصمة</button>" +
+    '<button class="btn ghost block" data-act="closeSheet">دلوقتي لأ</button></div>');
+}
+
+/* ================= ui helpers ================= */
 let toastT = null;
 function toast(msg) { const t = el("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2600); }
 function pill(lv, txt) {
@@ -762,8 +1154,9 @@ function niceMax(v) {
   const e = Math.pow(10, Math.floor(Math.log10(v))), n = v / e;
   return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * e;
 }
-function donutChart(mk) {
-  const sc = spendByCat(mk), T = totalsOf(mk);
+function donutChart(mk) { return donutRange(rangeOf("month", mk)); }
+function donutRange(r) {
+  const sc = spendByCatIn(r);
   let ent = Object.entries(sc).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
   if (!ent.length) return null;
   let parts = ent.slice(0, 6).map(e => ({ c: catById(e[0]), v: e[1] }));
@@ -888,10 +1281,44 @@ function viewHome() {
     '<div class="tile"><div class="k">' + ico("down") + '<span>مصروف الشهر</span></div><div class="v down">' + nf(T.exp) + '</div></div>' +
     '<div class="tile"><div class="k">' + ico("coins") + '<span>الفرق</span></div><div class="v ' + (T.net >= 0 ? "up" : "down") + '">' + nf(T.net) + "</div></div></div>";
 
+  // اللي اتصرف النهاردة
+  const tSpent = spentOnDay(todayISO()), ySpent = spentOnDay(shiftDay(todayISO(), -1));
+  const ck2 = monthClock(thisMK());
+  const avgDay = ck2.day > 0 ? totalsOf(thisMK()).exp / ck2.day : 0;
+  h += '<div style="margin-top:12px"><button class="today" style="width:100%" data-act="goDay"><span class="ic">' + ico("sun") + "</span>" +
+    '<span style="flex:1;text-align:right"><span class="v" style="display:block">' + nf(tSpent) + " " + esc(state.settings.currency) + "</span>" +
+    '<span class="t" style="display:block">صرفت النهاردة' + (avgDay > 0 ? " · متوسطك " + nf(avgDay, 0) + " في اليوم" : "") + "</span></span>" +
+    (ySpent > 0 || tSpent > 0 ? '<span style="margin-inline-start:auto">' + (tSpent > avgDay * 1.25 && avgDay > 0 ? pill("warn", "أعلى من متوسطك") : tSpent === 0 ? pill("good", "لسه ما صرفتش") : pill("good", "في الطبيعي")) + "</span>" : "") +
+    "</button></div>";
+
   if (al && !ck.past && !ck.future) {
-    h += '<div style="margin-top:12px"><div class="allow"><div class="ic">' + ico(al.over ? "alert" : "clock") + "</div><div><div class=\"v\">" +
-      (al.over ? "عديت الميزانية بـ " + nf(-al.rem) + " " + esc(state.settings.currency) : nf(al.perDay) + " " + esc(state.settings.currency) + " في اليوم") +
+    h += '<div style="margin-top:10px"><div class="allow"><div class="ic">' + ico(al.over ? "alert" : "clock") + "</div><div><div class=\"v\">" +
+      (al.over ? "عديت الميزانية بـ " + nf(-al.rem) + " " + esc(state.settings.currency) : nf(al.perDay, 0) + " " + esc(state.settings.currency) + " في اليوم") +
       '</div><div class="t">' + (al.over ? "أي صرف زيادة هياكل من الادخار" : "المسموح لك تصرفه على باقي " + al.left + " يوم في الشهر") + "</div></div></div></div>";
+  }
+
+  // أماكن الفلوس
+  const wb = B.byWallet;
+  h += '<h2 class="sec">فلوسك فين<span class="hint"><button class="btn ghost" style="padding:2px 6px;font-size:12px" data-act="wallets">إدارة</button></span></h2>' +
+    '<div class="wrail">' + state.wallets.map(w =>
+      '<button class="wcard" data-act="editWallet" data-id="' + w.id + '">' +
+      '<span class="wt"><i style="background:color-mix(in srgb,var(--' + w.color + ') 15%, var(--surface));color:var(--' + w.color + ')">' + ico(w.icon) + "</i>" + esc(w.name) + "</span>" +
+      '<span class="wv' + ((wb[w.id] || 0) < 0 ? " neg" : "") + '">' + nf(wb[w.id] || 0) + "</span></button>").join("") +
+    '<button class="wcard add" data-act="newWallet" aria-label="مكان جديد">' + ico("plus") + "</button></div>";
+
+  // سلف وديون
+  const D = B.debts;
+  if (D.owedToMe > 0 || D.iOwe > 0) {
+    h += '<h2 class="sec">سلف وديون<span class="hint"><button class="btn ghost" style="padding:2px 6px;font-size:12px" data-act="debts">الكل</button></span></h2>' +
+      '<div class="tiles" style="grid-template-columns:1fr 1fr">' +
+      '<button class="tile" style="text-align:right" data-act="debts"><div class="k">' + ico("handOut") + '<span>ليك عند الناس</span></div><div class="v up">' + nf(D.owedToMe) + "</div></button>" +
+      '<button class="tile" style="text-align:right" data-act="debts"><div class="k">' + ico("handIn") + '<span>عليك للناس</span></div><div class="v down">' + nf(D.iOwe) + "</div></button></div>" +
+      '<p class="sub" style="margin:9px 2px 0">الفلوس دي مش محسوبة في مصاريفك — لو حسبت كل حاجة، معاك فعلياً ' + money2(B.net) + ".</p>";
+  } else {
+    h += '<h2 class="sec">سلف وديون</h2><button class="today" style="width:100%" data-act="debts">' +
+      '<span class="ic">' + ico("handOut") + '</span><span style="flex:1;text-align:right">' +
+      '<span style="display:block;font-weight:600;font-size:14.5px">سجّل سلفة أو دين</span>' +
+      '<span class="t" style="display:block">دفعت لحد؟ سلّفت حد؟ الفلوس دي مش مصروف</span></span>' + ico("chevL") + "</button>";
   }
 
   if (bt > 0) {
@@ -932,24 +1359,39 @@ function viewHome() {
   h += '<div class="statusline" id="storLine"></div>';
   return h;
 }
-function txRow(t) {
-  const c = catById(t.catId), inc = t.type === "income";
+function txRow(t, opts) {
+  opts = opts || {};
+  const showDate = opts.date !== false;
+  if (t.type === "transfer") {
+    const a = walletById(t.fromWallet), b = walletById(t.toWallet);
+    return '<button class="item" data-act="editTx" data-id="' + t.id + '">' +
+      '<span class="ic" style="background:var(--surface-3);color:var(--muted)">' + ico("swap") + "</span>" +
+      '<span style="flex:1;min-width:0"><span class="nm">تحويل من ' + esc(a.name) + " لـ " + esc(b.name) + "</span>" +
+      '<span class="mt" style="display:block">' + (t.note ? esc(t.note) + " · " : "") + (showDate ? dayLabel(t.date) : "") + "</span></span>" +
+      '<span class="amt" style="color:var(--muted)"><span class="num">' + nf(t.amount) + "</span></span></button>";
+  }
+  const c = catById(t.catId), inc = t.type === "income", w = walletById(t.walletId);
+  const meta = [t.note ? esc(t.note) : "", esc(w.name), showDate ? dayLabel(t.date) : ""].filter(Boolean).join(" · ");
   return '<button class="item" data-act="editTx" data-id="' + t.id + '">' + catDot(c) +
-    '<span style="flex:1;min-width:0"><span class="nm">' + esc(c.name) + '</span><span class="mt" style="display:block">' + (t.note ? esc(t.note) + " · " : "") + dayLabel(t.date) + "</span></span>" +
+    '<span style="flex:1;min-width:0"><span class="nm">' + esc(c.name) + '</span><span class="mt" style="display:block">' + meta + "</span></span>" +
     '<span class="amt ' + (inc ? "up" : "down") + '"><span class="num">' + (inc ? "+" : "−") + nf(t.amount) + "</span></span></button>";
 }
 
 function viewTx() {
-  const mk = state.ui.mk, f = state.ui.filter, q = (state.ui.q || "").trim();
+  const mk = state.ui.mk, f = state.ui.filter, wf = state.ui.wallet, q = (state.ui.q || "").trim();
   let list = txOfMonth(mk);
   if (f === "income") list = list.filter(t => t.type === "income");
   if (f === "expense") list = list.filter(t => t.type === "expense");
+  if (f === "transfer") list = list.filter(t => t.type === "transfer");
+  if (wf !== "all") list = list.filter(t => t.walletId === wf || t.fromWallet === wf || t.toWallet === wf);
   if (q) list = list.filter(t => (t.note || "").includes(q) || catById(t.catId).name.includes(q) || String(t.amount).includes(q));
   list.sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
   const T = totalsOf(mk);
   let h = '<div class="card pad" style="margin-bottom:12px">' +
     '<div class="segs" style="margin-bottom:10px">' +
-    ['all:الكل', 'expense:مصروف', 'income:دخل'].map(s => { const [v, n] = s.split(":"); return '<button data-act="filter" data-v="' + v + '" aria-pressed="' + (f === v) + '">' + n + "</button>"; }).join("") + "</div>" +
+    ['all:الكل', 'expense:مصروف', 'income:دخل', 'transfer:تحويل'].map(s => { const [v, n] = s.split(":"); return '<button data-act="filter" data-v="' + v + '" aria-pressed="' + (f === v) + '">' + n + "</button>"; }).join("") + "</div>" +
+    '<div class="chips" style="margin-bottom:10px"><button class="chip" data-act="wfilter" data-v="all" aria-pressed="' + (wf === "all") + '">كل الأماكن</button>' +
+    state.wallets.map(w => '<button class="chip" data-act="wfilter" data-v="' + w.id + '" aria-pressed="' + (wf === w.id) + '" style="' + (wf === w.id ? "color:var(--" + w.color + ")" : "") + '"><span style="color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" + esc(w.name) + "</button>").join("") + "</div>" +
     '<input class="inp" id="txSearch" type="search" placeholder="دوّر على حركة أو بند…" value="' + esc(q) + '">' +
     '<div class="ftrow" style="padding-top:10px"><span>' + list.length + ' حركة</span><span>دخل ' + nf(T.inc) + " · مصروف " + nf(T.exp) + "</span></div></div>";
   if (!list.length) return h + '<div class="card"><div class="empty"><div class="eic">' + ico("tabList") + "</div><h4>ما فيش نتايج</h4><p>غيّر الشهر أو الفلتر، أو سجّل حركة جديدة من زرار +.</p></div></div>";
@@ -957,8 +1399,10 @@ function viewTx() {
   list.forEach(t => { (groups[t.date] = groups[t.date] || []).push(t); });
   h += '<div class="card list">';
   Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(d => {
-    const day = groups[d], net = day.reduce((s, t) => s + (t.type === "income" ? t.amount : -t.amount), 0);
-    h += '<div class="daygroup"><span>' + dayLabel(d) + '</span><span class="tot"><span class="num">' + (net >= 0 ? "+" : "−") + nf(Math.abs(net)) + "</span></span></div>" + day.map(txRow).join("");
+    const day = groups[d];
+    const net = day.reduce((s, t) => s + (t.type === "income" ? t.amount : t.type === "expense" ? -t.amount : 0), 0);
+    h += '<div class="daygroup"><span>' + dayLabel(d) + '</span><span class="tot"><span class="num">' + (net >= 0 ? "+" : "−") + nf(Math.abs(net)) + "</span></span></div>" +
+      day.map(t => txRow(t, { date: false })).join("");
   });
   return h + "</div>";
 }
@@ -1043,37 +1487,142 @@ function viewGoals() {
 }
 function fmtDate(iso) { if (!iso) return ""; const d = new Date(iso + "T00:00:00"); return d.getDate() + " " + AR_MONTHS[d.getMonth()] + " " + d.getFullYear(); }
 
+function prevRange(r) {
+  if (r.kind === "day") return rangeOf("day", shiftDay(r.from, -1));
+  if (r.kind === "year") return rangeOf("year", String(+r.from.slice(0, 4) - 1));
+  return rangeOf("month", mkShift(r.from.slice(0, 7), -1));
+}
+function periodNav() {
+  const u = state.ui, p = u.period;
+  const anchor = p === "day" ? u.day : p === "year" ? u.year : u.mk;
+  const r = rangeOf(p, anchor);
+  const atEnd = p === "day" ? u.day >= todayISO() : p === "year" ? u.year >= todayISO().slice(0, 4) : u.mk >= thisMK();
+  return '<div class="psegs">' +
+    [["day", "يوم"], ["month", "شهر"], ["year", "سنة"]].map(x =>
+      '<button data-act="period" data-v="' + x[0] + '" aria-current="' + (p === x[0]) + '">' + x[1] + "</button>").join("") + "</div>" +
+    '<div class="monthbar"><button class="mnav" data-act="pprev" aria-label="السابق">' + ico("chevR") + "</button>" +
+    "<b>" + r.label + "</b>" +
+    '<button class="mnav" data-act="pnext" aria-label="التالي"' + (atEnd ? " disabled" : "") + ">" + ico("chevL") + "</button></div>";
+}
+/* أعمدة: أيام الشهر أو شهور السنة */
+function periodBars(r) {
+  let buckets = [];
+  if (r.kind === "year") {
+    for (let m = 1; m <= 12; m++) {
+      const mk = r.from.slice(0, 4) + "-" + String(m).padStart(2, "0");
+      buckets.push({ label: AR_MONTHS_SHORT[m - 1], v: totalsIn(rangeOf("month", mk)).exp, key: mk });
+    }
+  } else if (r.kind === "month") {
+    const dim = daysIn(r.from.slice(0, 7));
+    for (let d = 1; d <= dim; d++) {
+      const iso = r.from.slice(0, 7) + "-" + String(d).padStart(2, "0");
+      buckets.push({ label: d % 5 === 0 || d === 1 ? String(d) : "", v: spentOnDay(iso), key: iso });
+    }
+  } else return "";
+  const max = niceMax(Math.max(1, ...buckets.map(b => b.v)));
+  const W = 620, H = r.kind === "year" ? 220 : 190, pL = 58, pR = 10, pT = 12, pB = 28;
+  const pw = W - pL - pR, ph = H - pT - pB;
+  const y = v => pT + ph - (v / max) * ph;
+  let g = "";
+  for (let i = 0; i <= 4; i++) {
+    const val = max * i / 4, yy = y(val);
+    g += '<line x1="' + pL + '" x2="' + (W - pR) + '" y1="' + yy.toFixed(1) + '" y2="' + yy.toFixed(1) + '" stroke="var(--line)" stroke-width="1"/>' +
+      '<text x="' + (pL - 8) + '" y="' + (yy + 4).toFixed(1) + '" text-anchor="end" fill="var(--muted)" style="font:400 11px var(--ff-body);font-variant-numeric:tabular-nums" direction="ltr">' + nf(val, 0) + "</text>";
+  }
+  const slot = pw / buckets.length, bw = Math.max(3, Math.min(26, slot * 0.62));
+  let bars = "";
+  buckets.forEach((b, i) => {
+    const cx = pL + slot * i + slot / 2;
+    if (b.v > 0) bars += roundTop(cx - bw / 2, y(b.v), bw, Math.max(2, (b.v / max) * ph), Math.min(4, bw / 2), "var(--accent)", 'data-k="' + b.key + '" data-v="' + b.v + '" data-l="' + esc(b.label || b.key) + '"');
+    if (b.label) bars += '<text x="' + cx + '" y="' + (H - 9) + '" text-anchor="middle" fill="var(--muted)" style="font:500 10.5px var(--ff-body)">' + b.label + "</text>";
+  });
+  return '<div class="chartbox" id="pbarsBox"><svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="المصروف على مدار الفترة">' + g +
+    '<line x1="' + pL + '" x2="' + (W - pR) + '" y1="' + (pT + ph) + '" y2="' + (pT + ph) + '" stroke="var(--muted)" stroke-width="1"/>' + bars +
+    '</svg><div class="tt" id="pbarsTT"></div></div>';
+}
 function viewStats() {
-  const mk = state.ui.mk, T = totalsOf(mk), ck = monthClock(mk), list = txOfMonth(mk).filter(t => t.type === "expense");
-  let h = "";
-  const d = donutChart(mk);
-  h += '<h2 class="sec">المصاريف على البنود<span class="hint">' + mkLabel(mk) + "</span></h2>";
-  h += '<div class="card pad">' + (d ? d.html : '<div class="empty"><div class="eic">' + ico("pie") + "</div><h4>ما فيش مصاريف الشهر ده</h4><p>سجّل حركات عشان نقدر نطلعلك التوزيع.</p></div>") + "</div>";
+  const r = curRange(), pr = prevRange(r), T = totalsIn(r), P = totalsIn(pr);
+  const list = txIn(r).filter(t => t.type === "expense");
+  const cur = esc(state.settings.currency);
+  let h = periodNav();
 
-  h += '<h2 class="sec">الدخل والمصروف<span class="hint">آخر 6 شهور</span></h2><div class="card pad">' + barsChart(mk) + "</div>";
+  // headline
+  const elapsed = r.kind === "day" ? 1 : (() => {
+    const t = todayISO();
+    if (r.to < t) return r.days;
+    if (r.from > t) return 1;
+    return Math.max(1, daysBetween(r.from, t) + 1);
+  })();
+  const diff = P.exp > 0 ? (T.exp - P.exp) / P.exp * 100 : null;
+  h += '<div class="card pad"><div class="lbl">' + (r.kind === "day" ? "صرفت في اليوم ده" : r.kind === "year" ? "صرفت في السنة دي" : "صرفت في الشهر ده") + "</div>" +
+    '<div class="row" style="align-items:baseline;gap:8px;margin-top:2px"><div style="font-family:var(--ff-display);font-weight:700;font-size:30px;letter-spacing:-.02em">' + nf(T.exp) + "</div>" +
+    '<span style="font-size:14px;color:var(--muted)">' + cur + "</span>" +
+    (diff !== null && Math.abs(diff) >= 1 ? '<span style="margin-inline-start:auto">' + pill(diff > 0 ? "warn" : "good", (diff > 0 ? "أعلى" : "أقل") + " " + Math.round(Math.abs(diff)) + "% عن " + pr.label) + "</span>" : "") + "</div>" +
+    '<div class="ftrow" style="padding-top:11px"><span>دخل ' + nf(T.inc) + "</span><span>" + (r.kind === "day" ? "" : "متوسط اليوم " + nf(T.exp / elapsed, 0)) + "</span></div></div>";
 
-  // stats grid
+  if (r.kind !== "day") h += '<h2 class="sec">' + (r.kind === "year" ? "الصرف على شهور السنة" : "الصرف يوم بيوم") + "</h2><div class=\"card pad\">" + periodBars(r) + "</div>";
+
+  // donut
+  const d = donutRange(r);
+  h += '<h2 class="sec">المصاريف على البنود<span class="hint">' + r.label + "</span></h2>";
+  h += '<div class="card pad">' + (d ? d.html : '<div class="empty"><div class="eic">' + ico("pie") + "</div><h4>ما فيش مصاريف في الفترة دي</h4><p>غيّر الفترة أو سجّل حركات عشان نقدر نطلعلك التوزيع.</p></div>") + "</div>";
+
+  if (r.kind === "day") {
+    const dl = txIn(r).sort((a, b) => (b.at || 0) - (a.at || 0));
+    h += '<h2 class="sec">حركات اليوم<span class="hint">' + dl.length + "</span></h2>" +
+      (dl.length ? '<div class="card list">' + dl.map(t => txRow(t, { date: false })).join("") + "</div>"
+        : '<div class="card"><div class="empty"><p>ما فيش حركات في اليوم ده.</p></div></div>');
+    const week = []; for (let i = 6; i >= 0; i--) { const iso = shiftDay(r.from, -i); week.push({ iso: iso, v: spentOnDay(iso) }); }
+    const wmax = Math.max(1, ...week.map(x => x.v));
+    h += '<h2 class="sec">آخر 7 أيام</h2><div class="card list">' + week.map(x => {
+      const dt = new Date(x.iso + "T00:00:00");
+      const lbl = x.iso === todayISO() ? "النهاردة" : AR_DAYS[dt.getDay()].replace("الأ", "أ") + " " + dt.getDate();
+      return '<button class="item" style="gap:12px" data-act="pickDay" data-v="' + x.iso + '">' +
+        '<span style="width:66px;flex:none;font-size:12.5px;white-space:nowrap;text-align:right;color:' + (x.iso === r.from ? "var(--accent)" : "var(--muted)") + ';font-weight:' + (x.iso === r.from ? 600 : 400) + '">' + lbl + "</span>" +
+        '<span style="flex:1"><span class="bar thin"><i style="width:' + (x.v / wmax * 100).toFixed(1) + '%;background:' + (x.iso === r.from ? "var(--accent)" : "var(--s1)") + '"></i></span></span>' +
+        '<span class="amt" style="font-size:13.5px;min-width:52px;text-align:left">' + nf(x.v) + "</span></button>";
+    }).join("") + "</div>";
+  } else {
+    h += '<h2 class="sec">الدخل والمصروف<span class="hint">' + (r.kind === "year" ? "آخر 6 شهور" : "آخر 6 شهور") + "</span></h2><div class=\"card pad\">" + barsChart(r.kind === "year" ? r.to.slice(0, 7) : r.from.slice(0, 7)) + "</div>";
+  }
+
+  // wallets share
+  const byW = {};
+  list.forEach(t => byW[t.walletId] = (byW[t.walletId] || 0) + t.amount);
+  const wEnt = Object.entries(byW).sort((a, b) => b[1] - a[1]);
+  if (wEnt.length > 1) {
+    h += '<h2 class="sec">اتصرف من فين</h2><div class="card list">' + wEnt.map(([id, v]) => {
+      const w = walletById(id);
+      return '<div class="item" style="cursor:default">' +
+        '<span class="ic" style="background:color-mix(in srgb,var(--' + w.color + ') 15%, var(--surface));color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" +
+        '<span style="flex:1"><span class="nm">' + esc(w.name) + '</span><span class="mt" style="display:block">' + Math.round(v / T.exp * 100) + "% من الصرف</span></span>" +
+        '<span class="amt">' + nf(v) + "</span></div>";
+    }).join("") + "</div>";
+  }
+
+  // quick numbers
   const dayTot = {}; list.forEach(t => dayTot[t.date] = (dayTot[t.date] || 0) + t.amount);
   const topDay = Object.entries(dayTot).sort((a, b) => b[1] - a[1])[0];
   const big = list.slice().sort((a, b) => b.amount - a.amount)[0];
-  const divDays = ck.past ? ck.dim : Math.max(1, ck.day);
   h += '<h2 class="sec">أرقام سريعة</h2><div class="tiles">' +
-    '<div class="tile"><div class="k">' + ico("clock") + '<span>متوسط اليوم</span></div><div class="v">' + nf(T.exp / divDays) + "</div></div>" +
+    '<div class="tile"><div class="k">' + ico("clock") + '<span>متوسط اليوم</span></div><div class="v">' + nf(T.exp / elapsed, 0) + "</div></div>" +
     '<div class="tile"><div class="k">' + ico("tabList") + '<span>عدد الحركات</span></div><div class="v">' + list.length + "</div></div>" +
-    '<div class="tile"><div class="k">' + ico("tUp") + '<span>أعلى يوم</span></div><div class="v">' + (topDay ? nf(topDay[1]) : "0") + "</div></div></div>";
-  if (topDay || big) h += '<p class="sub" style="margin:9px 2px 0">' +
-    (topDay ? "أعلى يوم صرف كان " + dayLabel(topDay[0]) + " بمبلغ " + money2(topDay[1]) + ". " : "") +
-    (big ? "أكبر حركة: " + money2(big.amount) + " في " + esc(catById(big.catId).name) + "." : "") + "</p>";
+    '<div class="tile"><div class="k">' + ico("tUp") + '<span>' + (r.kind === "year" ? "أعلى شهر" : "أعلى يوم") + '</span></div><div class="v">' +
+    (r.kind === "year" ? nf(Math.max(0, ...Array.from({ length: 12 }, (_, i) => totalsIn(rangeOf("month", r.from.slice(0, 4) + "-" + String(i + 1).padStart(2, "0"))).exp)))
+      : topDay ? nf(topDay[1]) : "0") + "</div></div></div>";
+  if (big) h += '<p class="sub" style="margin:9px 2px 0">' +
+    (topDay && r.kind !== "year" ? "أعلى يوم صرف كان " + dayLabel(topDay[0]) + " بمبلغ " + money2(topDay[1]) + ". " : "") +
+    "أكبر حركة: " + money2(big.amount) + " في " + esc(catById(big.catId).name) + ".</p>";
 
   // movers
-  const cur = spendByCat(mk), prv = spendByCat(mkShift(mk, -1));
-  const ids = [...new Set([...Object.keys(cur), ...Object.keys(prv)])];
-  const mov = ids.map(id => ({ c: catById(id), d: (cur[id] || 0) - (prv[id] || 0), a: cur[id] || 0, b: prv[id] || 0 }))
+  const cs = spendByCatIn(r), ps = spendByCatIn(pr);
+  const ids = [...new Set([...Object.keys(cs), ...Object.keys(ps)])];
+  const mov = ids.map(id => ({ c: catById(id), d: (cs[id] || 0) - (ps[id] || 0), a: cs[id] || 0, b: ps[id] || 0 }))
     .filter(m => Math.abs(m.d) > 0).sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 5);
   if (mov.length) {
-    h += '<h2 class="sec">مقارنة بـ ' + mkLabel(mkShift(mk, -1)) + "</h2><div class=\"card list\">" + mov.map(m =>
+    h += '<h2 class="sec">مقارنة بـ ' + pr.label + "</h2><div class=\"card list\">" + mov.map(m =>
       '<div class="item" style="cursor:default">' + catDot(m.c, 34) +
-      '<span style="flex:1"><span class="nm">' + esc(m.c.name) + '</span><span class="mt" style="display:block">' + nf(m.b) + " ← " + nf(m.a) + "</span></span>" +
+      '<span style="flex:1"><span class="nm">' + esc(m.c.name) + '</span><span class="mt" style="display:block"><span class="num">' + nf(m.b) + " ← " + nf(m.a) + "</span></span></span>" +
       '<span class="amt" style="color:' + (m.d > 0 ? "var(--down)" : "var(--up)") + '"><span class="num">' + (m.d > 0 ? "+" : "−") + nf(Math.abs(m.d)) + "</span></span></div>").join("") + "</div>";
   }
   h += '<div id="aiSlot"></div>';
@@ -1087,7 +1636,9 @@ function viewOnboard() {
     '<div class="card pad">' +
     '<div class="field"><label for="obName">اسمك (اختياري)</label><input class="inp" id="obName" placeholder="أحمد"></div>' +
     '<div class="field"><label for="obCur">العملة</label><input class="inp" id="obCur" value="ج.م" maxlength="8"></div>' +
-    '<div class="field"><label for="obBal">معاك كام دلوقتي؟ (كاش + بنك)</label><input class="inp" id="obBal" type="number" inputmode="decimal" placeholder="0"></div>' +
+    '<div class="field"><label for="obCash">معاك كام في جيبك دلوقتي؟</label><input class="inp" id="obCash" type="number" inputmode="decimal" placeholder="0"></div>' +
+    '<div class="field"><label for="obHome">وكام في البيت أو البنك؟</label><input class="inp" id="obHome" type="number" inputmode="decimal" placeholder="0"></div>' +
+    '<p class="sub" style="margin:-6px 0 13px">التطبيق بيفرّق بين أماكن فلوسك، وكل حركة بتسجلها بتختار مكانها. تقدر تضيف أماكن تانية بعدين.</p>' +
     '<div class="field"><label for="obInc">دخلك الشهري التقريبي</label><input class="inp" id="obInc" type="number" inputmode="decimal" placeholder="0"></div>' +
     '<div class="field" style="margin-bottom:6px"><label for="obSave">عايز تحوّش كام % من دخلك كل شهر؟</label>' +
     '<input class="inp" id="obSave" type="number" inputmode="decimal" value="15" min="0" max="90"></div>' +
@@ -1107,15 +1658,21 @@ function renderStorageLine() {
 }
 function render() {
   const v = el("view");
-  if (!state.settings.onboarded) { el("dock").hidden = true; el("btnSettings").hidden = true; v.innerHTML = viewOnboard(); return; }
+  if (Lock.on && !Lock.unlocked) {
+    el("dock").hidden = true; el("btnSettings").hidden = true; el("btnAnalyzeTop").hidden = true;
+    v.innerHTML = viewLock();
+    return;
+  }
+  if (!state.settings.onboarded) { el("dock").hidden = true; el("btnSettings").hidden = true; el("btnAnalyzeTop").hidden = true; v.innerHTML = viewOnboard(); return; }
   el("dock").hidden = false; el("btnSettings").hidden = false;
   renderTabs();
   const alerts = insights(state.ui.mk).filter(i => i.lv === "crit" || i.lv === "warn").length;
   const b = el("btnAnalyzeTop");
   b.hidden = alerts === 0; b.innerHTML = ico("alert"); b.dataset.act = "allTips";
   b.style.color = alerts ? "var(--crit)" : "";
-  const body = state.ui.tab === "home" ? viewHome() : state.ui.tab === "tx" ? viewTx() : state.ui.tab === "budget" ? viewBudget() : state.ui.tab === "goals" ? viewGoals() : viewStats();
-  v.innerHTML = monthBar() + body;
+  const t = state.ui.tab;
+  const body = t === "home" ? viewHome() : t === "tx" ? viewTx() : t === "budget" ? viewBudget() : t === "goals" ? viewGoals() : viewStats();
+  v.innerHTML = (t === "stats" ? "" : monthBar()) + body;
   renderStorageLine();
   if (state.ui.tab === "stats") { wireCharts(); mountAI(); }
   const s = el("txSearch"); if (s) { s.addEventListener("input", debounce(e => { state.ui.q = e.target.value; const p = e.target.selectionStart; render(); const n = el("txSearch"); if (n) { n.focus(); try { n.setSelectionRange(p, p); } catch (_) { } } }, 260)); }
@@ -1124,9 +1681,31 @@ function debounce(fn, ms) { let t; return function () { const a = arguments, c =
 
 /* ---------- chart interactions ---------- */
 function wireCharts() {
+  const pb = el("pbarsBox");
+  if (pb) {
+    const tt = el("pbarsTT");
+    pb.querySelectorAll("path[data-k]").forEach(p => {
+      const move = (ev) => {
+        const rect = pb.getBoundingClientRect();
+        const k = p.dataset.k;
+        const lbl = k.length > 7 ? dayLabel(k) : mkLabel(k);
+        tt.innerHTML = '<div class="tk">' + lbl + '</div><div class="tv"><span class="num">' + nf(+p.dataset.v) + "</span> " + esc(state.settings.currency) + "</div>";
+        tt.style.left = (ev.clientX - rect.left) + "px"; tt.style.top = (ev.clientY - rect.top) + "px"; tt.classList.add("on");
+      };
+      p.addEventListener("pointermove", move); p.addEventListener("pointerenter", move);
+      p.addEventListener("pointerleave", () => tt.classList.remove("on"));
+      p.addEventListener("click", () => {
+        const k = p.dataset.k;
+        if (k.length > 7) { state.ui.period = "day"; state.ui.day = k; }
+        else { state.ui.period = "month"; state.ui.mk = k; }
+        render(); window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+      p.style.cursor = "pointer";
+    });
+  }
   const db = el("donutBox");
   if (db) {
-    const d = donutChart(state.ui.mk), tt = el("donutTT");
+    const d = donutRange(curRange()), tt = el("donutTT");
     db.querySelectorAll(".seg").forEach(s => {
       const move = (ev) => {
         const p = d.parts[+s.dataset.i], r = db.getBoundingClientRect();
@@ -1163,35 +1742,74 @@ function openSheet(title, body, onMount) {
 }
 function closeSheet() { el("backdrop").hidden = true; el("sheet").innerHTML = ""; document.body.style.overflow = ""; sheetMount = null; }
 
+function lastUsedWallet() {
+  const last = state.txs.filter(t => t.type !== "transfer").sort((a, b) => (b.at || 0) - (a.at || 0))[0];
+  return last && walletById(last.walletId).id === last.walletId ? last.walletId : (state.wallets[0] || {}).id;
+}
 function sheetTx(id) {
   const t = id ? state.txs.find(x => x.id === id) : null;
   const type = t ? t.type : "expense";
   const body =
     '<div class="segs" style="margin-bottom:14px">' +
     '<button data-act="txType" data-v="expense" aria-pressed="' + (type === "expense") + '">مصروف</button>' +
-    '<button data-act="txType" data-v="income" aria-pressed="' + (type === "income") + '">دخل</button></div>' +
+    '<button data-act="txType" data-v="income" aria-pressed="' + (type === "income") + '">دخل</button>' +
+    '<button data-act="txType" data-v="transfer" aria-pressed="' + (type === "transfer") + '">تحويل</button></div>' +
     '<div class="field"><label for="txAmt">المبلغ</label><input class="inp big" id="txAmt" type="number" inputmode="decimal" step="0.01" value="' + (t ? t.amount : "") + '" placeholder="0"></div>' +
     '<div class="keypad" style="margin:-6px 0 14px">' + [10, 25, 50, 100, 200, 500, 1000, "مسح"].map(v =>
       '<button data-act="quick" data-v="' + v + '">' + (v === "مسح" ? "مسح" : '<span class="num">+' + v + "</span>") + "</button>").join("") + "</div>" +
-    '<div class="field"><label>البند</label><div class="chips" id="txCats"></div></div>' +
+    '<div class="field" id="fCats"><label>البند</label><div class="chips" id="txCats"></div></div>' +
+    '<div class="field" id="fWallet"><label id="lblWallet">الفلوس من فين؟</label><div class="chips" id="txWallets"></div></div>' +
+    '<div class="field" id="fTo"><label>لفين؟</label><div class="chips" id="txTo"></div></div>' +
+    (id ? "" : '<div class="field" id="fSplit"><button class="btn block" data-act="splitToggle" id="splitBtn">' + ico("split") + "الحساب ده فيه حد تاني</button>" +
+      '<div id="splitBox" hidden style="margin-top:11px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px">' +
+      '<div class="field" style="margin-bottom:11px"><label for="spPerson">مين معاك؟</label><input class="inp" id="spPerson" placeholder="مثلاً: محمود" autocomplete="off"></div>' +
+      '<div class="field" style="margin-bottom:9px"><label for="spAmt">نصيبه اللي هيرجعهولك</label><input class="inp" id="spAmt" type="number" inputmode="decimal" placeholder="0"></div>' +
+      '<div class="chips" style="margin-bottom:9px"><button class="chip" data-act="spHalf">نص الحساب</button><button class="chip" data-act="spThird">تلت الحساب</button></div>' +
+      '<p class="sub" style="margin:0">هنسجّل نصيبك إنت بس كمصروف، والباقي يبقى سلفة ليك عنده.</p></div></div>') +
     '<div class="field"><label for="txDate">التاريخ</label><input class="inp" id="txDate" type="date" value="' + (t ? t.date : todayISO()) + '" max="' + todayISO() + '"></div>' +
     '<div class="field"><label for="txNote">ملاحظة (اختياري)</label><input class="inp" id="txNote" value="' + esc(t ? t.note || "" : "") + '" placeholder="مثلاً: أكل الشغل"></div>' +
     '<div class="btnrow" style="margin-top:6px"><button class="btn pri" style="flex:1" data-act="saveTx" data-id="' + (id || "") + '">' + ico("check") + (t ? "حفظ التعديل" : "سجّل الحركة") + "</button>" +
     (t ? '<button class="btn danger" data-act="delTx" data-id="' + id + '">' + ico("trash") + "حذف</button>" : "") + "</div>";
   openSheet(t ? "تعديل حركة" : "حركة جديدة", body, () => {
-    el("sheet").dataset.type = type;
-    el("sheet").dataset.cat = t ? t.catId : "";
-    paintCats();
+    const sh = el("sheet");
+    sh.dataset.type = type;
+    sh.dataset.cat = t ? t.catId || "" : "";
+    sh.dataset.wallet = t ? (t.type === "transfer" ? t.fromWallet : t.walletId) || lastUsedWallet() : lastUsedWallet();
+    sh.dataset.towallet = t && t.type === "transfer" ? t.toWallet : (state.wallets.find(w => w.id !== sh.dataset.wallet) || {}).id || "";
+    paintTxForm();
     setTimeout(() => { const a = el("txAmt"); if (a && !t) a.focus(); }, 60);
   });
 }
-function paintCats() {
-  const sh = el("sheet"), type = sh.dataset.type, sel = sh.dataset.cat;
-  const cats = type === "income" ? INCOME_CATS : state.categories;
-  if (!cats.some(c => c.id === sel)) sh.dataset.cat = cats[0] ? cats[0].id : "";
-  el("txCats").innerHTML = cats.map(c =>
-    '<button class="chip" data-act="pickCat" data-v="' + c.id + '" aria-pressed="' + (c.id === sh.dataset.cat) + '" style="' + (c.id === sh.dataset.cat ? "color:var(--" + c.color + ")" : "") + '">' +
-    '<span style="color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" + esc(c.name) + "</button>").join("");
+function walletChips(boxId, selected, act, exclude) {
+  el(boxId).innerHTML = state.wallets.filter(w => w.id !== exclude).map(w =>
+    '<button class="chip" data-act="' + act + '" data-v="' + w.id + '" aria-pressed="' + (w.id === selected) + '" style="' + (w.id === selected ? "color:var(--" + w.color + ")" : "") + '">' +
+    '<span style="color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" + esc(w.name) + "</button>").join("");
+}
+function paintTxForm() {
+  const sh = el("sheet"), type = sh.dataset.type;
+  const transfer = type === "transfer";
+  el("fCats").hidden = transfer;
+  el("fTo").hidden = !transfer;
+  const fs = el("fSplit");
+  if (fs) {
+    fs.hidden = type !== "expense";
+    if (type !== "expense") { sh.dataset.split = ""; el("splitBox").hidden = true; }
+  }
+  el("lblWallet").textContent = transfer ? "من فين؟" : type === "income" ? "الفلوس راحت فين؟" : "الفلوس من فين؟";
+  if (!transfer) {
+    const cats = type === "income" ? INCOME_CATS : state.categories;
+    if (!cats.some(c => c.id === sh.dataset.cat)) sh.dataset.cat = cats[0] ? cats[0].id : "";
+    el("txCats").innerHTML = cats.map(c =>
+      '<button class="chip" data-act="pickCat" data-v="' + c.id + '" aria-pressed="' + (c.id === sh.dataset.cat) + '" style="' + (c.id === sh.dataset.cat ? "color:var(--" + c.color + ")" : "") + '">' +
+      '<span style="color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" + esc(c.name) + "</button>").join("");
+  }
+  if (!state.wallets.some(w => w.id === sh.dataset.wallet)) sh.dataset.wallet = (state.wallets[0] || {}).id || "";
+  walletChips("txWallets", sh.dataset.wallet, "pickWallet");
+  if (transfer) {
+    if (sh.dataset.towallet === sh.dataset.wallet || !state.wallets.some(w => w.id === sh.dataset.towallet))
+      sh.dataset.towallet = (state.wallets.find(w => w.id !== sh.dataset.wallet) || {}).id || "";
+    walletChips("txTo", sh.dataset.towallet, "pickTo", sh.dataset.wallet);
+  }
 }
 
 function sheetCat(id) {
@@ -1266,16 +1884,147 @@ function goalPreview() {
     '<div class="ftrow" style="padding:6px 0' + (i < rows.length - 1 ? ";border-bottom:1px solid var(--line)" : "") + '"><span>' + r[0] + '</span><span style="color:var(--ink);font-weight:600;font-family:var(--ff-display)">' + r[1] + "</span></div>").join("") +
     (cap > 0 && st.need > cap ? '<div style="margin-top:10px">' + pill("warn", "أكتر من قدرتك (" + nf(cap) + ") بـ " + nf(st.need - cap)) + "</div>" : "");
 }
-function sheetBalance() {
-  const B = balanceNow(), net = B.total - (+state.settings.startBalance || 0);
-  openSheet("معاك كام دلوقتي؟",
-    '<p class="sub" style="margin:0 0 14px">اكتب اللي معاك فعلاً دلوقتي (كاش + بنك + محفظة). التطبيق هيظبط الرصيد على الرقم ده من غير ما يلمس حركاتك.</p>' +
-    '<div class="field"><label for="balAmt">الرصيد الحالي</label><input class="inp big" id="balAmt" type="number" inputmode="decimal" value="' + Math.round(B.total * 100) / 100 + '"></div>' +
+/* ---------- سلف وديون: الشاشات ---------- */
+function debtRow(d) {
+  const left = d.closedAt ? 0 : debtLeft(d), paid = debtPaid(d), extra = debtExtra(d);
+  const out = d.dir === "out";
+  const pct = d.amount > 0 ? clamp(paid / d.amount * 100, 0, 100) : 0;
+  const col = out ? "var(--s3)" : "var(--s4)";
+  let badge;
+  if (d.closedAt) badge = pill("flat", "اتقفل");
+  else if (left <= 0.004) badge = pill("good", extra > 0 ? "رجع زيادة " + nf(extra) : "اترد بالكامل");
+  else if (paid > 0) badge = pill("warn", "رجع " + nf(paid) + " من " + nf(d.amount));
+  else badge = pill(out ? "warn" : "crit", out ? "لسه ما رجعش" : "لسه ما دفعتش");
+  const age = daysBetween(d.date, todayISO());
+  return '<div class="bud" style="border-bottom:1px solid var(--line)">' +
+    '<div class="hd">' +
+    '<span class="ic" style="background:color-mix(in srgb,' + col + ' 15%, var(--surface));color:' + col + '">' + ico(out ? "handOut" : "handIn") + "</span>" +
+    '<span style="flex:1;min-width:0"><span class="nm" style="display:block">' + esc(d.person || "من غير اسم") + "</span>" +
+    '<span class="mt" style="display:block;color:var(--muted);font-size:12px">' + (d.note ? esc(d.note) + " · " : "") + fmtDate(d.date) + (age > 0 ? " · من " + age + " يوم" : "") + "</span></span>" +
+    '<span class="rt"><b style="color:' + (out ? "var(--up)" : "var(--down)") + '">' + nf(left || d.amount) + "</b><small>" + (left > 0 ? (out ? "ليك" : "عليك") : "من " + nf(d.amount)) + "</small></span></div>" +
+    '<div class="bar thin"><i style="width:' + pct + "%;background:" + col + '"></i></div>' +
+    '<div class="ftrow" style="padding-top:8px;align-items:center">' + badge +
+    '<span class="btnrow" style="gap:6px">' +
+    (left > 0.004 && !d.closedAt ? '<button class="btn" style="padding:6px 11px;font-size:13px" data-act="debtPay" data-id="' + d.id + '">' + ico("plus") + (out ? "رجّعلي" : "دفعت") + "</button>" : "") +
+    '<button class="btn ghost" style="padding:6px 9px;font-size:13px" data-act="debtEdit" data-id="' + d.id + '">' + ico("edit") + "</button></span></div></div>";
+}
+function sheetDebts() {
+  const t = debtTotals();
+  const open = state.debts.filter(d => !d.closedAt && debtLeft(d) > 0.004);
+  const done = state.debts.filter(d => d.closedAt || debtLeft(d) <= 0.004);
+  const out = open.filter(d => d.dir === "out").sort((a, b) => a.date.localeCompare(b.date));
+  const inn = open.filter(d => d.dir === "in").sort((a, b) => a.date.localeCompare(b.date));
+  let h = '<div class="tiles" style="grid-template-columns:1fr 1fr;margin-bottom:14px">' +
+    '<div class="tile"><div class="k">' + ico("handOut") + '<span>ليك عند الناس</span></div><div class="v up">' + nf(t.owedToMe) + "</div></div>" +
+    '<div class="tile"><div class="k">' + ico("handIn") + '<span>عليك للناس</span></div><div class="v down">' + nf(t.iOwe) + "</div></div></div>" +
+    '<div class="btnrow" style="margin-bottom:16px"><button class="btn pri" style="flex:1" data-act="newDebt" data-v="out">' + ico("handOut") + 'سلّفت حد</button>' +
+    '<button class="btn" style="flex:1" data-act="newDebt" data-v="in">' + ico("handIn") + "استلفت</button></div>";
+  if (!state.debts.length) {
+    h += '<div class="card"><div class="empty"><div class="eic">' + ico("handOut") + "</div><h4>ما فيش سلف مسجلة</h4>" +
+      "<p>لما تسلّف حد أو تدفع عنه، سجّلها هنا. الفلوس دي بتتشال من محفظتك بس <b>مش بتتحسب مصروف</b> — عشان تحليل صرفك يفضل مظبوط.</p></div></div>";
+    return openSheet("سلف وديون", h);
+  }
+  if (out.length) h += '<h2 class="sec" style="margin-top:0">ليك عند الناس<span class="hint">' + out.length + "</span></h2><div class=\"card\">" + out.map(debtRow).join("") + "</div>";
+  if (inn.length) h += '<h2 class="sec">عليك للناس<span class="hint">' + inn.length + "</span></h2><div class=\"card\">" + inn.map(debtRow).join("") + "</div>";
+  if (done.length) h += '<details class="more" style="margin-top:14px"><summary>خلصانة (' + done.length + ')</summary><div class="card" style="margin-top:10px">' +
+    done.slice().reverse().slice(0, 25).map(debtRow).join("") + "</div></details>";
+  openSheet("سلف وديون", h);
+}
+function sheetDebt(id, dir) {
+  const d = id ? state.debts.find(x => x.id === id) : null;
+  const dr = d ? d.dir : (dir || "out");
+  const out = dr === "out";
+  const names = [...new Set(state.debts.map(x => (x.person || "").trim()).filter(Boolean))].slice(0, 8);
+  openSheet(d ? "تعديل" : out ? "سلّفت حد فلوس" : "استلفت من حد",
+    '<p class="sub" style="margin:0 0 14px">' + (out
+      ? "الفلوس دي هتتشال من محفظتك، بس مش هتتحسب مصروف — لأنها راجعة."
+      : "الفلوس دي هتتضاف لمحفظتك، بس مش هتتحسب دخل — لأنها مش بتاعتك.") + "</p>" +
+    '<div class="field"><label for="dPerson">' + (out ? "مين اللي واخد الفلوس؟" : "مين اللي سلّفك؟") + '</label>' +
+    '<input class="inp" id="dPerson" value="' + esc(d ? d.person : "") + '" placeholder="مثلاً: محمود" list="dNames" autocomplete="off">' +
+    (names.length ? '<datalist id="dNames">' + names.map(n => '<option value="' + esc(n) + '"></option>').join("") + "</datalist>" : "") + "</div>" +
+    '<div class="field"><label for="dAmt">المبلغ</label><input class="inp big" id="dAmt" type="number" inputmode="decimal" step="0.01" value="' + (d ? d.amount : "") + '" placeholder="0"></div>' +
+    '<div class="field"><label>' + (out ? "الفلوس خرجت من فين؟" : "الفلوس دخلت فين؟") + '</label><div class="chips" id="dWallets"></div></div>' +
+    '<div class="field"><label for="dDate">التاريخ</label><input class="inp" id="dDate" type="date" value="' + (d ? d.date : todayISO()) + '" max="' + todayISO() + '"></div>' +
+    '<div class="field"><label for="dNote">على إيه؟ (اختياري)</label><input class="inp" id="dNote" value="' + esc(d ? d.note || "" : "") + '" placeholder="مثلاً: حساب الفطار"></div>' +
+    '<div class="btnrow"><button class="btn pri" style="flex:1" data-act="saveDebt" data-id="' + (id || "") + '">' + ico("check") + "حفظ</button>" +
+    (id ? '<button class="btn danger" data-act="delDebt" data-id="' + id + '">' + ico("trash") + "حذف</button>" : "") + "</div>",
+    () => {
+      const sh = el("sheet");
+      sh.dataset.ddir = dr;
+      sh.dataset.wallet = d ? d.walletId : lastUsedWallet();
+      walletChips("dWallets", sh.dataset.wallet, "pickWallet2");
+      setTimeout(() => { const n = el("dPerson"); if (n && !d) n.focus(); }, 60);
+    });
+}
+function sheetDebtPay(id) {
+  const d = state.debts.find(x => x.id === id); if (!d) return;
+  const left = debtLeft(d), out = d.dir === "out";
+  const paid = debtPaid(d);
+  openSheet(out ? esc(d.person) + " رجّعلك كام؟" : "دفعت لـ " + esc(d.person) + " كام؟",
     '<div class="card pad" style="margin-bottom:14px">' +
-    '<div class="ftrow" style="padding:5px 0;border-bottom:1px solid var(--line)"><span>محسوب من حركاتك</span><span style="color:var(--ink);font-weight:600"><span class="num">' + (net >= 0 ? "+" : "−") + nf(Math.abs(net)) + "</span></span></div>" +
-    '<div class="ftrow" style="padding:5px 0"><span>محجوز لأهداف الادخار</span><span style="color:var(--ink);font-weight:600">' + nf(B.locked) + "</span></div></div>" +
-    '<button class="btn pri block" data-act="saveBalance">' + ico("check") + "ظبّط الرصيد</button>",
-    () => setTimeout(() => { const a = el("balAmt"); if (a) { a.focus(); a.select(); } }, 60));
+    '<div class="ftrow" style="padding:5px 0;border-bottom:1px solid var(--line)"><span>المبلغ الأصلي</span><b style="font-family:var(--ff-display)">' + nf(d.amount) + "</b></div>" +
+    (paid > 0 ? '<div class="ftrow" style="padding:5px 0;border-bottom:1px solid var(--line)"><span>اترد لحد دلوقتي</span><b style="font-family:var(--ff-display)">' + nf(paid) + "</b></div>" : "") +
+    '<div class="ftrow" style="padding:5px 0"><span>الباقي</span><b style="font-family:var(--ff-display);color:' + (out ? "var(--up)" : "var(--down)") + '">' + nf(left) + "</b></div></div>" +
+    '<div class="field"><label for="pAmt">المبلغ</label><input class="inp big" id="pAmt" type="number" inputmode="decimal" step="0.01" value="' + (Math.round(left * 100) / 100) + '"></div>' +
+    '<p class="sub" style="margin:-4px 0 12px">تقدر تكتب أقل من الباقي لو رجّع جزء، أو أكتر لو زوّد.</p>' +
+    '<div class="field"><label>' + (out ? "الفلوس دخلت فين؟" : "دفعتها من فين؟") + '</label><div class="chips" id="pWallets"></div></div>' +
+    '<div class="field"><label for="pDate">التاريخ</label><input class="inp" id="pDate" type="date" value="' + todayISO() + '" max="' + todayISO() + '"></div>' +
+    '<button class="btn pri block" data-act="doDebtPay" data-id="' + id + '">' + ico("check") + "سجّل" + "</button>" +
+    (left > 0.004 ? '<button class="btn danger block" style="margin-top:9px" data-act="debtWriteOff" data-id="' + id + '">' + ico("x") +
+      (out ? "اعتبر الباقي راح (مصروف)" : "اعتبر الباقي اتسامح فيه") + "</button>" : ""),
+    () => {
+      const sh = el("sheet");
+      sh.dataset.wallet = d.walletId;
+      walletChips("pWallets", sh.dataset.wallet, "pickWallet2");
+      setTimeout(() => { const a = el("pAmt"); if (a) { a.focus(); a.select(); } }, 60);
+    });
+}
+function sheetWallets() {
+  const wb = walletBalances();
+  openSheet("أماكن الفلوس",
+    '<p class="sub" style="margin:0 0 14px">قسّم فلوسك على أماكن: اللي في جيبك، اللي في البيت، اللي في البنك. كل حركة بتسجلها بتختار مكانها، فتعرف كل مكان فيه كام.</p>' +
+    '<div class="card">' + state.wallets.map(w =>
+      '<button class="item" data-act="editWallet" data-id="' + w.id + '">' +
+      '<span class="ic" style="background:color-mix(in srgb,var(--' + w.color + ') 15%, var(--surface));color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" +
+      '<span style="flex:1;min-width:0"><span class="nm">' + esc(w.name) + "</span></span>" +
+      '<span class="amt" style="color:' + ((wb[w.id] || 0) < 0 ? "var(--down)" : "var(--ink)") + '">' + nf(wb[w.id] || 0) + "</span></button>").join("") + "</div>" +
+    '<div class="btnrow" style="margin-top:14px"><button class="btn pri block" data-act="newWallet">' + ico("plus") + "مكان جديد</button></div>");
+}
+function sheetWallet(id) {
+  const w = id ? state.wallets.find(x => x.id === id) : null;
+  const wb = walletBalances();
+  const cur = w ? wb[w.id] || 0 : 0;
+  openSheet(w ? "تعديل « " + w.name + " »" : "مكان جديد للفلوس",
+    '<div class="field"><label for="wName">الاسم</label><input class="inp" id="wName" value="' + esc(w ? w.name : "") + '" placeholder="مثلاً: محفظة الموبايل"></div>' +
+    '<div class="field"><label for="wOpen">' + (w ? "الرصيد الحالي فيه" : "فيه كام دلوقتي؟") + '</label><input class="inp big" id="wOpen" type="number" inputmode="decimal" value="' + (w ? Math.round(cur * 100) / 100 : "") + '" placeholder="0"></div>' +
+    (w ? '<p class="sub" style="margin:-4px 0 14px">لو غيّرت الرقم ده، التطبيق بيظبط رصيد المكان عليه من غير ما يلمس حركاتك.</p>' : "") +
+    '<div class="field"><label>الشكل</label><div class="chips" id="wIcons">' + WALLET_ICONS.map(i =>
+      '<button class="chip" data-act="pickWIcon" data-v="' + i + '" aria-pressed="' + (w && w.icon === i) + '">' + ico(i) + "</button>").join("") + "</div></div>" +
+    '<div class="field"><label>اللون</label><div class="chips" id="wColors">' + COLOR_CHOICES.map(k =>
+      '<button class="chip" data-act="pickWColor" data-v="' + k + '" aria-pressed="' + (w && w.color === k) + '" style="padding:7px"><i style="width:18px;height:18px;border-radius:6px;display:block;background:var(--' + k + ')"></i></button>').join("") + "</div></div>" +
+    '<div class="btnrow"><button class="btn pri" style="flex:1" data-act="saveWallet" data-id="' + (id || "") + '">' + ico("check") + "حفظ</button>" +
+    (id && state.wallets.length > 1 ? '<button class="btn danger" data-act="delWallet" data-id="' + id + '">' + ico("trash") + "حذف</button>" : "") + "</div>",
+    () => {
+      const sh = el("sheet");
+      sh.dataset.wicon = w ? w.icon : "wallet"; sh.dataset.wcolor = w ? w.color : "s3";
+      repaintPick("wIcons", sh.dataset.wicon); repaintPick("wColors", sh.dataset.wcolor);
+    });
+}
+function sheetBalance() {
+  const B = balanceNow();
+  openSheet("فلوسك فين؟",
+    '<p class="sub" style="margin:0 0 14px">رصيدك الكلي مجموع الأماكن دي. دوس على أي مكان تظبط رقمه.</p>' +
+    '<div class="card">' + state.wallets.map(w =>
+      '<button class="item" data-act="editWallet" data-id="' + w.id + '">' +
+      '<span class="ic" style="background:color-mix(in srgb,var(--' + w.color + ') 15%, var(--surface));color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" +
+      '<span style="flex:1"><span class="nm">' + esc(w.name) + "</span></span>" +
+      '<span class="amt" style="color:' + ((B.byWallet[w.id] || 0) < 0 ? "var(--down)" : "var(--ink)") + '">' + nf(B.byWallet[w.id] || 0) + "</span></button>").join("") +
+      '<div class="item" style="cursor:default;background:var(--surface-2)"><span style="flex:1"><span class="nm">الإجمالي</span>' +
+      '<span class="mt" style="display:block">محجوز للأهداف ' + nf(B.locked) + "</span></span>" +
+      '<span class="amt" style="font-size:17px">' + nf(B.total) + "</span></div></div>" +
+    '<div class="btnrow" style="margin-top:14px;flex-direction:column;align-items:stretch">' +
+    '<button class="btn pri block" data-act="newWallet">' + ico("plus") + "ضيف مكان جديد</button>" +
+    '<button class="btn block" data-act="quickTransfer">' + ico("swap") + "حوّل فلوس بين مكانين</button></div>");
 }
 function sheetContrib(id) {
   const g = state.goals.find(x => x.id === id); if (!g) return;
@@ -1296,16 +2045,37 @@ function sheetTips() {
       return '<div class="tip"><span class="bullet" style="background:' + bg + ";color:" + fg + '">' + ico(t.ic || ic) + "</span><div><h4>" + esc(t.t) + "</h4><p>" + esc(t.x) + "</p></div></div>";
     }).join("") : '<div class="empty"><p>ما فيش ملاحظات على الشهر ده.</p></div>') + "</div>");
 }
+function sheetBioAsk() {
+  openSheet("تفعيل البصمة",
+    '<p class="sub" style="margin:0 0 14px">اكتب رمزك الحالي عشان نربط البصمة بيه.</p>' +
+    '<div class="field"><label for="bioPin">الرمز</label><input class="inp big" id="bioPin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••" style="text-align:center;letter-spacing:.3em"></div>' +
+    '<button class="btn pri block" data-act="bioPinOk">' + ico("finger") + "كمّل</button>",
+    () => setTimeout(() => { const n = el("bioPin"); if (n) n.focus(); }, 60));
+}
+function lockSectionHTML() {
+  const on = Lock.on && Lock.cfg, bio = on && Lock.cfg.bio;
+  if (!hasCrypto()) return '<p class="sub" style="margin:0">المتصفح ده مش بيدعم التشفير، فالقفل مش متاح هنا. جرّب كروم أو سفاري.</p>';
+  if (!on) return '<p class="sub" style="margin:0 0 12px">اقفل التطبيق برمز من 4 أرقام. الرمز مش بيمنع الفتح بس — كمان بيشفّر بياناتك على الجهاز، فحد لو فتح التليفون مش هيقرا حاجة.</p>' +
+    '<button class="btn pri block" data-act="lockSetup">' + ico("lock") + "فعّل القفل</button>";
+  return '<div class="ftrow" style="padding:0 0 12px"><span>القفل بالرمز</span>' + pill("good", "شغال") + "</div>" +
+    '<div class="ftrow" style="padding:0 0 12px"><span>الفتح بالبصمة</span>' + (bio ? pill("good", "مفعّلة") : pill("flat", "مش مفعّلة")) + "</div>" +
+    '<div class="btnrow">' +
+    (bio ? '<button class="btn" data-act="bioOff">' + ico("finger") + "ألغي البصمة</button>"
+      : '<button class="btn" data-act="bioAsk">' + ico("finger") + "فعّل البصمة</button>") +
+    '<button class="btn danger" data-act="lockOff">' + ico("x") + "اقفل القفل</button></div>" +
+    '<p class="sub" style="margin:12px 0 0">لو نسيت الرمز مفيش طريقة نرجّع البيانات غير من نسخة احتياطية — خد نسخة وإنت فاكره.</p>';
+}
 function sheetSettings() {
   const s = state.settings;
   const body =
     '<div class="field"><label for="stName">اسمك</label><input class="inp" id="stName" value="' + esc(s.name) + '"></div>' +
     '<div class="field"><label for="stCur">العملة</label><input class="inp" id="stCur" value="' + esc(s.currency) + '" maxlength="8"></div>' +
-    '<div class="field"><label for="stBal">الرصيد الابتدائي</label><input class="inp" id="stBal" type="number" inputmode="decimal" value="' + (s.startBalance || 0) + '"></div>' +
-    '<p class="sub" style="margin:-8px 0 13px">ده الرصيد اللي بدأت بيه. الرصيد الحالي = الرصيد ده + كل دخل − كل مصروف.</p>' +
+    '<button class="btn block" data-act="wallets" style="margin-bottom:13px">' + ico("wallet") + "أماكن الفلوس وأرصدتها</button>" +
     '<div class="field"><label for="stInc">الدخل الشهري</label><input class="inp" id="stInc" type="number" inputmode="decimal" value="' + (s.income || 0) + '"></div>' +
     '<div class="field"><label for="stSave">نسبة الادخار المستهدفة %</label><input class="inp" id="stSave" type="number" inputmode="decimal" value="' + (s.savePct || 0) + '"></div>' +
     '<button class="btn pri block" data-act="saveSettings">' + ico("check") + "حفظ</button>" +
+    '<hr class="sep"><h4 style="margin:0 0 8px;font-family:var(--ff-display);font-size:15px">القفل والخصوصية</h4>' +
+    lockSectionHTML() +
     '<hr class="sep"><h4 style="margin:0 0 6px;font-family:var(--ff-display);font-size:15px">نسخة احتياطية</h4>' +
     '<div id="bkStatus" style="margin-bottom:10px">' + backupStatusHTML() + "</div>" +
     '<p class="sub" style="margin:0 0 12px">ينزّل ملف واحد فيه كل حركاتك وبنودك وأهدافك وإعداداتك. سمّي الملف زي ما تحب — واختار مكانه لو متصفحك بيسمح.</p>' +
@@ -1329,22 +2099,54 @@ function sheetSettings() {
 function addTxFromSheet(id) {
   const sh = el("sheet"), amt = parseFloat(el("txAmt").value);
   if (!(amt > 0)) return toast("اكتب مبلغ أكبر من صفر");
-  const cat = sh.dataset.cat; if (!cat) return toast("اختار البند");
+  const type = sh.dataset.type, transfer = type === "transfer";
   const date = el("txDate").value || todayISO();
   const note = el("txNote").value.trim().slice(0, 120);
-  const type = sh.dataset.type;
+  const from = sh.dataset.wallet;
+  if (!from) return toast("اختار مكان الفلوس");
+  let data;
+  if (transfer) {
+    const to = sh.dataset.towallet;
+    if (!to || to === from) return toast("اختار مكانين مختلفين");
+    data = { type: "transfer", amount: amt, fromWallet: from, toWallet: to, catId: "", walletId: "", date: date, note: note };
+  } else {
+    const cat = sh.dataset.cat; if (!cat) return toast("اختار البند");
+    data = { type: type, amount: amt, catId: cat, walletId: from, fromWallet: "", toWallet: "", date: date, note: note };
+  }
+  // تقسيم الحساب: نصيب حد تاني يتسجل سلفة مش مصروف
+  let splitInfo = null;
+  if (!id && type === "expense" && sh.dataset.split === "1") {
+    const person = (el("spPerson").value || "").trim().slice(0, 40);
+    const theirs = parseFloat(el("spAmt").value) || 0;
+    if (!person) return toast("اكتب اسم اللي معاك");
+    if (!(theirs > 0)) return toast("اكتب نصيبه من الحساب");
+    if (theirs >= amt) return toast("نصيبه لازم يكون أقل من المبلغ الكلي");
+    splitInfo = { person: person, theirs: theirs };
+    data.amount = amt - theirs;
+  }
   if (id) {
     const t = state.txs.find(x => x.id === id); if (!t) return;
     const oldMK = mkOf(t.date);
-    Object.assign(t, { type: type, amount: amt, catId: cat, date: date, note: note });
+    Object.assign(t, data);
     save("m:" + oldMK); if (mkOf(date) !== oldMK) save("m:" + mkOf(date));
     toast("اتعدلت");
   } else {
-    state.txs.push({ id: uid("t"), type: type, amount: amt, catId: cat, date: date, note: note, at: Date.now() });
+    state.txs.push(Object.assign({ id: uid("t"), at: Date.now() }, data));
     save("m:" + mkOf(date));
-    toast(type === "income" ? "اتسجل دخل " + money2(amt) : "اتسجل مصروف " + money2(amt));
+    if (splitInfo) {
+      state.debts.push({
+        id: uid("d"), dir: "out", person: splitInfo.person, amount: splitInfo.theirs,
+        walletId: from, date: date, note: note || catById(data.catId).name,
+        payments: [], closedAt: "", at: Date.now()
+      });
+      save("debts");
+      toast("اتسجل " + money2(data.amount) + " مصروف · و" + money2(splitInfo.theirs) + " ليك عند " + splitInfo.person);
+    } else {
+      toast(transfer ? "اتحوّل " + money2(amt) + " من " + walletById(from).name + " لـ " + walletById(data.toWallet).name
+        : type === "income" ? "اتسجل دخل " + money2(amt) : "اتسجل مصروف " + money2(amt));
+    }
   }
-  state.ui.mk = mkOf(date) <= thisMK() ? mkOf(date) : state.ui.mk;
+  if (mkOf(date) <= thisMK()) { state.ui.mk = mkOf(date); state.ui.day = date; state.ui.year = date.slice(0, 4); }
   closeSheet(); render();
 }
 function suggestLimits() {
@@ -1388,7 +2190,7 @@ async function saveFile(name, text, mime) {
   catch (_) { return "failed"; }
 }
 function backupPayload() {
-  return { app: "masroufy", v: 1, savedAt: new Date().toISOString(), settings: state.settings, categories: state.categories, txs: state.txs, goals: state.goals };
+  return Object.assign({ app: "masroufy", v: 2, savedAt: new Date().toISOString() }, dataBundle());
 }
 function cleanName(n, ext) {
   n = (n || "").trim().replace(/[\\/:*?"<>|]/g, "-").slice(0, 60) || "masroufy-backup-" + todayISO();
@@ -1463,6 +2265,7 @@ function sheetRestore(fileName) {
     row("الفترة", dates.length ? fmtDate(dates[0]) + " ← " + fmtDate(dates[dates.length - 1]) : "—") +
     row("البنود", nf((d.categories || []).length)) +
     row("أهداف الادخار", nf((d.goals || []).length)) +
+    row("سلف وديون", nf((d.debts || []).length)) +
     (savedAt && !isNaN(savedAt) ? row("تاريخ النسخة", fmtDate(savedAt.toISOString().slice(0, 10))) : "") +
     '<div class="ftrow" style="padding:6px 0"><span>حركات جديدة مش عندك</span><span style="color:var(--ink);font-weight:600">' + nf(fresh) + "</span></div></div>" +
     '<div class="btnrow" style="flex-direction:column;align-items:stretch">' +
@@ -1474,21 +2277,21 @@ function sheetRestore(fileName) {
 function applyRestore(mode) {
   const d = pendingRestore; if (!d) return;
   const touched = new Set(state.txs.map(t => mkOf(t.date)));
+  migrate(d);
   if (mode === "replace") {
-    if (d.settings) { Object.assign(state.settings, d.settings); state.settings.onboarded = true; }
-    if (Array.isArray(d.categories) && d.categories.length) state.categories = d.categories;
-    state.txs = d.txs.slice();
-    state.goals = Array.isArray(d.goals) ? d.goals.slice() : [];
+    applyData(d);
+    state.settings.onboarded = true;
   } else {
     const known = new Set(state.txs.map(t => t.id));
     d.txs.forEach(t => { if (t && t.id && !known.has(t.id)) { state.txs.push(t); known.add(t.id); } });
+    (d.wallets || []).forEach(w => { if (w && w.id && !state.wallets.some(x => x.id === w.id)) state.wallets.push(w); });
     (d.categories || []).forEach(c => { if (c && c.id && !state.categories.some(x => x.id === c.id)) state.categories.push(c); });
     (d.goals || []).forEach(g => { if (g && g.id && !state.goals.some(x => x.id === g.id)) state.goals.push(g); });
+    (d.debts || []).forEach(x => { if (x && x.id && !state.debts.some(y => y.id === x.id)) state.debts.push(x); });
   }
   state.txs.forEach(t => touched.add(mkOf(t.date)));
-  save("settings", "categories", "goals");
+  save("settings", "wallets", "categories", "goals", "debts");
   touched.forEach(mk => save("m:" + mk));
-  const n = d.txs.length;
   pendingRestore = null;
   closeSheet(); render();
   toast(mode === "replace" ? "رجّعنا النسخة — " + nf(state.txs.length) + " حركة" : "دمجنا النسخة — إجمالي " + nf(state.txs.length) + " حركة");
@@ -1514,14 +2317,21 @@ async function runAI() {
     const T = totalsOf(m), sc = spendByCat(m);
     return { month: m, income: Math.round(T.inc), expense: Math.round(T.exp), byCategory: Object.entries(sc).map(([id, v]) => ({ name: catById(id).name, amount: Math.round(v), limit: +catById(id).limit || 0 })) };
   };
+  const B = balanceNow(), ckN = monthClock(mk);
   const data = {
     currency: state.settings.currency, monthlyIncome: +state.settings.income || 0, savingTargetPct: +state.settings.savePct || 0,
-    balance: Math.round(balanceNow().total), current: pack(mk), previous: pack(prev),
+    balance: Math.round(B.total),
+    wallets: state.wallets.map(w => ({ name: w.name, balance: Math.round(B.byWallet[w.id] || 0) })),
+    dayOfMonth: ckN.day, daysInMonth: ckN.dim,
+    avgPerDay: Math.round(ckN.day > 0 ? totalsOf(mk).exp / ckN.day : 0),
+    spentToday: Math.round(spentOnDay(todayISO())),
+    current: pack(mk), previous: pack(prev),
     goals: state.goals.map(g => { const s = goalStatus(g); return { name: g.name, target: g.target, saved: g.saved || 0, deadline: g.deadline || null, neededMonthly: Math.round(s.need || 0) }; })
   };
   const prompt = "إنت مستشار مالي شخصي بتكلم مصري بالعامية المصرية البسيطة. جاتلك بيانات مصاريف شخص بالجنيه. " +
     "اكتب تحليل قصير ومفيد في 4 أقسام بعناوين واضحة: (1) الخلاصة في سطرين، (2) أكتر 3 حاجات بتاكل فلوسه وليه، " +
-    "(3) 4 خطوات عملية بأرقام محددة يقدر ينفذها الشهر الجاي عشان يوفر، (4) هل هيقدر يوصل لأهدافه ولا لأ وإيه المطلوب. " +
+    "(3) 4 خطوات عملية بأرقام محددة يقدر ينفذها الشهر الجاي عشان يوفر — واحدة منهم على الأقل عن معدل صرفه اليومي، " +
+    "(4) هل هيقدر يوصل لأهدافه ولا لأ وإيه المطلوب. " +
     "استخدم أرقام من البيانات نفسها، ما تخترعش أرقام، وما تكتبش مقدمات أو اعتذارات. البيانات:\n" + JSON.stringify(data);
   try {
     const res = await sampleNS(prompt, { modelTier: "default", onText: ({ text }) => { out.textContent = text; } });
@@ -1538,18 +2348,83 @@ document.addEventListener("click", (ev) => {
   const a = b.dataset.act, v = b.dataset.v, id = b.dataset.id;
   const sh = el("sheet");
   switch (a) {
+    case "pinKey": pinPush(v); break;
+    case "pinDel": if (!LockUI.busy && LockUI.entry) { LockUI.entry = LockUI.entry.slice(0, -1); paintDots(); lockErr(""); } break;
+    case "pinBio": tryBio(false); break;
+    case "pinRestart": LockUI.entry = ""; LockUI.first = ""; LockUI.mode = "set"; render(); break;
+    case "pinForgot":
+      openSheet("نسيت الرمز؟",
+        '<p class="sub" style="margin:0 0 14px">بياناتك متشفّرة بالرمز، فمفيش طريقة نفتحها من غيره — ولا إحنا نقدر. اللي تقدر تعمله إنك تبدأ من جديد وترجّع آخر نسخة احتياطية عندك.</p>' +
+        '<div class="btnrow" style="flex-direction:column;align-items:stretch">' +
+        '<button class="btn danger block" data-act="wipeAndStart">' + ico("trash") + "ابدأ من جديد وامسح كل حاجة</button>" +
+        '<button class="btn ghost block" data-act="closeSheet">رجعني أجرب الرمز</button></div>');
+      break;
+    case "wipeAndStart":
+      try { localStorage.removeItem(LS); localStorage.removeItem(LS_LOCK); } catch (_) { }
+      Lock.on = false; Lock.key = null; Lock.cfg = null; Lock.unlocked = true;
+      state.settings.onboarded = false; state.txs = []; state.goals = [];
+      state.wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
+      state.categories = JSON.parse(JSON.stringify(DEFAULT_CATS));
+      closeSheet(); render(); toast("ابدأ من جديد — ترجّع نسختك من الإعدادات");
+      break;
+    case "lockSetup":
+      if (!hasCrypto()) return toast("المتصفح ده مش بيدعم التشفير — جرّب كروم أو سفاري");
+      closeSheet(); LockUI.mode = "set"; LockUI.entry = ""; LockUI.first = ""; Lock.unlocked = false; Lock.on = true; Lock.cfg = null; render();
+      break;
+    case "lockOff":
+      openSheet("تقفل القفل؟",
+        '<p class="sub" style="margin:0 0 14px">التطبيق هيفتح على طول من غير رمز، والبيانات هتترجع من غير تشفير على الجهاز.</p>' +
+        '<div class="btnrow"><button class="btn" style="flex:1" data-act="closeSheet">سيبه شغال</button>' +
+        '<button class="btn danger" data-act="lockOffDo">اقفله</button></div>');
+      break;
+    case "lockOffDo": disableLock().then(() => { closeSheet(); render(); toast("القفل اتقفل"); }); break;
+    case "bioOn":
+      (async () => {
+        try { await attachBio(LockUI.first || sh.dataset.pin || ""); closeSheet(); render(); toast("البصمة اتفعّلت"); }
+        catch (e) { toast("مقدرناش نفعّل البصمة على الجهاز ده"); }
+      })();
+      break;
+    case "bioOff": detachBio(); closeSheet(); render(); toast("البصمة اتلغت"); break;
+    case "bioAsk": sheetBioAsk(); break;
+    case "bioPinOk":
+      (async () => {
+        const pin = (el("bioPin").value || "").trim();
+        if (!/^\d{4}$/.test(pin)) return toast("اكتب الرمز، 4 أرقام");
+        const cfg = Lock.cfg;
+        try { await decJSON(await deriveKey(pin, cfg.salt, cfg.iter), cfg.check); }
+        catch (_) { return toast("الرمز غلط"); }
+        try { await attachBio(pin); closeSheet(); render(); toast("البصمة اتفعّلت"); }
+        catch (e) { toast("الجهاز ده مش بيدعم البصمة، أو الطلب اتلغى"); }
+      })();
+      break;
     case "tab": state.ui.tab = v; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "mprev": state.ui.mk = mkShift(state.ui.mk, -1); render(); break;
     case "mnext": if (state.ui.mk < thisMK()) { state.ui.mk = mkShift(state.ui.mk, 1); render(); } break;
     case "goTx": state.ui.tab = "tx"; render(); break;
     case "goGoals": state.ui.tab = "goals"; render(); break;
     case "filter": state.ui.filter = v; render(); break;
+    case "wfilter": state.ui.wallet = v; render(); break;
     case "allTips": sheetTips(); break;
     case "closeSheet": closeSheet(); break;
     case "newTx": sheetTx(); break;
     case "editTx": sheetTx(id); break;
-    case "txType": sh.dataset.type = v; sh.querySelectorAll('[data-act="txType"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); paintCats(); break;
-    case "pickCat": sh.dataset.cat = v; paintCats(); break;
+    case "txType": sh.dataset.type = v; sh.querySelectorAll('[data-act="txType"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); paintTxForm(); break;
+    case "pickCat": sh.dataset.cat = v; paintTxForm(); break;
+    case "pickWallet": sh.dataset.wallet = v; paintTxForm(); break;
+    case "pickTo": sh.dataset.towallet = v; paintTxForm(); break;
+    case "splitToggle": {
+      const box = el("splitBox"), on = box.hidden;
+      box.hidden = !on; sh.dataset.split = on ? "1" : "";
+      el("splitBtn").innerHTML = ico(on ? "x" : "split") + (on ? "ألغي التقسيم" : "الحساب ده فيه حد تاني");
+      if (on) setTimeout(() => { const n = el("spPerson"); if (n) n.focus(); }, 60);
+      break;
+    }
+    case "spHalf": case "spThird": {
+      const total = parseFloat(el("txAmt").value) || 0;
+      if (!(total > 0)) return toast("اكتب المبلغ الكلي الأول");
+      el("spAmt").value = Math.round(total / (a === "spHalf" ? 2 : 3) * 100) / 100;
+      break;
+    }
     case "quick": {
       const inp = el("txAmt"); if (!inp) break;
       if (v === "مسح") inp.value = ""; else inp.value = String((parseFloat(inp.value) || 0) + parseFloat(v));
@@ -1603,14 +2478,121 @@ document.addEventListener("click", (ev) => {
       break;
     }
     case "delGoal": state.goals = state.goals.filter(g => g.id !== id); save("goals"); closeSheet(); render(); toast("اتمسح الهدف"); break;
-    case "editBalance": sheetBalance(); break;
-    case "saveBalance": {
-      const want = parseFloat(el("balAmt").value);
-      if (isNaN(want)) return toast("اكتب رقم");
-      const net = state.txs.reduce((s, t) => s + (t.type === "income" ? t.amount : -t.amount), 0);
-      state.settings.startBalance = want - net;
-      save("settings"); closeSheet(); render(); toast("الرصيد بقى " + money2(want));
+    case "debts": sheetDebts(); break;
+    case "newDebt": sheetDebt(null, v); break;
+    case "debtEdit": sheetDebt(id); break;
+    case "debtPay": sheetDebtPay(id); break;
+    case "pickWallet2": sh.dataset.wallet = v; walletChips(el("dWallets") ? "dWallets" : "pWallets", v, "pickWallet2"); break;
+    case "saveDebt": {
+      const person = el("dPerson").value.trim().slice(0, 40);
+      if (!person) return toast("اكتب اسم الشخص");
+      const amt = parseFloat(el("dAmt").value);
+      if (!(amt > 0)) return toast("اكتب مبلغ أكبر من صفر");
+      const data = {
+        dir: sh.dataset.ddir, person: person, amount: amt, walletId: sh.dataset.wallet,
+        date: el("dDate").value || todayISO(), note: el("dNote").value.trim().slice(0, 120)
+      };
+      if (id) { const d = state.debts.find(x => x.id === id); Object.assign(d, data); }
+      else state.debts.push(Object.assign({ id: uid("d"), payments: [], closedAt: "", at: Date.now() }, data));
+      save("debts"); closeSheet(); render();
+      toast(data.dir === "out" ? "ليك عند " + person + " " + money2(amt) : "عليك لـ " + person + " " + money2(amt));
       break;
+    }
+    case "delDebt": {
+      state.debts = state.debts.filter(d => d.id !== id);
+      save("debts"); closeSheet(); render(); toast("اتمسح");
+      break;
+    }
+    case "doDebtPay": {
+      const d = state.debts.find(x => x.id === id); if (!d) break;
+      const amt = parseFloat(el("pAmt").value);
+      if (!(amt > 0)) return toast("اكتب مبلغ");
+      d.payments = (d.payments || []).concat([{ date: el("pDate").value || todayISO(), amount: amt, walletId: sh.dataset.wallet }]);
+      const left = debtLeft(d), extra = debtExtra(d);
+      save("debts"); closeSheet(); render();
+      toast(left <= 0.004
+        ? (extra > 0 ? "خلص الدين — ورجع زيادة " + money2(extra) : "خلص الدين بالكامل")
+        : "اتسجل " + money2(amt) + " — فاضل " + money2(left));
+      break;
+    }
+    case "debtWriteOff": {
+      const d = state.debts.find(x => x.id === id); if (!d) break;
+      const left = debtLeft(d);
+      closeSheet();
+      openSheet(d.dir === "out" ? "الباقي راح؟" : "اتسامح في الباقي؟",
+        '<p class="sub" style="margin:0 0 14px">' + (d.dir === "out"
+          ? "هنقفل الدين ونسجّل " + money2(left) + " <b>مصروف حقيقي</b> في بند « حاجات تانية » — لأنها فلوس خرجت وما رجعتش."
+          : "هنقفل الدين ونسجّل " + money2(left) + " <b>دخل</b> — لأنك مش هتدفعها.") + "</p>" +
+        '<div class="btnrow"><button class="btn" style="flex:1" data-act="closeSheet">رجعني</button>' +
+        '<button class="btn danger" data-act="doWriteOff" data-id="' + id + '">اقفله</button></div>');
+      break;
+    }
+    case "doWriteOff": {
+      const d = state.debts.find(x => x.id === id); if (!d) break;
+      const left = debtLeft(d);
+      const today = todayISO();
+      if (d.dir === "out") {
+        state.txs.push({
+          id: uid("t"), type: "expense", amount: left, catId: "c_other", walletId: d.walletId,
+          date: today, note: "سلفة ما رجعتش · " + d.person, at: Date.now()
+        });
+      } else {
+        state.txs.push({
+          id: uid("t"), type: "income", amount: left, catId: "i_gift", walletId: d.walletId,
+          date: today, note: "اتسامح في دين · " + d.person, at: Date.now()
+        });
+      }
+      // نقفله من غير ما نلمس الكاش تاني: القيد الجديد بيوازن المحفظة
+      d.payments = (d.payments || []).concat([{ date: today, amount: left, walletId: d.walletId, writeOff: 1 }]);
+      d.closedAt = today;
+      save("debts", "m:" + mkOf(today)); closeSheet(); render();
+      toast(d.dir === "out" ? "اتسجلت " + money2(left) + " مصروف" : "اتسجلت " + money2(left) + " دخل");
+      break;
+    }
+    case "wallets": sheetWallets(); break;
+    case "newWallet": sheetWallet(); break;
+    case "editWallet": sheetWallet(id); break;
+    case "pickWIcon": sh.dataset.wicon = v; repaintPick("wIcons", v); break;
+    case "pickWColor": sh.dataset.wcolor = v; repaintPick("wColors", v); break;
+    case "saveWallet": {
+      const name = el("wName").value.trim(); if (!name) return toast("اكتب اسم المكان");
+      const want = parseFloat(el("wOpen").value) || 0;
+      if (id) {
+        const w = state.wallets.find(x => x.id === id);
+        const cur = walletBalances()[id] || 0;
+        w.opening = (+w.opening || 0) + (want - cur);
+        Object.assign(w, { name: name, icon: sh.dataset.wicon, color: sh.dataset.wcolor });
+      } else {
+        state.wallets.push({ id: uid("w"), name: name, icon: sh.dataset.wicon, color: sh.dataset.wcolor, opening: want });
+      }
+      save("wallets"); closeSheet(); render(); toast("اتحفظ");
+      break;
+    }
+    case "delWallet": {
+      const used = state.txs.some(t => t.walletId === id || t.fromWallet === id || t.toWallet === id);
+      if (used) return toast("المكان ده عليه حركات — حوّل فلوسه لمكان تاني الأول");
+      state.wallets = state.wallets.filter(w => w.id !== id);
+      save("wallets"); closeSheet(); render(); toast("اتمسح");
+      break;
+    }
+    case "editBalance": sheetBalance(); break;
+    case "quickTransfer": closeSheet(); setTimeout(() => { sheetTx(); setTimeout(() => { const t = document.querySelector('[data-act="txType"][data-v="transfer"]'); if (t) t.click(); }, 80); }, 180); break;
+    case "goDay": state.ui.tab = "stats"; state.ui.period = "day"; state.ui.day = todayISO(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
+    case "period": state.ui.period = v; render(); break;
+    case "pickDay": state.ui.period = "day"; state.ui.day = v; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
+    case "pprev": {
+      const u = state.ui;
+      if (u.period === "day") u.day = shiftDay(u.day, -1);
+      else if (u.period === "year") u.year = String(+u.year - 1);
+      else u.mk = mkShift(u.mk, -1);
+      render(); break;
+    }
+    case "pnext": {
+      const u = state.ui;
+      if (u.period === "day") { if (u.day < todayISO()) u.day = shiftDay(u.day, 1); }
+      else if (u.period === "year") { if (u.year < todayISO().slice(0, 4)) u.year = String(+u.year + 1); }
+      else if (u.mk < thisMK()) u.mk = mkShift(u.mk, 1);
+      render(); break;
     }
     case "contrib": sheetContrib(id); break;
     case "doContrib": {
@@ -1624,15 +2606,17 @@ document.addEventListener("click", (ev) => {
       const s = state.settings;
       s.name = el("obName").value.trim().slice(0, 30);
       s.currency = (el("obCur").value.trim() || "ج.م").slice(0, 8);
-      s.startBalance = parseFloat(el("obBal").value) || 0;
       s.income = parseFloat(el("obInc").value) || 0;
       s.savePct = clamp(parseFloat(el("obSave").value) || 0, 0, 90);
       s.onboarded = true;
+      const wc = state.wallets.find(x => x.id === "w_cash"), wh = state.wallets.find(x => x.id === "w_home");
+      if (wc) wc.opening = parseFloat(el("obCash").value) || 0;
+      if (wh) wh.opening = parseFloat(el("obHome").value) || 0;
       if (s.income > 0) {
         const avail = s.income * (1 - s.savePct / 100);
         state.categories.forEach(c => { c.limit = Math.round(avail * (c.pct || 0) / 100 / 5) * 5; });
       }
-      save("settings", "categories"); render();
+      save("settings", "categories", "wallets"); render();
       toast(s.name ? "أهلاً " + s.name + " — يلا نسجل أول حركة" : "يلا نسجل أول حركة");
       break;
     }
@@ -1640,7 +2624,6 @@ document.addEventListener("click", (ev) => {
       const s = state.settings;
       s.name = el("stName").value.trim().slice(0, 30);
       s.currency = (el("stCur").value.trim() || "ج.م").slice(0, 8);
-      s.startBalance = parseFloat(el("stBal").value) || 0;
       s.income = parseFloat(el("stInc").value) || 0;
       s.savePct = clamp(parseFloat(el("stSave").value) || 0, 0, 90);
       save("settings"); closeSheet(); render(); toast("الإعدادات اتحفظت");
@@ -1669,15 +2652,19 @@ window.addEventListener("scroll", () => { el("topbar").classList.toggle("scrolle
 
 async function doReset() {
   const mks = [...new Set(state.txs.map(t => mkOf(t.date)))];
-  state.settings = { name: "", currency: "ج.م", startBalance: 0, income: 0, savePct: 15, onboarded: false };
+  state.settings = { name: "", currency: "ج.م", income: 0, savePct: 15, onboarded: false, lastBackup: "" };
   state.categories = JSON.parse(JSON.stringify(DEFAULT_CATS));
-  state.txs = []; state.goals = []; state.ui = { tab: "home", mk: thisMK(), filter: "all", q: "" };
+  state.wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
+  state.txs = []; state.goals = []; state.debts = [];
+  state.ui = { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", q: "" };
   writeLocal();
   if (Store.db) {
     try {
       await Store.db.doc("app/settings").set(state.settings);
+      await Store.db.doc("app/wallets").set({ list: state.wallets });
       await Store.db.doc("app/categories").set({ list: state.categories });
       await Store.db.doc("app/goals").set({ list: [] });
+      await Store.db.doc("app/debts").set({ list: [] });
       for (const mk of mks) await Store.db.doc("months/" + mk).delete();
     } catch (_) { }
   }
@@ -1689,9 +2676,31 @@ document.documentElement.setAttribute("dir", "rtl");
 document.documentElement.setAttribute("lang", "ar");
 el("fab").innerHTML = ico("plus");
 el("btnSettings").innerHTML = ico("gear");
-readLocal();
-render();
-connect();
+
+(function boot() {
+  const cfg = readLockCfg();
+  if (cfg && hasCrypto()) {
+    Lock.on = true; Lock.cfg = cfg; Lock.unlocked = false;
+    LockUI.mode = "unlock";
+    render();
+    if (cfg.bio) setTimeout(() => { tryBio(true); }, 350);
+    return;
+  }
+  readLocal();
+  render();
+  connect();
+})();
+
+let bioTried = false;
+async function tryBio(auto) {
+  if (bioTried && auto) return;
+  bioTried = true;
+  try {
+    const ok = await unlockWithBio();
+    if (ok) { LockUI.entry = ""; render(); connect(); }
+    else if (!auto) lockErr("مقدرناش نتأكد من البصمة");
+  } catch (e) { if (!auto) lockErr("البصمة مش شغالة دلوقتي — استخدم الرمز"); }
+}
 </script>
 
 <script>
