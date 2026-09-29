@@ -1,5 +1,7 @@
-/* مصروفي — service worker: يخلي التطبيق يفتح من غير نت */
-const CACHE = "masroufy-v4";
+/* مصروفي — service worker
+   غيّر VERSION مع كل إصدار جديد: الكاش بيتبنى منه، والتطبيق بيعرف إن في تحديث. */
+const VERSION = "1.4.0";
+const CACHE = "masroufy-" + VERSION;
 const CORE = [
   "./",
   "./index.html",
@@ -11,10 +13,9 @@ const CORE = [
 ];
 
 self.addEventListener("install", (e) => {
+  // مفيش skipWaiting تلقائي: بنستنى المستخدم يوافق على التحديث
   e.waitUntil(
-    caches.open(CACHE)
-      .then((c) => Promise.allSettled(CORE.map((u) => c.add(u))))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE).then((c) => Promise.allSettled(CORE.map((u) => c.add(u))))
   );
 });
 
@@ -26,20 +27,46 @@ self.addEventListener("activate", (e) => {
   );
 });
 
+self.addEventListener("message", (e) => {
+  const d = e.data || {};
+  if (d.type === "SKIP_WAITING") self.skipWaiting();
+  if (d.type === "GET_VERSION" && e.source) e.source.postMessage({ type: "VERSION", version: VERSION });
+});
+
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
-  e.respondWith(
-    fetch(req)
-      .then((res) => {
-        if (res && res.status === 200 && res.type === "basic") {
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  // الصفحة نفسها: الشبكة الأول عشان التحديث يوصل بسرعة
+  const isDoc = req.mode === "navigate" || url.pathname.endsWith("/") || url.pathname.endsWith("index.html");
+
+  if (isDoc) {
+    e.respondWith(
+      fetch(req, { cache: "no-store" })
+        .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
-        }
-        return res;
-      })
-      .catch(() =>
-        caches.match(req).then((hit) => hit || caches.match("./index.html"))
-      )
+          caches.open(CACHE).then((c) => c.put("./index.html", copy)).catch(() => {});
+          return res;
+        })
+        .catch(() => caches.match("./index.html").then((hit) => hit || caches.match("./")))
+    );
+    return;
+  }
+
+  e.respondWith(
+    caches.match(req).then((hit) => {
+      const net = fetch(req)
+        .then((res) => {
+          if (res && res.status === 200 && res.type === "basic") {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          }
+          return res;
+        })
+        .catch(() => hit);
+      return hit || net;
+    })
   );
 });

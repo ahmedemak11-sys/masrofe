@@ -259,9 +259,11 @@ textarea.inp{resize:vertical; min-height:62px}
   background:color-mix(in srgb,var(--surface) 92%, transparent); backdrop-filter:blur(12px) saturate(1.5);
   border:1px solid var(--line); border-radius:18px; padding:6px;
   margin-bottom:calc(10px + env(safe-area-inset-bottom,0px)); box-shadow:var(--shadow)}
-.tabbar button{flex:1; border:0; background:transparent; border-radius:13px;
-  display:flex; flex-direction:column; align-items:center; gap:3px; padding:7px 2px 6px; color:var(--muted); font-size:10.5px; font-weight:600}
-.tabbar button svg{width:20px;height:20px}
+.tabbar button{flex:1; min-width:0; border:0; background:transparent; border-radius:12px;
+  display:flex; flex-direction:column; align-items:center; gap:3px; padding:7px 1px 6px; color:var(--muted); font-size:9.5px; font-weight:600}
+.tabbar button span{max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.tabbar button svg{width:19px;height:19px}
+@media(min-width:420px){ .tabbar button{font-size:10.5px} .tabbar button svg{width:20px;height:20px} }
 .tabbar button[aria-current="true"]{background:var(--accent-soft); color:var(--accent)}
 .fab{pointer-events:auto; position:absolute; bottom:calc(76px + env(safe-area-inset-bottom,0px)); inset-inline-start:18px;
   width:54px; height:54px; border-radius:18px; border:0; background:var(--accent); color:var(--accent-ink);
@@ -329,6 +331,20 @@ details.more summary::-webkit-details-marker{display:none}
   z-index:70; opacity:0; transition:.2s; pointer-events:none; box-shadow:var(--shadow); max-width:calc(100vw - 32px); text-align:center}
 .toast.on{opacity:1; transform:translateX(-50%)}
 
+/* split bill */
+.splitbox{margin-top:11px; background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:12px}
+.splitequal{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-2); flex-wrap:wrap; margin-bottom:11px}
+.splitequal .inp{width:62px; padding:8px; text-align:center; background:var(--surface)}
+.splitequal .btn{padding:8px 13px; font-size:13px}
+.splitrow{display:flex; gap:7px; align-items:center; margin-bottom:7px}
+.splitrow .sp-name{flex:1.4; min-width:0; background:var(--surface); padding:9px 11px}
+.splitrow .sp-amt{flex:1; min-width:0; background:var(--surface); padding:9px 11px}
+.splitrow .sp-del{width:34px;height:34px;flex:none;border-radius:9px}
+.splitrow .sp-del svg{width:15px;height:15px}
+.spsum{margin-top:11px; padding-top:11px; border-top:1px solid var(--line); font-size:13px; line-height:1.7}
+.spsum b{font-family:var(--ff-display)}
+.spsum .warnline{color:var(--down); font-weight:600}
+
 /* wallets */
 .wrail{display:flex; gap:9px; overflow-x:auto; padding-bottom:3px; scrollbar-width:none}
 .wrail::-webkit-scrollbar{display:none}
@@ -378,6 +394,36 @@ details.more summary::-webkit-details-marker{display:none}
 .numpad button.bio{color:var(--accent)}
 .lockerr{color:var(--down); font-size:13px; min-height:19px; margin-top:16px; font-weight:500}
 
+/* update banner */
+.updbar{position:fixed; left:50%; transform:translateX(-50%);
+  bottom:calc(146px + env(safe-area-inset-bottom,0px)); width:min(596px,calc(100vw - 24px));
+  z-index:45; background:var(--accent); color:var(--accent-ink); border-radius:15px;
+  padding:12px 14px; box-shadow:0 10px 30px -12px rgba(0,0,0,.5), var(--shadow);
+  display:flex; align-items:center; gap:11px}
+.updbar .ui{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}
+.updbar .ui svg{width:18px;height:18px}
+.updbar .ut{flex:1;min-width:0;font-size:13.5px;line-height:1.4}
+.updbar .ut b{display:block;font-family:var(--ff-display);font-size:14.5px}
+.updbar button{border:0;border-radius:10px;padding:9px 14px;font-weight:700;font-size:13.5px;
+  background:var(--accent-ink); color:var(--accent); flex:none}
+.updbar .later{background:rgba(255,255,255,.18);color:inherit;width:34px;height:34px;padding:0;
+  display:grid;place-items:center;border-radius:10px}
+.updbar .later svg{width:16px;height:16px}
+
+/* settings rows */
+.srow{display:flex; align-items:center; gap:11px; padding:13px 14px; border-bottom:1px solid var(--line);
+  background:transparent; border-top:0; border-inline:0; width:100%; text-align:right; color:var(--ink)}
+.srow:last-child{border-bottom:0}
+.srow:hover{background:var(--surface-2)}
+.srow .si{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--surface-2);color:var(--accent)}
+.srow .si svg{width:17px;height:17px}
+.srow .sn{font-weight:500; font-size:14.5px}
+.srow .sd{font-size:12px; color:var(--muted); margin-top:1px}
+.srow .sx{margin-inline-start:auto; color:var(--muted); display:flex; align-items:center; gap:7px}
+.srow .sx svg{width:16px;height:16px}
+.verbox{text-align:center; padding:18px 14px 4px; color:var(--muted); font-size:12.5px; line-height:1.9}
+.verbox .vn{font-family:var(--ff-display); font-size:15px; color:var(--ink); font-weight:600}
+
 .statusline{display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--muted); padding:14px 2px 0; justify-content:center}
 .statusline .sd{width:7px;height:7px;border-radius:50%;background:var(--good)}
 .statusline .sd.local{background:var(--warn)}
@@ -389,8 +435,7 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 <div class="shell" id="shell">
   <header class="topbar" id="topbar">
     <div class="brand"><span class="dot"></span><span id="brandName">مصروفي</span></div>
-    <button class="iconbtn" id="btnAnalyzeTop" title="تحليل ذكي" hidden></button>
-    <button class="iconbtn" id="btnSettings" title="الإعدادات" aria-label="الإعدادات"></button>
+    <button class="iconbtn" id="btnAnalyzeTop" title="تنبيهات" hidden></button>
   </header>
   <main id="view"></main>
 </div>
@@ -404,11 +449,14 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
   <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
 </div>
 
+<div class="updbar" id="updBar" hidden></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
+const APP_VERSION = "1.4.0";
+const APP_BUILD = "2026-09-29";
 
 /* ---------- helpers ---------- */
 const $ = (s, r) => (r || document).querySelector(s);
@@ -421,6 +469,7 @@ const N = (n, d) => '<span class="num">' + nf(n, d) + "</span>";
 const money = (n, d) => '<span class="num">' + nf(n, d) + "</span> " + esc(state.settings.currency);
 const money2 = (n) => nf(n) + " " + state.settings.currency;
 
+const people = (n) => n === 1 ? "حد واحد" : n === 2 ? "اتنين" : n <= 10 ? n + " ناس" : n + " شخص";
 const AR_MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
 const AR_MONTHS_SHORT = ["ينا", "فبر", "مار", "أبر", "مايو", "يون", "يول", "أغس", "سبت", "أكت", "نوف", "ديس"];
 const AR_DAYS = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
@@ -964,7 +1013,7 @@ function insights(mk) {
     const inc0 = +state.settings.income || 0;
     if (inc0 > 0 && dT.iOwe > inc0 * 0.3)
       push("crit", "الديون اللي عليك كبيرة", "عليك " + money2(dT.iOwe) + " — يعني " + Math.round(dT.iOwe / inc0 * 100) + "% من دخل شهر. حطها في حسابك قبل ما تخطط للصرف.", "handIn");
-    else push("info", "عليك ديون للناس", "إجمالي " + money2(dT.iOwe) + " لـ " + dT.countIn + " حد. الفلوس دي في محفظتك بس مش بتاعتك.", "handIn");
+    else push("info", "عليك ديون للناس", "إجمالي " + money2(dT.iOwe) + " لـ " + people(dT.countIn) + ". الفلوس دي في محفظتك بس مش بتاعتك.", "handIn");
   }
 
   // 10. backup reminder
@@ -1260,7 +1309,8 @@ const TABS = [
   { id: "tx", name: "الحركات", ic: "tabList" },
   { id: "budget", name: "الحدود", ic: "tabShield" },
   { id: "goals", name: "الادخار", ic: "tabTarget" },
-  { id: "stats", name: "التحليل", ic: "tabChart" }
+  { id: "stats", name: "التحليل", ic: "tabChart" },
+  { id: "settings", name: "الإعدادات", ic: "gear" }
 ];
 function monthBar() {
   const fwd = state.ui.mk >= thisMK();
@@ -1659,22 +1709,24 @@ function renderStorageLine() {
 function render() {
   const v = el("view");
   if (Lock.on && !Lock.unlocked) {
-    el("dock").hidden = true; el("btnSettings").hidden = true; el("btnAnalyzeTop").hidden = true;
+    el("dock").hidden = true; el("btnAnalyzeTop").hidden = true; updBanner(false);
     v.innerHTML = viewLock();
     return;
   }
-  if (!state.settings.onboarded) { el("dock").hidden = true; el("btnSettings").hidden = true; el("btnAnalyzeTop").hidden = true; v.innerHTML = viewOnboard(); return; }
-  el("dock").hidden = false; el("btnSettings").hidden = false;
+  if (!state.settings.onboarded) { el("dock").hidden = true; el("btnAnalyzeTop").hidden = true; updBanner(false); v.innerHTML = viewOnboard(); return; }
+  el("dock").hidden = false;
   renderTabs();
   const alerts = insights(state.ui.mk).filter(i => i.lv === "crit" || i.lv === "warn").length;
   const b = el("btnAnalyzeTop");
   b.hidden = alerts === 0; b.innerHTML = ico("alert"); b.dataset.act = "allTips";
   b.style.color = alerts ? "var(--crit)" : "";
   const t = state.ui.tab;
-  const body = t === "home" ? viewHome() : t === "tx" ? viewTx() : t === "budget" ? viewBudget() : t === "goals" ? viewGoals() : viewStats();
-  v.innerHTML = (t === "stats" ? "" : monthBar()) + body;
+  const body = t === "home" ? viewHome() : t === "tx" ? viewTx() : t === "budget" ? viewBudget()
+    : t === "goals" ? viewGoals() : t === "settings" ? viewSettings() : viewStats();
+  v.innerHTML = (t === "stats" || t === "settings" ? "" : monthBar()) + body;
   renderStorageLine();
-  if (state.ui.tab === "stats") { wireCharts(); mountAI(); }
+  if (t === "settings") { const f = el("impFile"); if (f) f.addEventListener("change", importFile); }
+  if (t === "stats") { wireCharts(); mountAI(); }
   const s = el("txSearch"); if (s) { s.addEventListener("input", debounce(e => { state.ui.q = e.target.value; const p = e.target.selectionStart; render(); const n = el("txSearch"); if (n) { n.focus(); try { n.setSelectionRange(p, p); } catch (_) { } } }, 260)); }
 }
 function debounce(fn, ms) { let t; return function () { const a = arguments, c = this; clearTimeout(t); t = setTimeout(() => fn.apply(c, a), ms); }; }
@@ -1760,12 +1812,14 @@ function sheetTx(id) {
     '<div class="field" id="fCats"><label>البند</label><div class="chips" id="txCats"></div></div>' +
     '<div class="field" id="fWallet"><label id="lblWallet">الفلوس من فين؟</label><div class="chips" id="txWallets"></div></div>' +
     '<div class="field" id="fTo"><label>لفين؟</label><div class="chips" id="txTo"></div></div>' +
-    (id ? "" : '<div class="field" id="fSplit"><button class="btn block" data-act="splitToggle" id="splitBtn">' + ico("split") + "الحساب ده فيه حد تاني</button>" +
-      '<div id="splitBox" hidden style="margin-top:11px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px">' +
-      '<div class="field" style="margin-bottom:11px"><label for="spPerson">مين معاك؟</label><input class="inp" id="spPerson" placeholder="مثلاً: محمود" autocomplete="off"></div>' +
-      '<div class="field" style="margin-bottom:9px"><label for="spAmt">نصيبه اللي هيرجعهولك</label><input class="inp" id="spAmt" type="number" inputmode="decimal" placeholder="0"></div>' +
-      '<div class="chips" style="margin-bottom:9px"><button class="chip" data-act="spHalf">نص الحساب</button><button class="chip" data-act="spThird">تلت الحساب</button></div>' +
-      '<p class="sub" style="margin:0">هنسجّل نصيبك إنت بس كمصروف، والباقي يبقى سلفة ليك عنده.</p></div></div>') +
+    (id ? "" : '<div class="field" id="fSplit"><button class="btn block" data-act="splitToggle" id="splitBtn">' + ico("users") + "الحساب ده فيه ناس تانية</button>" +
+      '<div id="splitBox" hidden class="splitbox">' +
+      '<div class="splitequal"><span>قسّمه بالتساوي على</span>' +
+      '<input class="inp" id="spCount" type="number" inputmode="numeric" min="2" max="20" value="2">' +
+      '<span>أفراد</span><button class="btn" data-act="spEqual">قسّم</button></div>' +
+      '<div id="splitRows"></div>' +
+      '<button class="btn ghost block" data-act="spAdd" style="margin-top:8px">' + ico("plus") + "ضيف حد</button>" +
+      '<div id="spSum" class="spsum"></div></div></div>') +
     '<div class="field"><label for="txDate">التاريخ</label><input class="inp" id="txDate" type="date" value="' + (t ? t.date : todayISO()) + '" max="' + todayISO() + '"></div>' +
     '<div class="field"><label for="txNote">ملاحظة (اختياري)</label><input class="inp" id="txNote" value="' + esc(t ? t.note || "" : "") + '" placeholder="مثلاً: أكل الشغل"></div>' +
     '<div class="btnrow" style="margin-top:6px"><button class="btn pri" style="flex:1" data-act="saveTx" data-id="' + (id || "") + '">' + ico("check") + (t ? "حفظ التعديل" : "سجّل الحركة") + "</button>" +
@@ -1777,6 +1831,9 @@ function sheetTx(id) {
     sh.dataset.wallet = t ? (t.type === "transfer" ? t.fromWallet : t.walletId) || lastUsedWallet() : lastUsedWallet();
     sh.dataset.towallet = t && t.type === "transfer" ? t.toWallet : (state.wallets.find(w => w.id !== sh.dataset.wallet) || {}).id || "";
     paintTxForm();
+    sh.addEventListener("input", (e) => {
+      if (e.target.id === "txAmt" || e.target.closest("#splitBox")) splitSum();
+    });
     setTimeout(() => { const a = el("txAmt"); if (a && !t) a.focus(); }, 60);
   });
 }
@@ -1784,6 +1841,53 @@ function walletChips(boxId, selected, act, exclude) {
   el(boxId).innerHTML = state.wallets.filter(w => w.id !== exclude).map(w =>
     '<button class="chip" data-act="' + act + '" data-v="' + w.id + '" aria-pressed="' + (w.id === selected) + '" style="' + (w.id === selected ? "color:var(--" + w.color + ")" : "") + '">' +
     '<span style="color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" + esc(w.name) + "</button>").join("");
+}
+/* ---------- تقسيم الحساب على أكتر من حد ---------- */
+let splitSeq = 0;
+function splitRowHTML(name, amt) {
+  const i = ++splitSeq;
+  const names = [...new Set(state.debts.map(x => (x.person || "").trim()).filter(Boolean))].slice(0, 10);
+  return '<div class="splitrow" data-row="' + i + '">' +
+    '<input class="inp sp-name" placeholder="الاسم" value="' + esc(name || "") + '" autocomplete="off" list="spNames">' +
+    '<input class="inp sp-amt" type="number" inputmode="decimal" step="0.01" placeholder="0" value="' + (amt || amt === 0 ? amt : "") + '">' +
+    '<button class="iconbtn sp-del" data-act="spDel" data-v="' + i + '" aria-label="شيل الشخص ده">' + ico("x") + "</button></div>" +
+    (names.length && !document.getElementById("spNames") ? '<datalist id="spNames">' + names.map(n => '<option value="' + esc(n) + '"></option>').join("") + "</datalist>" : "");
+}
+function splitAdd(name, amt) {
+  el("splitRows").insertAdjacentHTML("beforeend", splitRowHTML(name, amt));
+  splitSum();
+}
+function splitRead() {
+  return [...document.querySelectorAll("#splitRows .splitrow")].map(r => ({
+    name: (r.querySelector(".sp-name").value || "").trim(),
+    amount: parseFloat(r.querySelector(".sp-amt").value) || 0
+  }));
+}
+function splitEqual() {
+  const total = parseFloat(el("txAmt").value) || 0;
+  if (!(total > 0)) return toast("اكتب المبلغ الكلي الأول");
+  const n = clamp(parseInt(el("spCount").value, 10) || 2, 2, 20);
+  el("spCount").value = n;
+  const old = splitRead();
+  const each = Math.round(total / n * 100) / 100;
+  const box = el("splitRows"); box.innerHTML = "";
+  for (let i = 0; i < n - 1; i++) box.insertAdjacentHTML("beforeend", splitRowHTML(old[i] ? old[i].name : "", each));
+  splitSum();
+}
+function splitSum() {
+  const box = el("spSum"); if (!box) return;
+  const total = parseFloat(el("txAmt").value) || 0;
+  const rows = splitRead().filter(r => r.amount > 0 || r.name);
+  const theirs = rows.reduce((s, r) => s + r.amount, 0);
+  const mine = total - theirs;
+  const cur = esc(state.settings.currency);
+  if (!total) { box.innerHTML = '<span class="sub">اكتب المبلغ الكلي فوق الأول.</span>'; return; }
+  let out = "المبلغ الكلي <b>" + nf(total) + " " + cur + "</b><br>" +
+    "عليهم <b>" + nf(theirs) + "</b> · نصيبك <b>" + nf(Math.max(0, mine)) + "</b>";
+  if (mine < -0.004) out += '<br><span class="warnline">' + ico("alert") + " نصيبهم أكبر من المبلغ الكلي</span>";
+  else if (Math.abs(mine) <= 0.004) out += "<br><span class=\"sub\">إنت دافع عنهم كله — مش هيتسجل عليك مصروف، كله سلف.</span>";
+  else out += "<br><span class=\"sub\">هيتسجل <b>" + nf(mine) + "</b> مصروف عليك، والباقي سلف على " + people(rows.filter(r => r.amount > 0).length) + ".</span>";
+  box.innerHTML = out;
 }
 function paintTxForm() {
   const sh = el("sheet"), type = sh.dataset.type;
@@ -1924,7 +2028,20 @@ function sheetDebts() {
       "<p>لما تسلّف حد أو تدفع عنه، سجّلها هنا. الفلوس دي بتتشال من محفظتك بس <b>مش بتتحسب مصروف</b> — عشان تحليل صرفك يفضل مظبوط.</p></div></div>";
     return openSheet("سلف وديون", h);
   }
-  if (out.length) h += '<h2 class="sec" style="margin-top:0">ليك عند الناس<span class="hint">' + out.length + "</span></h2><div class=\"card\">" + out.map(debtRow).join("") + "</div>";
+  // ملخص لكل شخص لما يكون عليه أكتر من سلفة
+  const people = debtPeople().filter(p => p.out + p.in > 0.004);
+  if (people.length > 1) {
+    h += '<h2 class="sec" style="margin-top:0">الحساب مع كل حد</h2><div class="card list">' + people.map(p => {
+      const net = p.out - p.in;
+      const n = p.items.filter(debtOpen).length;
+      return '<div class="item" style="cursor:default">' +
+        '<span class="ic" style="background:color-mix(in srgb,var(--' + (net >= 0 ? "s3" : "s4") + ') 15%, var(--surface));color:var(--' + (net >= 0 ? "s3" : "s4") + ')">' + ico("users") + "</span>" +
+        '<span style="flex:1;min-width:0"><span class="nm">' + esc(p.person) + '</span><span class="mt" style="display:block">' +
+        (net >= 0 ? "ليك عنده" : "عليك له") + " · " + n + " سلفة</span></span>" +
+        '<span class="amt" style="color:' + (net >= 0 ? "var(--up)" : "var(--down)") + '">' + nf(Math.abs(net)) + "</span></div>";
+    }).join("") + "</div>";
+  }
+  if (out.length) h += '<h2 class="sec">ليك عند الناس<span class="hint">' + out.length + "</span></h2><div class=\"card\">" + out.map(debtRow).join("") + "</div>";
   if (inn.length) h += '<h2 class="sec">عليك للناس<span class="hint">' + inn.length + "</span></h2><div class=\"card\">" + inn.map(debtRow).join("") + "</div>";
   if (done.length) h += '<details class="more" style="margin-top:14px"><summary>خلصانة (' + done.length + ')</summary><div class="card" style="margin-top:10px">' +
     done.slice().reverse().slice(0, 25).map(debtRow).join("") + "</div></details>";
@@ -2065,36 +2182,90 @@ function lockSectionHTML() {
     '<button class="btn danger" data-act="lockOff">' + ico("x") + "اقفل القفل</button></div>" +
     '<p class="sub" style="margin:12px 0 0">لو نسيت الرمز مفيش طريقة نرجّع البيانات غير من نسخة احتياطية — خد نسخة وإنت فاكره.</p>';
 }
-function sheetSettings() {
+function srow(act, icon, name, desc, right, extra) {
+  return '<button class="srow" data-act="' + act + '"' + (extra || "") + '>' +
+    '<span class="si">' + ico(icon) + "</span>" +
+    '<span style="flex:1;min-width:0"><span class="sn" style="display:block">' + name + "</span>" +
+    (desc ? '<span class="sd" style="display:block">' + desc + "</span>" : "") + "</span>" +
+    '<span class="sx">' + (right || "") + ico("chevL") + "</span></button>";
+}
+function viewSettings() {
+  const s = state.settings, B = balanceNow(), lockOn = Lock.on && Lock.cfg;
+  const a = backupAgeDays();
+  let h = '<h2 class="sec" style="margin-top:6px">حسابك</h2><div class="card">' +
+    srow("stProfile", "wallet", "بياناتك الأساسية", (s.name ? esc(s.name) + " · " : "") + "دخل " + nf(s.income) + " · ادخار " + nf(s.savePct) + "%") +
+    srow("wallets", "coins", "أماكن الفلوس", state.wallets.length + " مكان · إجمالي " + nf(B.total) + " " + esc(s.currency)) +
+    srow("debts", "handOut", "سلف وديون", B.debts.owedToMe || B.debts.iOwe
+      ? "ليك " + nf(B.debts.owedToMe) + " · عليك " + nf(B.debts.iOwe)
+      : "ما فيش سلف مفتوحة") +
+    "</div>";
+
+  h += '<h2 class="sec">القفل والخصوصية</h2><div class="card">' +
+    srow("stLock", "lock", "قفل التطبيق", lockOn ? "شغال" + (Lock.cfg.bio ? " · مع البصمة" : " · بالرمز بس") : "مقفول — أي حد يفتح التليفون يشوف بياناتك",
+      lockOn ? pill("good", "شغال") : pill("warn", "مطفي")) +
+    "</div>";
+
+  h += '<h2 class="sec">بياناتك</h2><div class="card">' +
+    srow("stBackup", "down", "نسخة احتياطية", a === null ? "لسه ما خدتش نسخة" : a === 0 ? "آخر نسخة النهاردة" : "آخر نسخة من " + a + " يوم",
+      a === null || a > 21 ? pill("warn", "خد نسخة") : pill("good", "تمام")) +
+    srow("importPick", "up", "استرجاع نسخة", "رجّع بياناتك من ملف احتياطي") +
+    srow("exportCSV", "tabList", "تصدير الحركات CSV", "جدول تفتحه في Excel") +
+    "</div>";
+
+  // التحديثات
+  const swOn = Upd.supported && Upd.reg;
+  const has = !!(Upd.waiting || (Upd.reg && Upd.reg.waiting));
+  h += '<h2 class="sec">التحديثات</h2><div class="card">' +
+    '<div class="srow" style="cursor:default">' +
+    '<span class="si">' + ico("down") + "</span>" +
+    '<span style="flex:1;min-width:0"><span class="sn" style="display:block">إصدار التطبيق</span>' +
+    '<span class="sd" style="display:block"><span class="num">' + APP_BUILD + '</span>' + (Upd.swVersion && Upd.swVersion !== APP_VERSION ? " · الكاش " + Upd.swVersion : "") + "</span></span>" +
+    '<span class="sx"><b class="num" style="color:var(--ink);font-family:var(--ff-display);font-size:15px">' + APP_VERSION + "</b></span></div>" +
+    (has
+      ? '<button class="srow" data-act="updNow"><span class="si" style="background:var(--accent-soft)">' + ico("bolt") + "</span>" +
+      '<span style="flex:1"><span class="sn" style="display:block;color:var(--accent)">في إصدار جديد جاهز</span>' +
+      '<span class="sd" style="display:block">دوس عشان تحدّث دلوقتي</span></span>' +
+      '<span class="sx">' + pill("good", "جديد") + "</span></button>"
+      : swOn
+        ? '<button class="srow" data-act="updCheck"><span class="si">' + ico(Upd.checking ? "clock" : "check") + "</span>" +
+        '<span style="flex:1"><span class="sn" style="display:block">' + (Upd.checking ? "بنشوف…" : "تأكد من التحديثات") + "</span>" +
+        '<span class="sd" style="display:block">' + (Upd.lastCheck ? "آخر فحص " + new Date(Upd.lastCheck).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" }) : "التطبيق بيفحص لوحده كل ما تفتحه") + "</span></span>" +
+        '<span class="sx">' + ico("chevL") + "</span></button>"
+        : '<div class="srow" style="cursor:default"><span class="si">' + ico("info") + "</span>" +
+        '<span style="flex:1"><span class="sn" style="display:block">النسخة دي بتتحدث لوحدها</span>' +
+        '<span class="sd" style="display:block">مفيش حاجة تعملها</span></span></div>') +
+    "</div>";
+
+  h += '<h2 class="sec">خطر</h2><div class="card">' +
+    '<button class="srow" data-act="resetAsk"><span class="si" style="background:color-mix(in srgb,var(--crit) 12%, var(--surface));color:var(--down)">' + ico("trash") + "</span>" +
+    '<span style="flex:1"><span class="sn" style="display:block;color:var(--down)">امسح كل البيانات</span>' +
+    '<span class="sd" style="display:block">مش بترجع — خد نسخة احتياطية الأول</span></span></button></div>';
+
+  h += '<div class="verbox"><span class="vn">مصروفي <span class="num">' + APP_VERSION + "</span></span><br>" +
+    (Store.mode === "cloud" ? "محفوظ في حسابك" : "محفوظ على الجهاز ده") + ' · بناء <span class="num">' + APP_BUILD + "</span></div>" +
+    '<input type="file" id="impFile" accept="application/json,.json" hidden>';
+  return h;
+}
+function sheetProfile() {
   const s = state.settings;
-  const body =
+  openSheet("بياناتك الأساسية",
     '<div class="field"><label for="stName">اسمك</label><input class="inp" id="stName" value="' + esc(s.name) + '"></div>' +
     '<div class="field"><label for="stCur">العملة</label><input class="inp" id="stCur" value="' + esc(s.currency) + '" maxlength="8"></div>' +
-    '<button class="btn block" data-act="wallets" style="margin-bottom:13px">' + ico("wallet") + "أماكن الفلوس وأرصدتها</button>" +
     '<div class="field"><label for="stInc">الدخل الشهري</label><input class="inp" id="stInc" type="number" inputmode="decimal" value="' + (s.income || 0) + '"></div>' +
     '<div class="field"><label for="stSave">نسبة الادخار المستهدفة %</label><input class="inp" id="stSave" type="number" inputmode="decimal" value="' + (s.savePct || 0) + '"></div>' +
-    '<button class="btn pri block" data-act="saveSettings">' + ico("check") + "حفظ</button>" +
-    '<hr class="sep"><h4 style="margin:0 0 8px;font-family:var(--ff-display);font-size:15px">القفل والخصوصية</h4>' +
-    lockSectionHTML() +
-    '<hr class="sep"><h4 style="margin:0 0 6px;font-family:var(--ff-display);font-size:15px">نسخة احتياطية</h4>' +
-    '<div id="bkStatus" style="margin-bottom:10px">' + backupStatusHTML() + "</div>" +
-    '<p class="sub" style="margin:0 0 12px">ينزّل ملف واحد فيه كل حركاتك وبنودك وأهدافك وإعداداتك. سمّي الملف زي ما تحب — واختار مكانه لو متصفحك بيسمح.</p>' +
-    '<div class="field"><label for="bkName">اسم الملف</label><input class="inp" id="bkName" value="masroufy-backup-' + todayISO() + '.json" spellcheck="false"></div>' +
-    '<div class="btnrow"><button class="btn pri" style="flex:1" data-act="exportBackup">' + ico("down") + 'نزّل النسخة</button>' +
-    '<button class="btn" data-act="exportCSV">' + ico("down") + "حركاتي CSV</button></div>" +
-    '<hr class="sep"><h4 style="margin:0 0 6px;font-family:var(--ff-display);font-size:15px">استرجاع</h4>' +
-    '<p class="sub" style="margin:0 0 12px">اختار ملف نسخة احتياطية، هنوريك اللي جواه الأول وبعدين تقرر تدمجه مع بياناتك ولا تستبدلها بيه.</p>' +
-    '<button class="btn block" data-act="importPick">' + ico("up") + "اختار ملف واسترجع</button>" +
-    '<input type="file" id="impFile" accept="application/json,.json" hidden>' +
-    '<hr class="sep"><h4 style="margin:0 0 4px;font-family:var(--ff-display);font-size:14px">التطبيق على موبايلك</h4>' +
-    '<p class="sub" style="margin:0 0 12px">افتح اللينك ده في المتصفح على الموبايل، وبعدين من قائمة المتصفح اختار « إضافة إلى الشاشة الرئيسية » — هيفتح زي أي تطبيق.</p>' +
-    '<hr class="sep"><button class="btn danger block" data-act="resetAsk">' + ico("trash") + "مسح كل البيانات</button>";
-  openSheet("الإعدادات", body, () => {
-    const f = el("impFile");
-    if (f) f.addEventListener("change", importFile);
-  });
+    '<button class="btn pri block" data-act="saveSettings">' + ico("check") + "حفظ</button>");
 }
-
+function sheetLock() {
+  openSheet("قفل التطبيق", lockSectionHTML());
+}
+function sheetBackup() {
+  openSheet("نسخة احتياطية",
+    '<div style="margin-bottom:10px">' + backupStatusHTML() + "</div>" +
+    '<p class="sub" style="margin:0 0 12px">ينزّل ملف واحد فيه كل حركاتك وبنودك وأهدافك وسلفك وإعداداتك. سمّي الملف زي ما تحب — واختار مكانه لو متصفحك بيسمح.</p>' +
+    '<div class="field"><label for="bkName">اسم الملف</label><input class="inp" id="bkName" value="masroufy-backup-' + todayISO() + '.json" spellcheck="false"></div>' +
+    '<button class="btn pri block" data-act="exportBackup">' + ico("down") + "نزّل النسخة</button>" +
+    '<p class="sub" style="margin:12px 0 0">لو القفل شغال، بياناتك على الجهاز متشفّرة — بس ملف النسخة الاحتياطية بيتحفظ عادي عشان تقدر ترجّعه. حطه في مكان آمن.</p>');
+}
 /* ---------- actions ---------- */
 function addTxFromSheet(id) {
   const sh = el("sheet"), amt = parseFloat(el("txAmt").value);
@@ -2113,16 +2284,19 @@ function addTxFromSheet(id) {
     const cat = sh.dataset.cat; if (!cat) return toast("اختار البند");
     data = { type: type, amount: amt, catId: cat, walletId: from, fromWallet: "", toWallet: "", date: date, note: note };
   }
-  // تقسيم الحساب: نصيب حد تاني يتسجل سلفة مش مصروف
-  let splitInfo = null;
+  // تقسيم الحساب: نصيب كل حد يتسجل سلفة مش مصروف
+  let splitRows = null;
   if (!id && type === "expense" && sh.dataset.split === "1") {
-    const person = (el("spPerson").value || "").trim().slice(0, 40);
-    const theirs = parseFloat(el("spAmt").value) || 0;
-    if (!person) return toast("اكتب اسم اللي معاك");
-    if (!(theirs > 0)) return toast("اكتب نصيبه من الحساب");
-    if (theirs >= amt) return toast("نصيبه لازم يكون أقل من المبلغ الكلي");
-    splitInfo = { person: person, theirs: theirs };
-    data.amount = amt - theirs;
+    const rows = splitRead().filter(r => r.name || r.amount > 0);
+    if (!rows.length) return toast("ضيف حد على الأقل، أو ألغي التقسيم");
+    const bad = rows.find(r => !r.name);
+    if (bad) return toast("في حد من غير اسم");
+    const noAmt = rows.find(r => !(r.amount > 0));
+    if (noAmt) return toast("اكتب نصيب " + noAmt.name);
+    const theirs = rows.reduce((s, r) => s + r.amount, 0);
+    if (theirs > amt + 0.004) return toast("مجموع نصيبهم أكبر من المبلغ الكلي");
+    splitRows = rows.map(r => ({ name: r.name.slice(0, 40), amount: r.amount }));
+    data.amount = Math.round((amt - theirs) * 100) / 100;
   }
   if (id) {
     const t = state.txs.find(x => x.id === id); if (!t) return;
@@ -2131,16 +2305,20 @@ function addTxFromSheet(id) {
     save("m:" + oldMK); if (mkOf(date) !== oldMK) save("m:" + mkOf(date));
     toast("اتعدلت");
   } else {
-    state.txs.push(Object.assign({ id: uid("t"), at: Date.now() }, data));
-    save("m:" + mkOf(date));
-    if (splitInfo) {
-      state.debts.push({
-        id: uid("d"), dir: "out", person: splitInfo.person, amount: splitInfo.theirs,
-        walletId: from, date: date, note: note || catById(data.catId).name,
+    if (data.amount > 0.004) { state.txs.push(Object.assign({ id: uid("t"), at: Date.now() }, data)); save("m:" + mkOf(date)); }
+    if (splitRows) {
+      const label = note || catById(data.catId).name;
+      splitRows.forEach(r => state.debts.push({
+        id: uid("d"), dir: "out", person: r.name, amount: r.amount,
+        walletId: from, date: date, note: label,
         payments: [], closedAt: "", at: Date.now()
-      });
+      }));
       save("debts");
-      toast("اتسجل " + money2(data.amount) + " مصروف · و" + money2(splitInfo.theirs) + " ليك عند " + splitInfo.person);
+      const theirs = splitRows.reduce((s, r) => s + r.amount, 0);
+      const who = splitRows.length === 1 ? splitRows[0].name : people(splitRows.length);
+      toast(data.amount > 0.004
+        ? "مصروف " + money2(data.amount) + " · و" + money2(theirs) + " ليك عند " + who
+        : money2(theirs) + " ليك عند " + who + " — مش محسوبة مصروف");
     } else {
       toast(transfer ? "اتحوّل " + money2(amt) + " من " + walletById(from).name + " لـ " + walletById(data.toWallet).name
         : type === "income" ? "اتسجل دخل " + money2(amt) : "اتسجل مصروف " + money2(amt));
@@ -2297,6 +2475,78 @@ function applyRestore(mode) {
   toast(mode === "replace" ? "رجّعنا النسخة — " + nf(state.txs.length) + " حركة" : "دمجنا النسخة — إجمالي " + nf(state.txs.length) + " حركة");
 }
 
+/* ================= التحديثات ================= */
+const Upd = { reg: null, waiting: null, swVersion: "", checking: false, lastCheck: 0, supported: false, reloading: false };
+
+function updBanner(show) {
+  const b = el("updBar");
+  if (!show) { b.hidden = true; return; }
+  b.innerHTML = '<span class="ui">' + ico("down") + "</span>" +
+    '<span class="ut"><b>في إصدار جديد جاهز</b>دوس حدّث عشان تاخده دلوقتي</span>' +
+    '<button data-act="updNow">حدّث</button>' +
+    '<button class="later" data-act="updLater" aria-label="بعدين">' + ico("x") + "</button>";
+  b.hidden = false;
+}
+function watchWorker(w) {
+  if (!w) return;
+  w.addEventListener("statechange", () => {
+    if (w.state === "installed" && navigator.serviceWorker.controller) {
+      Upd.waiting = w; updBanner(true);
+      if (state.ui.tab === "settings") render();
+    }
+  });
+}
+async function swSetup() {
+  if (!("serviceWorker" in navigator)) return;
+  Upd.supported = true;
+  try {
+    const reg = await navigator.serviceWorker.register("./sw.js");
+    Upd.reg = reg;
+    if (reg.waiting && navigator.serviceWorker.controller) { Upd.waiting = reg.waiting; updBanner(true); }
+    if (reg.installing) watchWorker(reg.installing);
+    reg.addEventListener("updatefound", () => watchWorker(reg.installing));
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (Upd.reloading) return;
+      Upd.reloading = true; location.reload();
+    });
+    navigator.serviceWorker.addEventListener("message", (e) => {
+      if (e.data && e.data.type === "VERSION") {
+        Upd.swVersion = e.data.version;
+        if (state.ui.tab === "settings") render();
+      }
+    });
+    if (navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage({ type: "GET_VERSION" });
+    // فحص عند كل فتح، وكل ساعة لو التطبيق فاضل مفتوح
+    setTimeout(() => checkUpdate(true), 1500);
+    setInterval(() => checkUpdate(true), 3600000);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) checkUpdate(true); });
+  } catch (e) { Upd.supported = false; }
+}
+async function checkUpdate(silent) {
+  if (!Upd.reg) { if (!silent) toast("التحديث التلقائي مش شغال هنا"); return; }
+  if (Upd.checking) return;
+  if (silent && Date.now() - Upd.lastCheck < 60000) return;
+  Upd.checking = true; Upd.lastCheck = Date.now();
+  if (!silent && state.ui.tab === "settings") render();
+  try {
+    await Upd.reg.update();
+    await new Promise(r => setTimeout(r, 900));
+    if (Upd.reg.waiting && navigator.serviceWorker.controller) { Upd.waiting = Upd.reg.waiting; updBanner(true); }
+    else if (!silent) toast("إنت على آخر إصدار (" + APP_VERSION + ")");
+  } catch (e) {
+    if (!silent) toast("مقدرناش نتأكد — اتأكد إن في نت");
+  }
+  Upd.checking = false;
+  if (state.ui.tab === "settings") render();
+}
+function applyUpdate() {
+  const w = Upd.waiting || (Upd.reg && Upd.reg.waiting);
+  if (!w) { location.reload(); return; }
+  toast("بنحدّث…");
+  w.postMessage({ type: "SKIP_WAITING" });
+  setTimeout(() => { if (!Upd.reloading) { Upd.reloading = true; location.reload(); } }, 1800);
+}
+
 /* ---------- AI analysis ---------- */
 let sampleNS = undefined;
 async function mountAI() {
@@ -2415,16 +2665,23 @@ document.addEventListener("click", (ev) => {
     case "splitToggle": {
       const box = el("splitBox"), on = box.hidden;
       box.hidden = !on; sh.dataset.split = on ? "1" : "";
-      el("splitBtn").innerHTML = ico(on ? "x" : "split") + (on ? "ألغي التقسيم" : "الحساب ده فيه حد تاني");
-      if (on) setTimeout(() => { const n = el("spPerson"); if (n) n.focus(); }, 60);
+      el("splitBtn").innerHTML = ico(on ? "x" : "users") + (on ? "ألغي التقسيم" : "الحساب ده فيه ناس تانية");
+      if (on) {
+        if (!el("splitRows").children.length) splitAdd("", "");
+        splitSum();
+        setTimeout(() => { const n = document.querySelector("#splitRows .sp-name"); if (n) n.focus(); }, 60);
+      }
       break;
     }
-    case "spHalf": case "spThird": {
-      const total = parseFloat(el("txAmt").value) || 0;
-      if (!(total > 0)) return toast("اكتب المبلغ الكلي الأول");
-      el("spAmt").value = Math.round(total / (a === "spHalf" ? 2 : 3) * 100) / 100;
+    case "spAdd": splitAdd("", ""); setTimeout(() => { const rows = document.querySelectorAll("#splitRows .sp-name"); const n = rows[rows.length - 1]; if (n) n.focus(); }, 40); break;
+    case "spDel": {
+      const row = document.querySelector('#splitRows .splitrow[data-row="' + v + '"]');
+      if (row) row.remove();
+      if (!el("splitRows").children.length) splitAdd("", "");
+      splitSum();
       break;
     }
+    case "spEqual": splitEqual(); break;
     case "quick": {
       const inp = el("txAmt"); if (!inp) break;
       if (v === "مسح") inp.value = ""; else inp.value = String((parseFloat(inp.value) || 0) + parseFloat(v));
@@ -2478,6 +2735,12 @@ document.addEventListener("click", (ev) => {
       break;
     }
     case "delGoal": state.goals = state.goals.filter(g => g.id !== id); save("goals"); closeSheet(); render(); toast("اتمسح الهدف"); break;
+    case "stProfile": sheetProfile(); break;
+    case "stLock": sheetLock(); break;
+    case "stBackup": sheetBackup(); break;
+    case "updNow": applyUpdate(); break;
+    case "updLater": updBanner(false); break;
+    case "updCheck": checkUpdate(false); break;
     case "debts": sheetDebts(); break;
     case "newDebt": sheetDebt(null, v); break;
     case "debtEdit": sheetDebt(id); break;
@@ -2645,7 +2908,6 @@ document.addEventListener("click", (ev) => {
   }
 });
 el("fab").addEventListener("click", () => sheetTx());
-el("btnSettings").addEventListener("click", sheetSettings);
 el("backdrop").addEventListener("click", (e) => { if (e.target === el("backdrop")) closeSheet(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !el("backdrop").hidden) closeSheet(); });
 window.addEventListener("scroll", () => { el("topbar").classList.toggle("scrolled", window.scrollY > 6); }, { passive: true });
@@ -2675,9 +2937,9 @@ async function doReset() {
 document.documentElement.setAttribute("dir", "rtl");
 document.documentElement.setAttribute("lang", "ar");
 el("fab").innerHTML = ico("plus");
-el("btnSettings").innerHTML = ico("gear");
 
 (function boot() {
+  swSetup();
   const cfg = readLockCfg();
   if (cfg && hasCrypto()) {
     Lock.on = true; Lock.cfg = cfg; Lock.unlocked = false;
@@ -2700,14 +2962,6 @@ async function tryBio(auto) {
     if (ok) { LockUI.entry = ""; render(); connect(); }
     else if (!auto) lockErr("مقدرناش نتأكد من البصمة");
   } catch (e) { if (!auto) lockErr("البصمة مش شغالة دلوقتي — استخدم الرمز"); }
-}
-</script>
-
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("./sw.js").catch(function () {});
-  });
 }
 </script>
 </body>
