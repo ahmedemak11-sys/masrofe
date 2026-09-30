@@ -1,6 +1,6 @@
 /* مصروفي — service worker
    غيّر VERSION مع كل إصدار جديد: الكاش بيتبنى منه، والتطبيق بيعرف إن في تحديث. */
-const VERSION = "1.4.0";
+const VERSION = "1.5.0";
 const CACHE = "masroufy-" + VERSION;
 const CORE = [
   "./",

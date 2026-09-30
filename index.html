@@ -359,6 +359,12 @@ details.more summary::-webkit-details-marker{display:none}
 .wcard.add{min-width:0; display:grid; place-items:center; color:var(--accent); border-style:dashed; padding-inline:16px}
 .wcard.add svg{width:20px;height:20px}
 
+/* wallet filter bar */
+.wfbar{margin-bottom:14px}
+.wfbar .chips{gap:7px}
+.wfbar .chip{background:var(--surface); box-shadow:var(--shadow-sm)}
+.wfbar .chip[aria-pressed="true"]{border-color:currentColor; background:var(--surface)}
+
 /* period switcher */
 .psegs{display:flex; gap:5px; background:var(--surface); padding:4px; border-radius:13px; border:1px solid var(--line); margin-bottom:12px; box-shadow:var(--shadow-sm)}
 .psegs button{flex:1; border:0; background:transparent; padding:8px 4px; border-radius:10px; font-weight:600; font-size:13.5px; color:var(--muted); white-space:nowrap}
@@ -455,8 +461,8 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
-const APP_VERSION = "1.4.0";
-const APP_BUILD = "2026-09-29";
+const APP_VERSION = "1.5.0";
+const APP_BUILD = "2026-09-30";
 
 /* ---------- helpers ---------- */
 const $ = (s, r) => (r || document).querySelector(s);
@@ -577,7 +583,7 @@ const state = {
   txs: [],
   debts: [],
   goals: [],
-  ui: { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", q: "" }
+  ui: { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", statW: "all", q: "" }
 };
 
 /* ---------- storage ---------- */
@@ -759,22 +765,40 @@ function curRange() {
   return rangeOf(u.period, u.period === "day" ? u.day : u.period === "year" ? u.year : u.mk);
 }
 const inRange = (d, r) => d >= r.from && d <= r.to;
-function txIn(r) { return state.txs.filter(t => inRange(t.date, r)); }
-function totalsIn(r) {
+/* wf = null يعني كل الأماكن، أو Set بمعرّفات المحافظ المختارة */
+const okW = (t, wf) => !wf || wf.has(t.walletId);
+function statWSet() {
+  const w = state.ui.statW;
+  if (!w || w === "all" || !Array.isArray(w) || !w.length) return null;
+  const valid = w.filter(id => state.wallets.some(x => x.id === id));
+  if (!valid.length || valid.length === state.wallets.length) return null;
+  return new Set(valid);
+}
+function statWLabel() {
+  const wf = statWSet();
+  if (!wf) return "كل الأماكن";
+  const names = state.wallets.filter(w => wf.has(w.id)).map(w => w.name);
+  return names.join(" + ");
+}
+function txIn(r, wf) { return state.txs.filter(t => inRange(t.date, r) && (t.type === "transfer" ? !wf : okW(t, wf))); }
+function totalsIn(r, wf) {
   let inc = 0, exp = 0;
-  for (const t of state.txs) if (inRange(t.date, r)) { if (t.type === "income") inc += t.amount; else if (t.type === "expense") exp += t.amount; }
+  for (const t of state.txs) {
+    if (!inRange(t.date, r) || !okW(t, wf)) continue;
+    if (t.type === "income") inc += t.amount; else if (t.type === "expense") exp += t.amount;
+  }
   return { inc: inc, exp: exp, net: inc - exp };
 }
 function totalsOf(mk) { return totalsIn(rangeOf("month", mk)); }
-function spendByCatIn(r) {
+function spendByCatIn(r, wf) {
   const m = {};
-  for (const t of state.txs) if (t.type === "expense" && inRange(t.date, r)) m[t.catId] = (m[t.catId] || 0) + t.amount;
+  for (const t of state.txs) if (t.type === "expense" && inRange(t.date, r) && okW(t, wf)) m[t.catId] = (m[t.catId] || 0) + t.amount;
   return m;
 }
 function spendByCat(mk) { return spendByCatIn(rangeOf("month", mk)); }
-function spentOnDay(iso) {
+function spentOnDay(iso, wf) {
   let s = 0;
-  for (const t of state.txs) if (t.type === "expense" && t.date === iso) s += t.amount;
+  for (const t of state.txs) if (t.type === "expense" && t.date === iso && okW(t, wf)) s += t.amount;
   return s;
 }
 /* ---------- سلف وديون ----------
@@ -1204,8 +1228,8 @@ function niceMax(v) {
   return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * e;
 }
 function donutChart(mk) { return donutRange(rangeOf("month", mk)); }
-function donutRange(r) {
-  const sc = spendByCatIn(r);
+function donutRange(r, wf) {
+  const sc = spendByCatIn(r, wf);
   let ent = Object.entries(sc).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
   if (!ent.length) return null;
   let parts = ent.slice(0, 6).map(e => ({ c: catById(e[0]), v: e[1] }));
@@ -1233,9 +1257,9 @@ function donutRange(r) {
     "</tbody></table></div></details>";
   return { html: '<div class="chartbox" id="donutBox">' + svg + '<div class="tt" id="donutTT"></div></div>' + legend + table, parts: parts, total: total };
 }
-function barsChart(endMK) {
+function barsChart(endMK, wf) {
   const mks = []; for (let i = 5; i >= 0; i--) mks.push(mkShift(endMK, -i));
-  const data = mks.map(mk => ({ mk: mk, t: totalsOf(mk) }));
+  const data = mks.map(mk => ({ mk: mk, t: totalsIn(rangeOf("month", mk), wf) }));
   const max = niceMax(Math.max(1, ...data.map(d => Math.max(d.t.inc, d.t.exp))));
   const W = 620, H = 234, pL = 62, pR = 10, pT = 14, pB = 30;
   const pw = W - pL - pR, ph = H - pT - pB;
@@ -1555,18 +1579,18 @@ function periodNav() {
     '<button class="mnav" data-act="pnext" aria-label="التالي"' + (atEnd ? " disabled" : "") + ">" + ico("chevL") + "</button></div>";
 }
 /* أعمدة: أيام الشهر أو شهور السنة */
-function periodBars(r) {
+function periodBars(r, wf) {
   let buckets = [];
   if (r.kind === "year") {
     for (let m = 1; m <= 12; m++) {
       const mk = r.from.slice(0, 4) + "-" + String(m).padStart(2, "0");
-      buckets.push({ label: AR_MONTHS_SHORT[m - 1], v: totalsIn(rangeOf("month", mk)).exp, key: mk });
+      buckets.push({ label: AR_MONTHS_SHORT[m - 1], v: totalsIn(rangeOf("month", mk), wf).exp, key: mk });
     }
   } else if (r.kind === "month") {
     const dim = daysIn(r.from.slice(0, 7));
     for (let d = 1; d <= dim; d++) {
       const iso = r.from.slice(0, 7) + "-" + String(d).padStart(2, "0");
-      buckets.push({ label: d % 5 === 0 || d === 1 ? String(d) : "", v: spentOnDay(iso), key: iso });
+      buckets.push({ label: d % 5 === 0 || d === 1 ? String(d) : "", v: spentOnDay(iso, wf), key: iso });
     }
   } else return "";
   const max = niceMax(Math.max(1, ...buckets.map(b => b.v)));
@@ -1590,11 +1614,22 @@ function periodBars(r) {
     '<line x1="' + pL + '" x2="' + (W - pR) + '" y1="' + (pT + ph) + '" y2="' + (pT + ph) + '" stroke="var(--muted)" stroke-width="1"/>' + bars +
     '</svg><div class="tt" id="pbarsTT"></div></div>';
 }
+function walletFilterBar() {
+  const wf = statWSet();
+  const sel = (id) => wf ? wf.has(id) : false;
+  return '<div class="wfbar"><div class="chips">' +
+    '<button class="chip" data-act="statW" data-v="all" aria-pressed="' + (!wf) + '">' + ico("coins") + "كل الأماكن</button>" +
+    state.wallets.map(w =>
+      '<button class="chip" data-act="statW" data-v="' + w.id + '" aria-pressed="' + sel(w.id) + '" style="' + (sel(w.id) ? "color:var(--" + w.color + ")" : "") + '">' +
+      '<span style="color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" + esc(w.name) + "</button>").join("") + "</div>" +
+    (wf ? '<p class="sub" style="margin:9px 2px 0">الأرقام تحت من <b style="color:var(--ink)">' + esc(statWLabel()) + "</b> بس — مش كل فلوسك.</p>" : "") + "</div>";
+}
 function viewStats() {
-  const r = curRange(), pr = prevRange(r), T = totalsIn(r), P = totalsIn(pr);
-  const list = txIn(r).filter(t => t.type === "expense");
+  const wf = statWSet();
+  const r = curRange(), pr = prevRange(r), T = totalsIn(r, wf), P = totalsIn(pr, wf);
+  const list = txIn(r, wf).filter(t => t.type === "expense");
   const cur = esc(state.settings.currency);
-  let h = periodNav();
+  let h = periodNav() + walletFilterBar();
 
   // headline
   const elapsed = r.kind === "day" ? 1 : (() => {
@@ -1604,25 +1639,25 @@ function viewStats() {
     return Math.max(1, daysBetween(r.from, t) + 1);
   })();
   const diff = P.exp > 0 ? (T.exp - P.exp) / P.exp * 100 : null;
-  h += '<div class="card pad"><div class="lbl">' + (r.kind === "day" ? "صرفت في اليوم ده" : r.kind === "year" ? "صرفت في السنة دي" : "صرفت في الشهر ده") + "</div>" +
+  h += '<div class="card pad"><div class="lbl">' + (r.kind === "day" ? "صرفت في اليوم ده" : r.kind === "year" ? "صرفت في السنة دي" : "صرفت في الشهر ده") + (wf ? " · " + esc(statWLabel()) : "") + "</div>" +
     '<div class="row" style="align-items:baseline;gap:8px;margin-top:2px"><div style="font-family:var(--ff-display);font-weight:700;font-size:30px;letter-spacing:-.02em">' + nf(T.exp) + "</div>" +
     '<span style="font-size:14px;color:var(--muted)">' + cur + "</span>" +
     (diff !== null && Math.abs(diff) >= 1 ? '<span style="margin-inline-start:auto">' + pill(diff > 0 ? "warn" : "good", (diff > 0 ? "أعلى" : "أقل") + " " + Math.round(Math.abs(diff)) + "% عن " + pr.label) + "</span>" : "") + "</div>" +
     '<div class="ftrow" style="padding-top:11px"><span>دخل ' + nf(T.inc) + "</span><span>" + (r.kind === "day" ? "" : "متوسط اليوم " + nf(T.exp / elapsed, 0)) + "</span></div></div>";
 
-  if (r.kind !== "day") h += '<h2 class="sec">' + (r.kind === "year" ? "الصرف على شهور السنة" : "الصرف يوم بيوم") + "</h2><div class=\"card pad\">" + periodBars(r) + "</div>";
+  if (r.kind !== "day") h += '<h2 class="sec">' + (r.kind === "year" ? "الصرف على شهور السنة" : "الصرف يوم بيوم") + "</h2><div class=\"card pad\">" + periodBars(r, wf) + "</div>";
 
   // donut
-  const d = donutRange(r);
+  const d = donutRange(r, wf);
   h += '<h2 class="sec">المصاريف على البنود<span class="hint">' + r.label + "</span></h2>";
   h += '<div class="card pad">' + (d ? d.html : '<div class="empty"><div class="eic">' + ico("pie") + "</div><h4>ما فيش مصاريف في الفترة دي</h4><p>غيّر الفترة أو سجّل حركات عشان نقدر نطلعلك التوزيع.</p></div>") + "</div>";
 
   if (r.kind === "day") {
-    const dl = txIn(r).sort((a, b) => (b.at || 0) - (a.at || 0));
+    const dl = txIn(r, wf).sort((a, b) => (b.at || 0) - (a.at || 0));
     h += '<h2 class="sec">حركات اليوم<span class="hint">' + dl.length + "</span></h2>" +
       (dl.length ? '<div class="card list">' + dl.map(t => txRow(t, { date: false })).join("") + "</div>"
         : '<div class="card"><div class="empty"><p>ما فيش حركات في اليوم ده.</p></div></div>');
-    const week = []; for (let i = 6; i >= 0; i--) { const iso = shiftDay(r.from, -i); week.push({ iso: iso, v: spentOnDay(iso) }); }
+    const week = []; for (let i = 6; i >= 0; i--) { const iso = shiftDay(r.from, -i); week.push({ iso: iso, v: spentOnDay(iso, wf) }); }
     const wmax = Math.max(1, ...week.map(x => x.v));
     h += '<h2 class="sec">آخر 7 أيام</h2><div class="card list">' + week.map(x => {
       const dt = new Date(x.iso + "T00:00:00");
@@ -1633,14 +1668,14 @@ function viewStats() {
         '<span class="amt" style="font-size:13.5px;min-width:52px;text-align:left">' + nf(x.v) + "</span></button>";
     }).join("") + "</div>";
   } else {
-    h += '<h2 class="sec">الدخل والمصروف<span class="hint">' + (r.kind === "year" ? "آخر 6 شهور" : "آخر 6 شهور") + "</span></h2><div class=\"card pad\">" + barsChart(r.kind === "year" ? r.to.slice(0, 7) : r.from.slice(0, 7)) + "</div>";
+    h += '<h2 class="sec">الدخل والمصروف<span class="hint">' + (r.kind === "year" ? "آخر 6 شهور" : "آخر 6 شهور") + "</span></h2><div class=\"card pad\">" + barsChart(r.kind === "year" ? r.to.slice(0, 7) : r.from.slice(0, 7), wf) + "</div>";
   }
 
   // wallets share
   const byW = {};
   list.forEach(t => byW[t.walletId] = (byW[t.walletId] || 0) + t.amount);
   const wEnt = Object.entries(byW).sort((a, b) => b[1] - a[1]);
-  if (wEnt.length > 1) {
+  if (wEnt.length > 1 && !wf) {
     h += '<h2 class="sec">اتصرف من فين</h2><div class="card list">' + wEnt.map(([id, v]) => {
       const w = walletById(id);
       return '<div class="item" style="cursor:default">' +
@@ -1658,14 +1693,14 @@ function viewStats() {
     '<div class="tile"><div class="k">' + ico("clock") + '<span>متوسط اليوم</span></div><div class="v">' + nf(T.exp / elapsed, 0) + "</div></div>" +
     '<div class="tile"><div class="k">' + ico("tabList") + '<span>عدد الحركات</span></div><div class="v">' + list.length + "</div></div>" +
     '<div class="tile"><div class="k">' + ico("tUp") + '<span>' + (r.kind === "year" ? "أعلى شهر" : "أعلى يوم") + '</span></div><div class="v">' +
-    (r.kind === "year" ? nf(Math.max(0, ...Array.from({ length: 12 }, (_, i) => totalsIn(rangeOf("month", r.from.slice(0, 4) + "-" + String(i + 1).padStart(2, "0"))).exp)))
+    (r.kind === "year" ? nf(Math.max(0, ...Array.from({ length: 12 }, (_, i) => totalsIn(rangeOf("month", r.from.slice(0, 4) + "-" + String(i + 1).padStart(2, "0")), wf).exp)))
       : topDay ? nf(topDay[1]) : "0") + "</div></div></div>";
   if (big) h += '<p class="sub" style="margin:9px 2px 0">' +
     (topDay && r.kind !== "year" ? "أعلى يوم صرف كان " + dayLabel(topDay[0]) + " بمبلغ " + money2(topDay[1]) + ". " : "") +
     "أكبر حركة: " + money2(big.amount) + " في " + esc(catById(big.catId).name) + ".</p>";
 
   // movers
-  const cs = spendByCatIn(r), ps = spendByCatIn(pr);
+  const cs = spendByCatIn(r, wf), ps = spendByCatIn(pr, wf);
   const ids = [...new Set([...Object.keys(cs), ...Object.keys(ps)])];
   const mov = ids.map(id => ({ c: catById(id), d: (cs[id] || 0) - (ps[id] || 0), a: cs[id] || 0, b: ps[id] || 0 }))
     .filter(m => Math.abs(m.d) > 0).sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 5);
@@ -1757,7 +1792,7 @@ function wireCharts() {
   }
   const db = el("donutBox");
   if (db) {
-    const d = donutRange(curRange()), tt = el("donutTT");
+    const d = donutRange(curRange(), statWSet()), tt = el("donutTT");
     db.querySelectorAll(".seg").forEach(s => {
       const move = (ev) => {
         const p = d.parts[+s.dataset.i], r = db.getBoundingClientRect();
@@ -2562,9 +2597,10 @@ async function runAI() {
   const out = el("aiOut"), btn = document.querySelector('[data-act="runAI"]');
   if (!sampleNS || !out) return;
   btn.disabled = true; out.textContent = "بنقرا الأرقام…";
+  const wfa = statWSet();
   const mk = state.ui.mk, prev = mkShift(mk, -1);
   const pack = (m) => {
-    const T = totalsOf(m), sc = spendByCat(m);
+    const rr = rangeOf("month", m), T = totalsIn(rr, wfa), sc = spendByCatIn(rr, wfa);
     return { month: m, income: Math.round(T.inc), expense: Math.round(T.exp), byCategory: Object.entries(sc).map(([id, v]) => ({ name: catById(id).name, amount: Math.round(v), limit: +catById(id).limit || 0 })) };
   };
   const B = balanceNow(), ckN = monthClock(mk);
@@ -2573,8 +2609,9 @@ async function runAI() {
     balance: Math.round(B.total),
     wallets: state.wallets.map(w => ({ name: w.name, balance: Math.round(B.byWallet[w.id] || 0) })),
     dayOfMonth: ckN.day, daysInMonth: ckN.dim,
-    avgPerDay: Math.round(ckN.day > 0 ? totalsOf(mk).exp / ckN.day : 0),
-    spentToday: Math.round(spentOnDay(todayISO())),
+    scope: wfa ? "الأرقام دي من " + statWLabel() + " بس، مش كل فلوسه" : "كل أماكن فلوسه",
+    avgPerDay: Math.round(ckN.day > 0 ? totalsIn(rangeOf("month", mk), wfa).exp / ckN.day : 0),
+    spentToday: Math.round(spentOnDay(todayISO(), wfa)),
     current: pack(mk), previous: pack(prev),
     goals: state.goals.map(g => { const s = goalStatus(g); return { name: g.name, target: g.target, saved: g.saved || 0, deadline: g.deadline || null, neededMonthly: Math.round(s.need || 0) }; })
   };
@@ -2842,6 +2879,17 @@ document.addEventListener("click", (ev) => {
     case "quickTransfer": closeSheet(); setTimeout(() => { sheetTx(); setTimeout(() => { const t = document.querySelector('[data-act="txType"][data-v="transfer"]'); if (t) t.click(); }, 80); }, 180); break;
     case "goDay": state.ui.tab = "stats"; state.ui.period = "day"; state.ui.day = todayISO(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "period": state.ui.period = v; render(); break;
+    case "statW": {
+      const u = state.ui;
+      if (v === "all") u.statW = "all";
+      else {
+        let cur2 = statWSet() ? [...statWSet()] : [];
+        cur2 = cur2.includes(v) ? cur2.filter(x => x !== v) : cur2.concat([v]);
+        u.statW = cur2.length ? cur2 : "all";
+      }
+      render();
+      break;
+    }
     case "pickDay": state.ui.period = "day"; state.ui.day = v; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "pprev": {
       const u = state.ui;
@@ -2918,7 +2966,7 @@ async function doReset() {
   state.categories = JSON.parse(JSON.stringify(DEFAULT_CATS));
   state.wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
   state.txs = []; state.goals = []; state.debts = [];
-  state.ui = { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", q: "" };
+  state.ui = { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", statW: "all", q: "" };
   writeLocal();
   if (Store.db) {
     try {
