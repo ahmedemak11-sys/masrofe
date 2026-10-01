@@ -150,6 +150,8 @@ h2.sec .hint{font-family:var(--ff-body); font-size:12px; font-weight:400; color:
   background:var(--accent-soft); border:1px solid var(--accent-line); color:var(--ink)}
 .allow .ic{width:38px;height:38px;border-radius:11px;background:var(--surface);display:grid;place-items:center;color:var(--accent);flex:none;border:1px solid var(--accent-line)}
 .allow .ic svg{width:20px;height:20px}
+.allow > span svg{width:100%;height:100%}
+.allow{font:inherit}
 .allow .v{font-family:var(--ff-display); font-weight:700; font-size:19px; line-height:1.2}
 .allow .t{font-size:12px; color:var(--ink-2)}
 
@@ -356,6 +358,7 @@ details.more summary::-webkit-details-marker{display:none}
 .wcard .wt i svg{width:14px;height:14px}
 .wcard .wv{font-family:var(--ff-display); font-weight:600; font-size:17px; margin-top:7px; letter-spacing:-.01em}
 .wcard .wv.neg{color:var(--down)}
+.wcard .wtag{display:block;margin-top:4px;font-size:10.5px;color:var(--s4);font-weight:600}
 .wcard.add{min-width:0; display:grid; place-items:center; color:var(--accent); border-style:dashed; padding-inline:16px}
 .wcard.add svg{width:20px;height:20px}
 
@@ -399,6 +402,16 @@ details.more summary::-webkit-details-marker{display:none}
 .numpad button.alt svg{width:22px;height:22px}
 .numpad button.bio{color:var(--accent)}
 .lockerr{color:var(--down); font-size:13px; min-height:19px; margin-top:16px; font-weight:500}
+
+/* install banner */
+.instbar{display:flex; align-items:center; gap:11px; padding:12px 13px; border-radius:15px;
+  background:linear-gradient(150deg, var(--accent) 0%, color-mix(in srgb,var(--accent) 74%, #000) 100%);
+  color:#fff; box-shadow:var(--shadow); margin-bottom:14px}
+.instbar .ic{width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}
+.instbar .ic svg{width:19px;height:19px}
+.instbar .x{width:30px;height:30px;flex:none;border:0;border-radius:9px;background:rgba(255,255,255,.14);
+  color:#fff;display:grid;place-items:center}
+.instbar .x svg{width:14px;height:14px}
 
 /* update banner */
 .updbar{position:fixed; left:50%; transform:translateX(-50%);
@@ -461,8 +474,8 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
-const APP_VERSION = "1.5.0";
-const APP_BUILD = "2026-09-30";
+const APP_VERSION = "2.0.0";
+const APP_BUILD = "2026-10-01";
 
 /* ---------- helpers ---------- */
 const $ = (s, r) => (r || document).querySelector(s);
@@ -544,6 +557,7 @@ const P = {
   handOut: '<path d="M3.4 12.6a2 2 0 0 1 2.6-.4l2.4 1.6h3.2a1.4 1.4 0 0 1 0 2.8h-2.2"/><path d="M9.4 16.6h2.8l5-2.4a1.7 1.7 0 0 1 2 2.7l-4.8 3.4a3 3 0 0 1-1.8.6H6.6l-3.2-2.4"/><circle cx="15.4" cy="6.4" r="3.4"/><path d="M15.4 4.8v3.2"/>',
   handIn: '<path d="M20.6 12.6a2 2 0 0 0-2.6-.4l-2.4 1.6h-3.2a1.4 1.4 0 0 0 0 2.8h2.2"/><path d="M14.6 16.6h-2.8l-5-2.4a1.7 1.7 0 0 0-2 2.7l4.8 3.4a3 3 0 0 0 1.8.6h6l3.2-2.4"/><circle cx="8.6" cy="6.4" r="3.4"/><path d="M8.6 4.8v3.2"/>',
   users: '<circle cx="9" cy="8" r="3.4"/><path d="M3.4 20a5.6 5.6 0 0 1 11.2 0"/><path d="M15.6 5.2a3.4 3.4 0 0 1 0 6.4"/><path d="M17 14.8a5.6 5.6 0 0 1 3.6 5.2"/>',
+  copy: '<rect x="8.4" y="8.4" width="11.2" height="11.2" rx="2.6"/><path d="M15.6 8.4V6.8a2.4 2.4 0 0 0-2.4-2.4H6.8a2.4 2.4 0 0 0-2.4 2.4v6.4a2.4 2.4 0 0 0 2.4 2.4h1.6"/>',
   split: '<path d="M4.4 5.6h4l7.2 12.8h4"/><path d="M15.6 5.6h4"/><path d="M4.4 18.4h4l2.6-4.6"/><path d="M17.4 3.4l2.4 2.2-2.4 2.2"/><path d="M17.4 16.2l2.4 2.2-2.4 2.2"/>'
 };
 function ico(n, cls) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (cls ? ' class="' + cls + '"' : "") + ">" + (P[n] || P.dots) + "</svg>"; }
@@ -570,9 +584,10 @@ const ICON_CHOICES = ["food", "car", "home", "bill", "health", "bag", "fun", "bo
 const COLOR_CHOICES = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9"];
 
 const DEFAULT_WALLETS = [
-  { id: "w_cash", name: "معايا", icon: "wallet", color: "s3", opening: 0 },
-  { id: "w_home", name: "في البيت", icon: "safe", color: "s7", opening: 0 },
-  { id: "w_bank", name: "البنك", icon: "bank", color: "s1", opening: 0 }
+  { id: "w_cash", name: "معايا", icon: "wallet", color: "s3", opening: 0, kind: "spend" },
+  { id: "w_home", name: "في البيت", icon: "safe", color: "s7", opening: 0, kind: "spend" },
+  { id: "w_bank", name: "البنك", icon: "bank", color: "s1", opening: 0, kind: "spend" },
+  { id: "w_save", name: "الادخار", icon: "tabTarget", color: "s4", opening: 0, kind: "save" }
 ];
 const WALLET_ICONS = ["wallet", "safe", "bank", "card", "coins", "phone", "gift", "home"];
 
@@ -600,6 +615,30 @@ function migrate(d) {
     delete d.settings.startBalance;
   }
   (d.txs || []).forEach(t => { if (!t.walletId && t.type !== "transfer") t.walletId = "w_cash"; });
+
+  // كل محفظة ليها نوع: صرف ولا ادخار
+  if (Array.isArray(d.wallets)) d.wallets.forEach(w => { if (!w.kind) w.kind = "spend"; });
+
+  // الادخار بقى محفظة حقيقية: ننقل أرصدة الأهداف القديمة جواها من غير ما الإجمالي يتغيّر
+  if (Array.isArray(d.wallets) && d.wallets.length && !d.wallets.some(w => w.kind === "save")) {
+    const goals = Array.isArray(d.goals) ? d.goals : [];
+    const locked = goals.reduce((s, g) => s + (+g.saved || 0), 0);
+    d.wallets.push({ id: "w_save", name: "الادخار", icon: "tabTarget", color: "s4", opening: locked, kind: "save" });
+    if (locked > 0) {
+      const spend = d.wallets.filter(w => w.kind === "spend");
+      const pos = spend.filter(w => (+w.opening || 0) > 0);
+      const pool = pos.length ? pos : spend.slice(0, 1);
+      const sum = pool.reduce((s, w) => s + Math.max(0, +w.opening || 0), 0);
+      let left = locked;
+      pool.forEach((w, i) => {
+        const share = i === pool.length - 1 ? left : (sum > 0 ? Math.round(locked * Math.max(0, +w.opening || 0) / sum * 100) / 100 : locked / pool.length);
+        w.opening = Math.round(((+w.opening || 0) - share) * 100) / 100;
+        left = Math.round((left - share) * 100) / 100;
+      });
+    }
+    goals.forEach(g => { g.saved0 = +g.saved || 0; if (!Array.isArray(g.moves)) g.moves = []; });
+  }
+  (d.goals || []).forEach(g => { if (!Array.isArray(g.moves)) g.moves = []; if (g.saved0 == null) g.saved0 = 0; });
   return d;
 }
 function applyData(d) {
@@ -852,13 +891,35 @@ function walletBalances() {
   }
   return m;
 }
+const isSaveW = (w) => (w && w.kind) === "save";
+function richestSpendWallet() {
+  const wb = walletBalances();
+  const list = state.wallets.filter(w => !isSaveW(w));
+  if (!list.length) return "";
+  return list.slice().sort((a, b) => (wb[b.id] || 0) - (wb[a.id] || 0))[0].id;
+}
+const spendWallets = () => state.wallets.filter(w => !isSaveW(w));
+const saveWallets = () => state.wallets.filter(w => isSaveW(w));
 function balanceNow() {
   const wb = walletBalances();
-  const b = state.wallets.reduce((s, w) => s + (wb[w.id] || 0), 0);
-  const saved = state.goals.reduce((s, g) => s + (g.saved || 0), 0);
+  let free = 0, locked = 0;
+  state.wallets.forEach(w => { if (isSaveW(w)) locked += wb[w.id] || 0; else free += wb[w.id] || 0; });
   const dt = debtTotals();
-  return { total: b, free: b - saved, locked: saved, byWallet: wb, debts: dt, net: b + dt.owedToMe - dt.iOwe };
+  return {
+    total: free + locked, free: free, locked: locked, byWallet: wb, debts: dt,
+    net: free + locked + dt.owedToMe - dt.iOwe,
+    allocated: state.goals.reduce((s, g) => s + goalSaved(g), 0),
+    get unallocated() { return Math.round((locked - this.allocated) * 100) / 100; }
+  };
 }
+/* الهدف بيخصّص جزء من فلوس الادخار — الفلوس نفسها في المحفظة */
+function goalSaved(g) {
+  return Math.max(0, (+g.saved0 || 0) + (g.moves || []).reduce((s, m) => s + (+m.amount || 0), 0));
+}
+function goalHistory(g) {
+  return (g.moves || []).slice().sort((a, b) => (b.at || 0) - (a.at || 0) || b.date.localeCompare(a.date));
+}
+function savingsTotal() { const wb = walletBalances(); return saveWallets().reduce((s, w) => s + (wb[w.id] || 0), 0); }
 const budgetTotal = () => state.categories.reduce((s, c) => s + (+c.limit || 0), 0);
 function savingCapacity() {
   const inc = +state.settings.income || 0;
@@ -874,13 +935,26 @@ function monthClock(mk) {
   const d = new Date().getDate();
   return { dim: dim, day: d, left: Math.max(0, dim - d + 1), past: false, future: false };
 }
+/* المسموح اليومي — بيتحسب من أول مصدر متاح، والتطبيق بيقول على أي أساس */
 function allowance(mk) {
   const { exp } = totalsOf(mk), ck = monthClock(mk);
-  const bt = budgetTotal();
-  const base = bt > 0 ? bt : (+state.settings.income || 0) * (1 - (+state.settings.savePct || 0) / 100);
-  if (!base) return null;
-  const rem = base - exp;
-  return { base: base, rem: rem, perDay: ck.left > 0 ? rem / ck.left : 0, left: ck.left, over: rem < 0 };
+  const bt = budgetTotal(), inc = +state.settings.income || 0;
+  if (bt > 0) {
+    const rem = bt - exp;
+    return { basis: "budget", base: bt, rem: rem, perDay: ck.left > 0 ? rem / ck.left : 0, left: ck.left, over: rem < 0,
+      why: "من إجمالي حدود الصرف (" + nf(bt) + ") ناقص اللي اتصرف الشهر ده" };
+  }
+  if (inc > 0) {
+    const base = inc * (1 - (+state.settings.savePct || 0) / 100);
+    const rem = base - exp;
+    return { basis: "income", base: base, rem: rem, perDay: ck.left > 0 ? rem / ck.left : 0, left: ck.left, over: rem < 0,
+      why: "من دخلك الشهري (" + nf(inc) + ") بعد خصم نسبة الادخار، ناقص اللي اتصرف" };
+  }
+  // من غير دخل ولا حدود: الفلوس المتاحة فعلاً على الأيام الفاضلة
+  const free = balanceNow().free;
+  if (free <= 0 || ck.left <= 0 || ck.future) return null;
+  return { basis: "cash", base: free, rem: free, perDay: free / ck.left, left: ck.left, over: false,
+    why: "المتاح للصرف عندك (" + nf(free) + ") مقسوم على " + ck.left + " يوم الباقيين في الشهر" };
 }
 function projected(mk) {
   const { exp } = totalsOf(mk), ck = monthClock(mk);
@@ -891,7 +965,7 @@ function projected(mk) {
 function goalMode(g) { return g.mode || (g.deadline ? "deadline" : "monthly"); }
 function goalStatus(g) {
   const today = todayISO(), mode = goalMode(g);
-  const target = +g.target || 0, saved = +g.saved || 0;
+  const target = +g.target || 0, saved = goalSaved(g);
   const left = Math.max(0, target - saved);
   const inc = +state.settings.income || 0;
 
@@ -999,7 +1073,7 @@ function insights(mk) {
     if (st.done) { push("good", "خلصت هدف « " + g.name + " »", "وصلت لـ " + money2(g.target) + ". مبروك — تقدر تقفل الهدف أو تزوّد المبلغ.", "check"); return; }
     if (st.late) { push("crit", "معاد « " + g.name + " » عدى", "لسه ناقص " + money2(st.left) + ". غيّر المعاد أو زوّد المبلغ الشهري.", "alert"); return; }
     if (st.stuck) { push("warn", "هدف « " + g.name + " » من غير خطة", "ناقصك " + money2(st.left) + " ومفيش مبلغ شهري محدد. افتح الهدف وحدّد مبلغ أو نسبة من دخلك.", "flag"); return; }
-    if (st.gap < -1) push("warn", "متأخر في « " + g.name + " »", "المفروض يكون معاك " + money2(st.expected) + " دلوقتي، ومعاك " + money2(g.saved || 0) + ". حوّش " + money2(st.need) + " الشهر ده عشان تلحق.", "flag");
+    if (st.gap < -1) push("warn", "متأخر في « " + g.name + " »", "المفروض يكون معاك " + money2(st.expected) + " دلوقتي، ومعاك " + money2(goalSaved(g)) + ". حوّش " + money2(st.need) + " الشهر ده عشان تلحق.", "flag");
   });
 
   // goals vs capacity
@@ -1347,9 +1421,10 @@ function viewHome() {
   const mk = state.ui.mk, T = totalsOf(mk), B = balanceNow(), ck = monthClock(mk), al = allowance(mk), bt = budgetTotal();
   const ins = insights(mk);
   let h = "";
+  h += installBanner();
   const greet = state.settings.name ? "أهلاً " + esc(state.settings.name) + " — معاك دلوقتي" : "معاك دلوقتي";
   h += '<button class="hero" data-act="editBalance"><div class="cap">' + greet + ico("edit", "heroedit") + '</div><div class="big">' + nf(B.total) + ' <span class="cur">' + esc(state.settings.currency) + "</span></div>" +
-    '<div class="split"><div class="qt"><div class="k">متاح للصرف</div><div class="v">' + nf(B.free) + '</div></div><div class="qt"><div class="k">محجوز للأهداف</div><div class="v">' + nf(B.locked) + "</div></div></div></button>";
+    '<div class="split"><div class="qt"><div class="k">متاح للصرف</div><div class="v">' + nf(B.free) + '</div></div><div class="qt"><div class="k">في الادخار</div><div class="v">' + nf(B.locked) + "</div></div></div></button>";
 
   h += '<div class="tiles" style="margin-top:14px"><div class="tile"><div class="k">' + ico("up") + '<span>دخل الشهر</span></div><div class="v up">' + nf(T.inc) + '</div></div>' +
     '<div class="tile"><div class="k">' + ico("down") + '<span>مصروف الشهر</span></div><div class="v down">' + nf(T.exp) + '</div></div>' +
@@ -1361,23 +1436,24 @@ function viewHome() {
   const avgDay = ck2.day > 0 ? totalsOf(thisMK()).exp / ck2.day : 0;
   h += '<div style="margin-top:12px"><button class="today" style="width:100%" data-act="goDay"><span class="ic">' + ico("sun") + "</span>" +
     '<span style="flex:1;text-align:right"><span class="v" style="display:block">' + nf(tSpent) + " " + esc(state.settings.currency) + "</span>" +
-    '<span class="t" style="display:block">صرفت النهاردة' + (avgDay > 0 ? " · متوسطك " + nf(avgDay, 0) + " في اليوم" : "") + "</span></span>" +
+    '<span class="t" style="display:block">صرفت النهاردة' + (avgDay > 0 ? " · متوسطك " + nf(avgDay, 0) + " في اليوم على مدار " + ck2.day + " يوم" : "") + "</span></span>" +
     (ySpent > 0 || tSpent > 0 ? '<span style="margin-inline-start:auto">' + (tSpent > avgDay * 1.25 && avgDay > 0 ? pill("warn", "أعلى من متوسطك") : tSpent === 0 ? pill("good", "لسه ما صرفتش") : pill("good", "في الطبيعي")) + "</span>" : "") +
     "</button></div>";
 
   if (al && !ck.past && !ck.future) {
-    h += '<div style="margin-top:10px"><div class="allow"><div class="ic">' + ico(al.over ? "alert" : "clock") + "</div><div><div class=\"v\">" +
+    h += '<div style="margin-top:10px"><button class="allow" style="width:100%;text-align:right;border-width:1px" data-act="whyAllow"><div class="ic">' + ico(al.over ? "alert" : "clock") + "</div><div style=\"flex:1\"><div class=\"v\">" +
       (al.over ? "عديت الميزانية بـ " + nf(-al.rem) + " " + esc(state.settings.currency) : nf(al.perDay, 0) + " " + esc(state.settings.currency) + " في اليوم") +
-      '</div><div class="t">' + (al.over ? "أي صرف زيادة هياكل من الادخار" : "المسموح لك تصرفه على باقي " + al.left + " يوم في الشهر") + "</div></div></div></div>";
+      '</div><div class="t">' + (al.over ? "أي صرف زيادة هياكل من الادخار" : "تقدر تصرفها على باقي " + al.left + " يوم · " + (al.basis === "cash" ? "محسوبة من فلوسك" : al.basis === "budget" ? "محسوبة من حدودك" : "محسوبة من دخلك")) + "</div></div><span style=\"width:18px;height:18px;flex:none;opacity:.55\">" + ico("info") + "</span></button></div>";
   }
 
   // أماكن الفلوس
   const wb = B.byWallet;
   h += '<h2 class="sec">فلوسك فين<span class="hint"><button class="btn ghost" style="padding:2px 6px;font-size:12px" data-act="wallets">إدارة</button></span></h2>' +
-    '<div class="wrail">' + state.wallets.map(w =>
+    '<div class="wrail">' + state.wallets.slice().sort((a, b) => (isSaveW(a) ? 1 : 0) - (isSaveW(b) ? 1 : 0)).map(w =>
       '<button class="wcard" data-act="editWallet" data-id="' + w.id + '">' +
       '<span class="wt"><i style="background:color-mix(in srgb,var(--' + w.color + ') 15%, var(--surface));color:var(--' + w.color + ')">' + ico(w.icon) + "</i>" + esc(w.name) + "</span>" +
-      '<span class="wv' + ((wb[w.id] || 0) < 0 ? " neg" : "") + '">' + nf(wb[w.id] || 0) + "</span></button>").join("") +
+      '<span class="wv' + ((wb[w.id] || 0) < 0 ? " neg" : "") + '">' + nf(wb[w.id] || 0) + "</span>" +
+      (isSaveW(w) ? '<span class="wtag">مش للصرف</span>' : "") + "</button>").join("") +
     '<button class="wcard add" data-act="newWallet" aria-label="مكان جديد">' + ico("plus") + "</button></div>";
 
   // سلف وديون
@@ -1425,7 +1501,7 @@ function viewHome() {
       state.goals.slice(0, 2).map(g => {
         const st = goalStatus(g);
         return '<div class="goal"><div class="ringwrap">' + ring(st.pct, st.done ? "var(--good)" : st.gap < 0 ? "var(--warn)" : "var(--accent)") +
-          '<div style="flex:1"><div class="gname">' + esc(g.name) + '</div><div class="gmeta">' + nf(g.saved || 0) + " من " + nf(g.target) + " " + esc(state.settings.currency) +
+          '<div style="flex:1"><div class="gname">' + esc(g.name) + '</div><div class="gmeta">' + nf(goalSaved(g)) + " من " + nf(g.target) + " " + esc(state.settings.currency) +
           (g.deadline ? " · فاضل " + st.mLeft + " شهر" : "") + "</div></div>" +
           '<button class="btn" data-act="contrib" data-id="' + g.id + '">' + ico("plus") + "ضيف</button></div></div>";
       }).join("") + "</div>";
@@ -1520,6 +1596,17 @@ function viewGoals() {
   const B = balanceNow(), inc = +state.settings.income || 0, bt = budgetTotal();
   const cap = savingCapacity(), need = goalsMonthlyTotal();
   const pctOfInc = inc > 0 ? cap / inc * 100 : 0;
+  const recentInc = totalsOf(mkShift(thisMK(), -1)).inc + totalsOf(thisMK()).inc;
+  const noIncome = inc <= 0 && recentInc <= 0;
+  if (noIncome) {
+    let hh = '<div class="card pad"><div class="lbl">متاح للصرف دلوقتي</div>' +
+      '<div class="row" style="align-items:baseline;gap:8px;margin-top:2px"><div style="font-family:var(--ff-display);font-weight:700;font-size:26px;letter-spacing:-.02em">' + nf(B.free) + "</div>" +
+      '<span style="font-size:14px;color:var(--muted)">' + esc(state.settings.currency) + "</span></div>" +
+      '<p class="sub" style="margin:8px 0 0">إنت مش كاتب دخل شهري، فبنحسب من فلوسك الموجودة فعلاً. أي مبلغ تحوّله للادخار هيتشال من الرقم ده.</p>';
+    if (need > 0) hh += '<hr class="sep" style="margin:12px 0"><div class="ftrow"><span>أهدافك محتاجة شهرياً</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(need) + "</b></div>";
+    hh += '<div class="btnrow" style="margin-top:14px"><button class="btn pri block" data-act="newGoal">' + ico("plus") + "هدف ادخار جديد</button></div></div>";
+    return hh + goalsRest(B);
+  }
   let h = '<div class="card pad">' +
     '<div class="lbl">قدرتك على الادخار شهرياً</div>' +
     '<div class="row" style="align-items:baseline;gap:8px"><div style="font-family:var(--ff-display);font-weight:700;font-size:26px;letter-spacing:-.02em;color:' + (cap > 0 ? "var(--up)" : "var(--ink)") + '">' + nf(cap) + '</div><span style="font-size:14px;font-weight:500;color:var(--muted)">' + esc(state.settings.currency) + "</span>" +
@@ -1533,6 +1620,20 @@ function viewGoals() {
       '<p class="sub" style="margin:8px 0 0">' + (okCap ? "في حدود قدرتك — فاضل " + money2(Math.max(0, cap - need)) + " كل شهر." : "أكتر من قدرتك بـ " + money2(need - cap) + ". قلّل حدود الصرف أو مدّ معاد هدف.") + "</p>";
   }
   h += '<div class="btnrow" style="margin-top:14px"><button class="btn pri block" data-act="newGoal">' + ico("plus") + "هدف ادخار جديد</button></div></div>";
+  return h + goalsRest(B);
+}
+function goalsRest(B) {
+  let h = "";
+  // محفظة الادخار الحقيقية
+  h += '<h2 class="sec">فلوس الادخار</h2><div class="card pad">' +
+    '<div class="row" style="align-items:baseline;gap:8px"><div style="font-family:var(--ff-display);font-weight:700;font-size:26px;letter-spacing:-.02em;color:var(--s4)">' + nf(B.locked) + "</div>" +
+    '<span style="font-size:14px;color:var(--muted)">' + esc(state.settings.currency) + "</span></div>" +
+    '<p class="sub" style="margin:7px 0 0">الفلوس دي مشالة من المتاح للصرف — مش بتبان في « متاح للصرف » على الشاشة الرئيسية.</p>' +
+    (B.locked > 0 ? '<hr class="sep" style="margin:12px 0">' +
+      '<div class="ftrow" style="padding:3px 0"><span>مخصص لأهداف</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(B.allocated) + "</b></div>" +
+      '<div class="ftrow" style="padding:6px 0 0"><span>لسه مش مخصص</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(B.unallocated) + "</b></div>" : "") +
+    '<div class="btnrow" style="margin-top:13px"><button class="btn pri" style="flex:1" data-act="saveMove" data-v="in">' + ico("down") + "حوّل للادخار</button>" +
+    (B.locked > 0.004 ? '<button class="btn" style="flex:1" data-act="saveMove" data-v="out">' + ico("up") + "اسحب للمتاح</button>" : "") + "</div></div>";
 
   if (!state.goals.length) {
     return h + '<div class="card" style="margin-top:14px"><div class="empty"><div class="eic">' + ico("tabTarget") + "</div><h4>ابدأ أول خطة ادخار</h4>" +
@@ -1551,11 +1652,13 @@ function viewGoals() {
     const badge = st.done ? pill("good", "خلص") : st.late ? pill("crit", "المعاد عدى") : st.stuck ? pill("crit", "محتاج خطة") : st.gap < -1 ? pill("warn", "متأخر " + nf(-st.gap)) : pill("good", "في السكة");
     return '<div class="goal"><div class="ringwrap">' + ring(st.pct, col) +
       '<div style="flex:1;min-width:0"><div class="gname">' + esc(g.name) + "</div>" +
-      '<div class="gmeta">' + nf(g.saved || 0) + " من " + nf(g.target) + " " + cur + "</div>" +
+      '<div class="gmeta">' + nf(goalSaved(g)) + " من " + nf(g.target) + " " + cur + "</div>" +
       '<div class="chips" style="margin-top:7px">' + badge + pill("flat", MODE_LABEL[st.mode] + (st.mode === "percent" ? " " + nf(g.pct) + "%" : "")) + "</div></div></div>" +
       '<div class="plan">' + plan + "</div>" +
-      '<div class="btnrow" style="margin-top:10px"><button class="btn pri" style="flex:1" data-act="contrib" data-id="' + g.id + '">' + ico("plus") + 'ضيف مبلغ</button>' +
-      '<button class="btn" data-act="editGoal" data-id="' + g.id + '">' + ico("edit") + "عدّل</button></div></div>";
+      '<div class="btnrow" style="margin-top:10px"><button class="btn pri" style="flex:1" data-act="contrib" data-id="' + g.id + '">' + ico("plus") + 'ضيف</button>' +
+      (goalSaved(g) > 0.004 ? '<button class="btn" data-act="goalWithdraw" data-id="' + g.id + '">' + ico("up") + 'اسحب</button>' : "") +
+      '<button class="btn ghost" data-act="goalHistory" data-id="' + g.id + '" aria-label="الحركة">' + ico("tabList") + '</button>' +
+      '<button class="btn ghost" data-act="editGoal" data-id="' + g.id + '" aria-label="تعديل">' + ico("edit") + "</button></div></div>";
   }).join("") + "</div>";
   return h;
 }
@@ -1624,6 +1727,79 @@ function walletFilterBar() {
       '<span style="color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" + esc(w.name) + "</button>").join("") + "</div>" +
     (wf ? '<p class="sub" style="margin:9px 2px 0">الأرقام تحت من <b style="color:var(--ink)">' + esc(statWLabel()) + "</b> بس — مش كل فلوسك.</p>" : "") + "</div>";
 }
+/* ---------- قايمة البنود القابلة للفتح ---------- */
+function catList(r, wf) {
+  const sc = spendByCatIn(r, wf);
+  const ent = Object.entries(sc).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
+  if (!ent.length) return "";
+  const total = ent.reduce((s, e) => s + e[1], 0);
+  const days = Math.max(1, elapsedDays(r));
+  return '<div class="card list">' + ent.map(([id, v]) => {
+    const c = catById(id), pct = v / total * 100;
+    return '<button class="bud" style="display:block;width:100%;text-align:right;background:transparent;border-inline:0;border-top:0" data-act="catDetail" data-id="' + id + '">' +
+      '<div class="hd">' + catDot(c, 34) + '<span class="nm">' + esc(c.name) + "</span>" +
+      '<span class="rt"><b>' + nf(v) + "</b><small>" + Math.round(pct) + "% · " + nf(v / days, 0) + " في اليوم</small></span></div>" +
+      '<div class="bar thin"><i style="width:' + pct.toFixed(1) + '%;background:var(--' + c.color + ')"></i></div></button>';
+  }).join("") + "</div>";
+}
+function elapsedDays(r) {
+  if (r.kind === "day") return 1;
+  const t = todayISO();
+  if (r.to < t) return r.days;
+  // آخر يوم فيه حركة في الفترة، لو بعد النهاردة
+  let last = "";
+  for (const x of state.txs) if (inRange(x.date, r) && x.date > last) last = x.date;
+  const end = (last && last > t) ? last : t;
+  if (r.from > end) return 1;
+  return clamp(daysBetween(r.from, end) + 1, 1, r.days);
+}
+/* تفاصيل بند في فترة: الإجمالي ثم الأيام ثم الحركات */
+function sheetCatDetail(catId) {
+  const wf = statWSet(), r = curRange(), c = catById(catId), cur = esc(state.settings.currency);
+  const list = state.txs.filter(t => t.type === "expense" && t.catId === catId && inRange(t.date, r) && okW(t, wf))
+    .sort((a, b) => b.date.localeCompare(a.date) || (b.at || 0) - (a.at || 0));
+  const total = list.reduce((s, t) => s + t.amount, 0);
+  const days = Math.max(1, elapsedDays(r));
+  const prev = prevRange(r);
+  const pTotal = state.txs.filter(t => t.type === "expense" && t.catId === catId && inRange(t.date, prev) && okW(t, wf)).reduce((s, t) => s + t.amount, 0);
+  const diff = pTotal > 0 ? (total - pTotal) / pTotal * 100 : null;
+  const lim = +c.limit || 0;
+
+  // تجميع: بالشهور لو السنة، وإلا بالأيام
+  const groups = {};
+  list.forEach(t => { const k = r.kind === "year" ? t.date.slice(0, 7) : t.date; groups[k] = (groups[k] || 0) + t.amount; });
+  const gk = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+  const gmax = Math.max(1, ...Object.values(groups));
+
+  let h = '<div class="card pad" style="margin-bottom:14px">' +
+    '<div class="row" style="align-items:center;gap:10px">' + catDot(c, 38) +
+    '<div style="flex:1"><div class="lbl">' + r.label + "</div>" +
+    '<div style="font-family:var(--ff-display);font-weight:700;font-size:26px;letter-spacing:-.02em">' + nf(total) + ' <span style="font-size:14px;font-weight:500;color:var(--muted)">' + cur + "</span></div></div>" +
+    (diff !== null && Math.abs(diff) >= 1 ? pill(diff > 0 ? "warn" : "good", (diff > 0 ? "+" : "−") + Math.round(Math.abs(diff)) + "%") : "") + "</div>" +
+    '<hr class="sep" style="margin:12px 0">' +
+    '<div class="ftrow" style="padding:3px 0"><span>متوسط اليوم</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(total / days, 0) + "</b></div>" +
+    '<div class="ftrow" style="padding:6px 0 0"><span>عدد الحركات</span><b style="color:var(--ink);font-family:var(--ff-display)">' + list.length + "</b></div>" +
+    (pTotal > 0 ? '<div class="ftrow" style="padding:6px 0 0"><span>' + prev.label + '</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(pTotal) + "</b></div>" : "") +
+    (lim > 0 && r.kind === "month" ? '<hr class="sep" style="margin:12px 0"><div class="bar"><i class="' + progClass(total / lim * 100) + '" style="width:' + clamp(total / lim * 100, 0, 100) + '%"></i></div>' +
+      '<div class="ftrow" style="padding-top:8px"><span>الحد الشهري ' + nf(lim) + "</span><span>" + (total > lim ? "عديته بـ " + nf(total - lim) : "فاضل " + nf(lim - total)) + "</span></div>" : "") +
+    "</div>";
+
+  if (gk.length > 1) {
+    h += '<h2 class="sec" style="margin-top:0">' + (r.kind === "year" ? "على الشهور" : "على الأيام") + '<span class="hint">دوس عشان تشوف الفترة</span></h2><div class="card list">' +
+      gk.map(k => {
+        const v = groups[k];
+        return '<button class="item" style="gap:11px" data-act="' + (r.kind === "year" ? "goMonth" : "pickDay") + '" data-v="' + k + '">' +
+          '<span style="width:84px;flex:none;font-size:12.5px;color:var(--muted);white-space:nowrap">' + (r.kind === "year" ? mkLabel(k) : dayLabel(k)) + "</span>" +
+          '<span style="flex:1"><span class="bar thin"><i style="width:' + (v / gmax * 100).toFixed(1) + '%;background:var(--' + c.color + ')"></i></span></span>' +
+          '<span class="amt" style="font-size:13.5px;min-width:54px;text-align:left">' + nf(v) + "</span></button>";
+      }).join("") + "</div>";
+  }
+
+  h += '<h2 class="sec">الحركات<span class="hint">' + list.length + "</span></h2>" +
+    (list.length ? '<div class="card list">' + list.map(t => txRow(t)).join("") + "</div>"
+      : '<div class="card"><div class="empty"><p>ما فيش حركات في الفترة دي.</p></div></div>');
+  openSheet(esc(c.name), h);
+}
 function viewStats() {
   const wf = statWSet();
   const r = curRange(), pr = prevRange(r), T = totalsIn(r, wf), P = totalsIn(pr, wf);
@@ -1632,12 +1808,7 @@ function viewStats() {
   let h = periodNav() + walletFilterBar();
 
   // headline
-  const elapsed = r.kind === "day" ? 1 : (() => {
-    const t = todayISO();
-    if (r.to < t) return r.days;
-    if (r.from > t) return 1;
-    return Math.max(1, daysBetween(r.from, t) + 1);
-  })();
+  const elapsed = elapsedDays(r);
   const diff = P.exp > 0 ? (T.exp - P.exp) / P.exp * 100 : null;
   h += '<div class="card pad"><div class="lbl">' + (r.kind === "day" ? "صرفت في اليوم ده" : r.kind === "year" ? "صرفت في السنة دي" : "صرفت في الشهر ده") + (wf ? " · " + esc(statWLabel()) : "") + "</div>" +
     '<div class="row" style="align-items:baseline;gap:8px;margin-top:2px"><div style="font-family:var(--ff-display);font-weight:700;font-size:30px;letter-spacing:-.02em">' + nf(T.exp) + "</div>" +
@@ -1651,6 +1822,8 @@ function viewStats() {
   const d = donutRange(r, wf);
   h += '<h2 class="sec">المصاريف على البنود<span class="hint">' + r.label + "</span></h2>";
   h += '<div class="card pad">' + (d ? d.html : '<div class="empty"><div class="eic">' + ico("pie") + "</div><h4>ما فيش مصاريف في الفترة دي</h4><p>غيّر الفترة أو سجّل حركات عشان نقدر نطلعلك التوزيع.</p></div>") + "</div>";
+  const cl = catList(r, wf);
+  if (cl) h += '<p class="sub" style="margin:10px 2px 8px">دوس على أي بند تشوف تفاصيله يوم بيوم.</p>' + cl;
 
   if (r.kind === "day") {
     const dl = txIn(r, wf).sort((a, b) => (b.at || 0) - (a.at || 0));
@@ -1668,7 +1841,23 @@ function viewStats() {
         '<span class="amt" style="font-size:13.5px;min-width:52px;text-align:left">' + nf(x.v) + "</span></button>";
     }).join("") + "</div>";
   } else {
-    h += '<h2 class="sec">الدخل والمصروف<span class="hint">' + (r.kind === "year" ? "آخر 6 شهور" : "آخر 6 شهور") + "</span></h2><div class=\"card pad\">" + barsChart(r.kind === "year" ? r.to.slice(0, 7) : r.from.slice(0, 7), wf) + "</div>";
+    // الأيام (أو الشهور) كقايمة قابلة للفتح
+    const unit = r.kind === "year" ? "month" : "day";
+    const tot = {};
+    txIn(r, wf).filter(t => t.type === "expense").forEach(t => {
+      const k = unit === "month" ? t.date.slice(0, 7) : t.date;
+      tot[k] = (tot[k] || 0) + t.amount;
+    });
+    const keys = Object.keys(tot).sort((a, b) => b.localeCompare(a));
+    if (keys.length) {
+      const mx = Math.max(1, ...Object.values(tot));
+      h += '<h2 class="sec">' + (unit === "month" ? "الشهور" : "الأيام") + '<span class="hint">دوس عشان تفتح</span></h2><div class="card list">' +
+        keys.map(k => '<button class="item" style="gap:11px" data-act="' + (unit === "month" ? "goMonth" : "pickDay") + '" data-v="' + k + '">' +
+          '<span style="width:84px;flex:none;font-size:12.5px;color:var(--muted);white-space:nowrap">' + (unit === "month" ? mkLabel(k) : dayLabel(k)) + "</span>" +
+          '<span style="flex:1"><span class="bar thin"><i style="width:' + (tot[k] / mx * 100).toFixed(1) + '%;background:var(--accent)"></i></span></span>' +
+          '<span class="amt" style="font-size:13.5px;min-width:54px;text-align:left">' + nf(tot[k]) + "</span></button>").join("") + "</div>";
+    }
+    h += '<h2 class="sec">الدخل والمصروف<span class="hint">آخر 6 شهور</span></h2><div class="card pad">' + barsChart(r.kind === "year" ? r.to.slice(0, 7) : r.from.slice(0, 7), wf) + "</div>";
   }
 
   // wallets share
@@ -1977,7 +2166,8 @@ function sheetGoal(id) {
   const body =
     '<div class="field"><label for="gName">اسم الهدف</label><input class="inp" id="gName" value="' + esc(g ? g.name : "") + '" placeholder="مثلاً: لابتوب جديد"></div>' +
     '<div class="field"><label for="gTarget">المبلغ المستهدف</label><input class="inp big" id="gTarget" type="number" inputmode="decimal" value="' + (g ? g.target : "") + '" placeholder="0"></div>' +
-    '<div class="field"><label for="gSaved">معاك منه كام دلوقتي؟</label><input class="inp" id="gSaved" type="number" inputmode="decimal" value="' + (g ? g.saved || 0 : 0) + '"></div>' +
+    (g ? '<div class="card pad" style="margin-bottom:13px"><div class="ftrow" style="padding:2px 0"><span>متجمّع في الهدف دلوقتي</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(goalSaved(g)) + ' ' + esc(state.settings.currency) + '</b></div></div>'
+      : '<p class="sub" style="margin:-4px 0 14px">بعد ما تحفظ، دوس « ضيف مبلغ » عشان تحوّل فلوس فعلية للهدف ده.</p>') +
     '<div class="field"><label>هتحوّش إزاي؟</label><div class="segs">' +
     modes.map(m => '<button data-act="goalMode" data-v="' + m[0] + '" aria-pressed="' + (mode === m[0]) + '">' + m[1] + "</button>").join("") + "</div></div>" +
     '<div class="field" id="fMonthly"><label for="gMonthly">المبلغ الشهري</label><input class="inp" id="gMonthly" type="number" inputmode="decimal" value="' + (g ? g.monthly || 0 : 0) + '" placeholder="0"></div>' +
@@ -1990,7 +2180,7 @@ function sheetGoal(id) {
   openSheet(g ? "تعديل الخطة" : "خطة ادخار جديدة", body, () => {
     el("sheet").dataset.gmode = mode;
     paintGoalMode();
-    ["gTarget", "gSaved", "gMonthly", "gPct", "gDate"].forEach(k => { const n = el(k); if (n) n.addEventListener("input", goalPreview); });
+    ["gTarget", "gMonthly", "gPct", "gDate"].forEach(k => { const n = el(k); if (n) n.addEventListener("input", goalPreview); });
   });
 }
 function paintGoalMode() {
@@ -2005,7 +2195,7 @@ function goalPreview() {
   const box = el("gPreview"); if (!box) return;
   const sh = el("sheet"), m = sh.dataset.gmode, cur = esc(state.settings.currency);
   const draft = {
-    mode: m, target: parseFloat(el("gTarget").value) || 0, saved: parseFloat(el("gSaved").value) || 0,
+    mode: m, target: parseFloat(el("gTarget").value) || 0, saved0: 0, moves: [],
     monthly: parseFloat(el("gMonthly").value) || 0, pct: parseFloat(el("gPct").value) || 0,
     deadline: el("gDate").value || "", startedAt: todayISO()
   };
@@ -2178,16 +2368,115 @@ function sheetBalance() {
     '<button class="btn pri block" data-act="newWallet">' + ico("plus") + "ضيف مكان جديد</button>" +
     '<button class="btn block" data-act="quickTransfer">' + ico("swap") + "حوّل فلوس بين مكانين</button></div>");
 }
+/* ---------- حركة فلوس الادخار ---------- */
+function moveRow(m) {
+  const inn = m.amount > 0;
+  const where = m.kind === "alloc"
+    ? (inn ? "خصّصته من الادخار الموجود" : "رجّعته للادخار غير المخصص")
+    : (inn ? "جه من " + esc(walletById(m.from || "").name) : "راح لـ " + esc(walletById(m.to || "").name));
+  return '<div class="item" style="cursor:default">' +
+    '<span class="ic" style="background:color-mix(in srgb,var(--' + (inn ? "s3" : "s2") + ') 15%, var(--surface));color:var(--' + (inn ? "s3" : "s2") + ')">' + ico(inn ? "up" : "down") + "</span>" +
+    '<span style="flex:1;min-width:0"><span class="nm">' + (inn ? "ضفت" : "سحبت") + '</span><span class="mt" style="display:block">' + where + " · " + fmtDate(m.date) + "</span></span>" +
+    '<span class="amt" style="color:' + (inn ? "var(--up)" : "var(--down)") + '"><span class="num">' + (inn ? "+" : "−") + nf(Math.abs(m.amount)) + "</span></span></div>";
+}
 function sheetContrib(id) {
   const g = state.goals.find(x => x.id === id); if (!g) return;
-  const st = goalStatus(g);
+  const st = goalStatus(g), B = balanceNow();
+  const unalloc = B.unallocated;
   openSheet("ضيف لـ « " + g.name + " »",
-    '<div class="card pad" style="margin-bottom:14px"><div class="row"><span class="sub">ناقصك</span><b style="margin-inline-start:auto;font-family:var(--ff-display)">' + money2(st.left) + "</b></div>" +
-    (g.deadline ? '<div class="row" style="margin-top:6px"><span class="sub">المطلوب شهرياً</span><b style="margin-inline-start:auto;font-family:var(--ff-display)">' + money2(st.need) + "</b></div>" : "") + "</div>" +
-    '<div class="field"><label for="ctAmt">المبلغ</label><input class="inp" id="ctAmt" type="number" inputmode="decimal" value="' + Math.round(st.need || 0) + '"></div>' +
-    '<p class="sub" style="margin:-4px 0 14px">المبلغ ده بيتحجز من رصيدك ومش بيتحسب مصروف.</p>' +
+    '<div class="card pad" style="margin-bottom:14px">' +
+    '<div class="ftrow" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>ناقصك</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(st.left) + "</b></div>" +
+    (st.need > 0 ? '<div class="ftrow" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>المطلوب شهرياً</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(st.need) + "</b></div>" : "") +
+    '<div class="ftrow" style="padding:4px 0"><span>متاح للصرف عندك</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(B.free) + "</b></div></div>" +
+    '<div class="field"><label for="ctAmt">المبلغ</label><input class="inp big" id="ctAmt" type="number" inputmode="decimal" value="' + (Math.round((st.need || st.left) * 100) / 100 || "") + '"></div>' +
+    '<div class="field"><label>الفلوس جاية منين؟</label><div class="chips" id="ctFrom"></div></div>' +
+    '<p class="sub" id="ctNote" style="margin:-4px 0 14px"></p>' +
     '<button class="btn pri block" data-act="doContrib" data-id="' + id + '">' + ico("check") + "ضيف للهدف</button>",
-    () => setTimeout(() => { const a = el("ctAmt"); if (a) { a.focus(); a.select(); } }, 60));
+    function () {
+      const sh = el("sheet");
+      sh.dataset.src = richestSpendWallet();
+      sh.dataset.unalloc = String(unalloc);
+      paintCtSrc();
+      setTimeout(function () { const a = el("ctAmt"); if (a) { a.focus(); a.select(); } }, 60);
+    });
+}
+function paintCtSrc() {
+  const sh = el("sheet"), sel = sh.dataset.src, unalloc = parseFloat(sh.dataset.unalloc) || 0;
+  const wb = walletBalances();
+  let html = spendWallets().map(function (w) {
+    return '<button class="chip" data-act="pickSrc" data-v="' + w.id + '" aria-pressed="' + (w.id === sel) + '" style="' + (w.id === sel ? "color:var(--" + w.color + ")" : "") + '">' +
+      '<span style="color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" + esc(w.name) + ' <span class="num" style="opacity:.6">' + nf(wb[w.id] || 0) + "</span></button>";
+  }).join("");
+  if (unalloc > 0.004) html += '<button class="chip" data-act="pickSrc" data-v="_alloc" aria-pressed="' + (sel === "_alloc") + '" style="' + (sel === "_alloc" ? "color:var(--s4)" : "") + '">' +
+    '<span style="color:var(--s4)">' + ico("tabTarget") + '</span>من الادخار الموجود <span class="num" style="opacity:.6">' + nf(unalloc) + "</span></button>";
+  el("ctFrom").innerHTML = html;
+  const n = el("ctNote");
+  if (n) n.innerHTML = sel === "_alloc"
+    ? "الفلوس موجودة في الادخار بالفعل — هنخصّصها للهدف ده بس، مفيش فلوس هتتحرك."
+    : "الفلوس هتتنقل من <b>" + esc(walletById(sel).name) + "</b> لمحفظة الادخار، فهتختفي من المتاح للصرف.";
+}
+function sheetWithdraw(id) {
+  const g = state.goals.find(function (x) { return x.id === id; }); if (!g) return;
+  const have = goalSaved(g);
+  if (have <= 0.004) return toast("مفيش فلوس في الهدف ده");
+  openSheet("اسحب من « " + g.name + " »",
+    '<div class="card pad" style="margin-bottom:14px"><div class="ftrow" style="padding:4px 0"><span>المتاح في الهدف</span>' +
+    '<b style="color:var(--ink);font-family:var(--ff-display)">' + nf(have) + "</b></div></div>" +
+    '<div class="field"><label for="wdAmt">المبلغ</label><input class="inp big" id="wdAmt" type="number" inputmode="decimal" value="' + (Math.round(have * 100) / 100) + '"></div>' +
+    '<div class="field"><label>الفلوس تروح فين؟</label><div class="chips" id="wdTo"></div></div>' +
+    '<p class="sub" id="wdNote" style="margin:-4px 0 14px"></p>' +
+    '<button class="btn pri block" data-act="doWithdraw" data-id="' + id + '">' + ico("check") + "اسحب</button>",
+    function () {
+      const sh = el("sheet");
+      sh.dataset.src = richestSpendWallet();
+      paintWdTo();
+      setTimeout(function () { const a = el("wdAmt"); if (a) { a.focus(); a.select(); } }, 60);
+    });
+}
+function paintWdTo() {
+  const sh = el("sheet"), sel = sh.dataset.src;
+  let html = spendWallets().map(function (w) {
+    return '<button class="chip" data-act="pickSrc" data-v="' + w.id + '" aria-pressed="' + (w.id === sel) + '" style="' + (w.id === sel ? "color:var(--" + w.color + ")" : "") + '">' +
+      '<span style="color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" + esc(w.name) + "</button>";
+  }).join("");
+  html += '<button class="chip" data-act="pickSrc" data-v="_alloc" aria-pressed="' + (sel === "_alloc") + '" style="' + (sel === "_alloc" ? "color:var(--s4)" : "") + '">' +
+    '<span style="color:var(--s4)">' + ico("tabTarget") + "</span>تفضل في الادخار</button>";
+  el("wdTo").innerHTML = html;
+  const n = el("wdNote");
+  if (n) n.innerHTML = sel === "_alloc"
+    ? "الفلوس هتفضل في محفظة الادخار بس من غير ما تكون محجوزة للهدف ده."
+    : "الفلوس هتخرج من الادخار وترجع لـ <b>" + esc(walletById(sel).name) + "</b> وتبقى متاحة للصرف.";
+}
+function sheetSaveMove(dir) {
+  const B = balanceNow(), wb = walletBalances();
+  const toSave = dir !== "out";
+  if (!saveWallets().length) return toast("مفيش محفظة ادخار");
+  openSheet(toSave ? "حوّل للادخار" : "اسحب من الادخار",
+    '<p class="sub" style="margin:0 0 14px">' + (toSave
+      ? "الفلوس هتتنقل لمحفظة الادخار وتختفي من المتاح للصرف. متاح عندك دلوقتي <b>" + money2(B.free) + "</b>."
+      : "الفلوس هترجع للمتاح للصرف. في الادخار دلوقتي <b>" + money2(B.locked) + "</b>.") + "</p>" +
+    '<div class="field"><label for="smAmt">المبلغ</label><input class="inp big" id="smAmt" type="number" inputmode="decimal" placeholder="0"></div>' +
+    '<div class="field"><label>' + (toSave ? "من فين؟" : "تروح فين؟") + '</label><div class="chips" id="smW"></div></div>' +
+    '<button class="btn pri block" data-act="doSaveMove" data-v="' + (toSave ? "in" : "out") + '">' + ico(toSave ? "down" : "up") + (toSave ? "حوّل للادخار" : "اسحب للمتاح") + "</button>",
+    function () {
+      const sh = el("sheet");
+      sh.dataset.src = richestSpendWallet();
+      el("smW").innerHTML = spendWallets().map(function (w) {
+        return '<button class="chip" data-act="pickSrc" data-v="' + w.id + '" aria-pressed="' + (w.id === sh.dataset.src) + '" style="' + (w.id === sh.dataset.src ? "color:var(--" + w.color + ")" : "") + '">' +
+          '<span style="color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" + esc(w.name) + ' <span class="num" style="opacity:.6">' + nf(wb[w.id] || 0) + "</span></button>";
+      }).join("");
+      setTimeout(function () { const a = el("smAmt"); if (a) a.focus(); }, 60);
+    });
+}
+function sheetGoalHistory(id) {
+  const g = state.goals.find(function (x) { return x.id === id; }); if (!g) return;
+  const hist = goalHistory(g);
+  openSheet("حركة « " + g.name + " »",
+    '<div class="card pad" style="margin-bottom:14px">' +
+    ((+g.saved0 || 0) > 0 ? '<div class="ftrow" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>رصيد مرحّل من قبل</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(g.saved0) + "</b></div>" : "") +
+    '<div class="ftrow" style="padding:4px 0"><span>الإجمالي دلوقتي</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(goalSaved(g)) + "</b></div></div>" +
+    (hist.length ? '<div class="card list">' + hist.map(moveRow).join("") + "</div>"
+      : '<div class="card"><div class="empty"><p>ما فيش حركة لسه على الهدف ده.</p></div></div>'));
 }
 function sheetTips() {
   const ins = insights(state.ui.mk);
@@ -2250,6 +2539,17 @@ function viewSettings() {
   // التحديثات
   const swOn = Upd.supported && Upd.reg;
   const has = !!(Upd.waiting || (Upd.reg && Upd.reg.waiting));
+  const ist = installState();
+  h += '<h2 class="sec">التطبيق على موبايلك</h2><div class="card">' +
+    srow("install", "down", ist === "installed" ? "متثبّت على جهازك" : "ثبّت التطبيق",
+      ist === "installed" ? "بيفتح بملء الشاشة ويشتغل من غير نت"
+        : ist === "inapp" ? "لازم تفتح اللينك في كروم الأول"
+          : ist === "ios" || ist === "ios-wrong" ? "من سفاري: المشاركة ← إضافة إلى الشاشة الرئيسية"
+            : ist === "desktop" ? "افتح اللينك من تليفونك" : "يبقى عندك زي أي تطبيق",
+      ist === "installed" ? pill("good", "متثبّت") : pill("flat", "مش متثبّت")) +
+    srow("shareApp", "users", "ابعته لحد", "لينك التطبيق عشان تبعته لأي حد") +
+    "</div>";
+
   h += '<h2 class="sec">التحديثات</h2><div class="card">' +
     '<div class="srow" style="cursor:default">' +
     '<span class="si">' + ico("down") + "</span>" +
@@ -2510,6 +2810,149 @@ function applyRestore(mode) {
   toast(mode === "replace" ? "رجّعنا النسخة — " + nf(state.txs.length) + " حركة" : "دمجنا النسخة — إجمالي " + nf(state.txs.length) + " حركة");
 }
 
+/* ================= التثبيت على الموبايل ================= */
+const Install = { prompt: null, dismissed: false };
+const LS_INST = "masroufy.install.hide";
+
+function isStandalone() {
+  try {
+    return window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: fullscreen)").matches ||
+      navigator.standalone === true;
+  } catch (_) { return false; }
+}
+function envInfo() {
+  const ua = navigator.userAgent || "";
+  const ios = /iphone|ipad|ipod/i.test(ua) && !window.MSStream;
+  const android = /android/i.test(ua);
+  const inApp = /\bwv\b|WhatsApp|FBAN|FBAV|FB_IAB|Instagram|Line\/|Twitter|MicroMessenger|TikTok|Snapchat|Telegram/i.test(ua);
+  const iosOtherBrowser = ios && /CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
+  const desktop = !ios && !android;
+  let app = "";
+  if (/WhatsApp/i.test(ua)) app = "واتساب";
+  else if (/FBAN|FBAV|FB_IAB/i.test(ua)) app = "فيسبوك";
+  else if (/Instagram/i.test(ua)) app = "إنستجرام";
+  else if (/Telegram/i.test(ua)) app = "تيليجرام";
+  else if (/MicroMessenger/i.test(ua)) app = "وي شات";
+  return { ios: ios, android: android, inApp: inApp, iosOtherBrowser: iosOtherBrowser, desktop: desktop, app: app };
+}
+function installHidden() { try { return localStorage.getItem(LS_INST) === "1"; } catch (_) { return false; } }
+function hideInstall() { try { localStorage.setItem(LS_INST, "1"); } catch (_) { } Install.dismissed = true; }
+
+function installState() {
+  if (isStandalone()) return "installed";
+  const e = envInfo();
+  if (e.inApp) return "inapp";
+  if (Install.prompt) return "ready";
+  if (e.ios) return e.iosOtherBrowser ? "ios-wrong" : "ios";
+  if (e.desktop) return "desktop";
+  return "manual";
+}
+async function copyLink() {
+  const url = location.href.split("#")[0];
+  try { await navigator.clipboard.writeText(url); toast("اتنسخ اللينك — الزقه في كروم"); }
+  catch (_) {
+    const i = el("lnkBox");
+    if (i) { i.focus(); i.select(); toast("اضغط مطوّل على اللينك وانسخه"); }
+    else toast("انسخ اللينك من فوق");
+  }
+}
+function sheetShare() {
+  const url = location.href.split("#")[0];
+  const msg = "جرّب تطبيق « مصروفي » — بتسجل مصاريفك وتعرف فلوسك بتروح فين، وبيشتغل من غير نت وبياناتك على تليفونك بس:\n" + url +
+    "\n\nللتثبيت: افتح اللينك في كروم (مش من جوه واتساب) ← النقط التلاتة ← Install app.\nلو آيفون: افتحه في سفاري ← زرار المشاركة ← إضافة إلى الشاشة الرئيسية.";
+  openSheet("ابعت التطبيق لحد",
+    '<p class="sub" style="margin:0 0 14px">أي حد يفتح اللينك ده يقدر يستخدم التطبيق. بيانات كل واحد بتفضل على تليفونه هو — مش هتشوف حاجة من مصاريفه ولا هو يشوف بتاعتك.</p>' +
+    '<div class="field"><label for="lnkBox">اللينك</label>' +
+    '<input class="inp" id="lnkBox" value="' + esc(url) + '" readonly onclick="this.select()" style="direction:ltr;text-align:left;font-size:13px"></div>' +
+    '<div class="field"><label for="shMsg">رسالة جاهزة تبعتها</label>' +
+    '<textarea class="inp" id="shMsg" rows="7" readonly onclick="this.select()" style="font-size:13px;line-height:1.7">' + esc(msg) + "</textarea></div>" +
+    '<div class="btnrow"><button class="btn pri" style="flex:1" data-act="copyMsg">' + ico("check") + 'انسخ الرسالة</button>' +
+    '<button class="btn" data-act="copyLink">' + ico("copy") + "اللينك بس</button></div>" +
+    '<p class="sub" style="margin:13px 0 0">أهم حاجة تقولها لأي حد: يفتح اللينك في <b>كروم أو سفاري</b>، مش من جوه واتساب — المتصفح اللي جوه واتساب ما بيسمحش بالتثبيت.</p>');
+}
+async function copyMsg() {
+  const t = el("shMsg"); if (!t) return;
+  try { await navigator.clipboard.writeText(t.value); toast("اتنسخت الرسالة — الزقها في واتساب"); }
+  catch (_) { t.focus(); t.select(); toast("اضغط مطوّل واختار نسخ"); }
+}
+function sheetInstall() {
+  const st = installState(), e = envInfo();
+  const url = location.href.split("#")[0];
+  const linkBox = '<div class="field" style="margin-top:14px"><label for="lnkBox">لينك التطبيق</label>' +
+    '<input class="inp" id="lnkBox" value="' + esc(url) + '" readonly onclick="this.select()" style="direction:ltr;text-align:left;font-size:13px"></div>' +
+    '<button class="btn block" data-act="copyLink">' + ico("copy") + "انسخ اللينك</button>";
+
+  let body;
+  if (st === "installed") {
+    body = '<div class="empty" style="padding:14px 8px 8px"><div class="eic">' + ico("check") + "</div>" +
+      "<h4>التطبيق متثبّت خلاص</h4><p>إنت فاتحه كتطبيق دلوقتي — مش محتاج تعمل حاجة.</p></div>";
+  } else if (st === "inapp") {
+    body = '<div class="card pad" style="background:color-mix(in srgb,var(--warn) 14%, var(--surface));border-color:color-mix(in srgb,var(--warn) 40%, transparent);margin-bottom:14px">' +
+      '<div class="row" style="align-items:flex-start;gap:10px"><span style="width:22px;height:22px;flex:none;color:color-mix(in srgb,var(--warn) 78%, var(--ink))">' + ico("alert") + "</span>" +
+      '<div><b style="font-family:var(--ff-display)">إنت فاتح اللينك من جوه ' + (e.app || "تطبيق تاني") + "</b>" +
+      '<p class="sub" style="margin:5px 0 0">المتصفح اللي جوه ' + (e.app || "التطبيق ده") + " ما بيسمحش بالتثبيت. لازم تفتح اللينك في كروم أو سفاري الأول.</p></div></div></div>" +
+      '<h4 style="margin:0 0 8px;font-family:var(--ff-display);font-size:15px">إزاي؟</h4>' +
+      '<ol style="margin:0 0 4px;padding-inline-start:20px;line-height:2;font-size:14px">' +
+      "<li>دوس على النقط التلاتة (أو زرار المشاركة) فوق في الصفحة دي</li>" +
+      "<li>اختار <b>فتح في المتصفح</b> أو <b>Open in browser</b></li>" +
+      "<li>لما يفتح في كروم أو سفاري، ارجع لهنا وهتلاقي زرار التثبيت</li></ol>" +
+      '<p class="sub" style="margin:12px 0 0">أو انسخ اللينك والزقه في كروم بنفسك:</p>' + linkBox;
+  } else if (st === "ready") {
+    body = '<p class="sub" style="margin:0 0 14px">هيتثبت على شاشتك الرئيسية ويفتح بملء الشاشة زي أي تطبيق، ويشتغل من غير نت.</p>' +
+      '<button class="btn pri block" data-act="doInstall">' + ico("down") + "ثبّت التطبيق</button>";
+  } else if (st === "ios") {
+    body = '<p class="sub" style="margin:0 0 14px">على الآيفون التثبيت بيتم من قايمة المشاركة:</p>' +
+      '<ol style="margin:0;padding-inline-start:20px;line-height:2.1;font-size:14px">' +
+      "<li>دوس زرار <b>المشاركة</b> تحت في سفاري (المربع اللي فيه سهم لفوق)</li>" +
+      "<li>انزل تحت واختار <b>إضافة إلى الشاشة الرئيسية</b> · <span style=\"direction:ltr;display:inline-block\">Add to Home Screen</span></li>" +
+      "<li>دوس <b>إضافة</b></li></ol>" +
+      '<p class="sub" style="margin:14px 0 0">هتلاقي أيقونة مصروفي على شاشتك زي أي تطبيق.</p>';
+  } else if (st === "ios-wrong") {
+    body = '<div class="card pad" style="background:color-mix(in srgb,var(--warn) 14%, var(--surface));border-color:color-mix(in srgb,var(--warn) 40%, transparent);margin-bottom:14px">' +
+      '<div class="row" style="align-items:flex-start;gap:10px"><span style="width:22px;height:22px;flex:none;color:color-mix(in srgb,var(--warn) 78%, var(--ink))">' + ico("alert") + "</span>" +
+      '<div><b style="font-family:var(--ff-display)">افتحه من سفاري</b>' +
+      '<p class="sub" style="margin:5px 0 0">على الآيفون، سفاري بس هو اللي بيقدر يثبّت التطبيقات. أي متصفح تاني مش هيعرف.</p></div></div></div>' +
+      '<p class="sub" style="margin:0 0 6px">انسخ اللينك وافتحه في سفاري، وبعدين: المشاركة ← إضافة إلى الشاشة الرئيسية.</p>' + linkBox;
+  } else if (st === "desktop") {
+    body = '<p class="sub" style="margin:0 0 14px">إنت على كمبيوتر. التطبيق بيشتغل هنا عادي، وعشان تثبته على الموبايل افتح اللينك ده من تليفونك:</p>' + linkBox;
+  } else {
+    body = '<p class="sub" style="margin:0 0 14px">من قايمة المتصفح (النقط التلاتة) اختار <b>تثبيت التطبيق</b> أو <b>إضافة إلى الشاشة الرئيسية</b>.</p>' +
+      '<p class="sub" style="margin:0 0 6px">لو مش لاقيها، اتأكد إنك فاتح اللينك في كروم مش من جوه تطبيق تاني:</p>' + linkBox;
+  }
+  openSheet("ثبّت مصروفي على موبايلك", body);
+}
+function installBanner() {
+  const st = installState();
+  if (st === "installed" || installHidden() || Install.dismissed) return "";
+  const msg = st === "inapp" ? "افتحه في كروم عشان تقدر تثبته"
+    : st === "ready" ? "ثبّته على شاشتك ويشتغل من غير نت"
+      : st === "ios" || st === "ios-wrong" ? "ضيفه لشاشتك الرئيسية من سفاري"
+        : st === "desktop" ? "افتحه من موبايلك عشان تثبته" : "ضيفه لشاشتك الرئيسية";
+  return '<div class="instbar"><span class="ic">' + ico("down") + "</span>" +
+    '<button style="flex:1;text-align:right;background:transparent;border:0;color:inherit;padding:0" data-act="install">' +
+    '<b style="display:block;font-family:var(--ff-display);font-size:14.5px">خلّيه تطبيق على موبايلك</b>' +
+    '<span style="font-size:12px;opacity:.85">' + msg + "</span></button>" +
+    '<button class="x" data-act="installHide" aria-label="إخفاء">' + ico("x") + "</button></div>";
+}
+async function doInstall() {
+  if (!Install.prompt) { sheetInstall(); return; }
+  const p = Install.prompt; Install.prompt = null;
+  try {
+    p.prompt();
+    const res = await p.userChoice;
+    closeSheet();
+    if (res && res.outcome === "accepted") { hideInstall(); toast("اتثبت — هتلاقيه على شاشتك"); }
+    else toast("تمام، تقدر تثبته بعدين من الإعدادات");
+    render();
+  } catch (_) { toast("مقدرناش نفتح نافذة التثبيت"); }
+}
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault(); Install.prompt = e;
+  if (state.settings.onboarded && !installHidden()) render();
+});
+window.addEventListener("appinstalled", () => { hideInstall(); Install.prompt = null; toast("اتثبت التطبيق"); render(); });
+
 /* ================= التحديثات ================= */
 const Upd = { reg: null, waiting: null, swVersion: "", checking: false, lastCheck: 0, supported: false, reloading: false };
 
@@ -2613,7 +3056,7 @@ async function runAI() {
     avgPerDay: Math.round(ckN.day > 0 ? totalsIn(rangeOf("month", mk), wfa).exp / ckN.day : 0),
     spentToday: Math.round(spentOnDay(todayISO(), wfa)),
     current: pack(mk), previous: pack(prev),
-    goals: state.goals.map(g => { const s = goalStatus(g); return { name: g.name, target: g.target, saved: g.saved || 0, deadline: g.deadline || null, neededMonthly: Math.round(s.need || 0) }; })
+    goals: state.goals.map(g => { const s = goalStatus(g); return { name: g.name, target: g.target, saved: Math.round(goalSaved(g)), deadline: g.deadline || null, neededMonthly: Math.round(s.need || 0) }; })
   };
   const prompt = "إنت مستشار مالي شخصي بتكلم مصري بالعامية المصرية البسيطة. جاتلك بيانات مصاريف شخص بالجنيه. " +
     "اكتب تحليل قصير ومفيد في 4 أقسام بعناوين واضحة: (1) الخلاصة في سطرين، (2) أكتر 3 حاجات بتاكل فلوسه وليه، " +
@@ -2756,7 +3199,6 @@ document.addEventListener("click", (ev) => {
     case "saveGoal": {
       const name = el("gName").value.trim(); if (!name) return toast("اكتب اسم الهدف");
       const target = parseFloat(el("gTarget").value) || 0; if (!(target > 0)) return toast("اكتب المبلغ المستهدف");
-      const saved = Math.max(0, parseFloat(el("gSaved").value) || 0);
       const m = sh.dataset.gmode || "monthly";
       const deadline = m === "deadline" ? (el("gDate").value || "") : "";
       const monthly = m === "monthly" ? Math.max(0, parseFloat(el("gMonthly").value) || 0) : 0;
@@ -2765,9 +3207,9 @@ document.addEventListener("click", (ev) => {
       if (m === "monthly" && !(monthly > 0)) return toast("اكتب المبلغ اللي هتحوّشه كل شهر");
       if (m === "percent" && !(pct > 0)) return toast("اختار نسبة من دخلك");
       if (m === "percent" && !(+state.settings.income > 0)) return toast("حدّد دخلك الشهري في الإعدادات الأول");
-      const data = { name: name, target: target, saved: saved, mode: m, deadline: deadline, monthly: monthly, pct: pct };
+      const data = { name: name, target: target, mode: m, deadline: deadline, monthly: monthly, pct: pct };
       if (id) { const g = state.goals.find(x => x.id === id); Object.assign(g, data); }
-      else state.goals.push(Object.assign({ id: uid("g"), startedAt: todayISO() }, data));
+      else state.goals.push(Object.assign({ id: uid("g"), startedAt: todayISO(), saved0: 0, moves: [] }, data));
       save("goals"); closeSheet(); render(); toast("الخطة اتحفظت");
       break;
     }
@@ -2775,6 +3217,12 @@ document.addEventListener("click", (ev) => {
     case "stProfile": sheetProfile(); break;
     case "stLock": sheetLock(); break;
     case "stBackup": sheetBackup(); break;
+    case "install": sheetInstall(); break;
+    case "doInstall": doInstall(); break;
+    case "installHide": hideInstall(); render(); break;
+    case "copyLink": copyLink(); break;
+    case "copyMsg": copyMsg(); break;
+    case "shareApp": sheetShare(); break;
     case "updNow": applyUpdate(); break;
     case "updLater": updBanner(false); break;
     case "updCheck": checkUpdate(false); break;
@@ -2877,6 +3325,22 @@ document.addEventListener("click", (ev) => {
     }
     case "editBalance": sheetBalance(); break;
     case "quickTransfer": closeSheet(); setTimeout(() => { sheetTx(); setTimeout(() => { const t = document.querySelector('[data-act="txType"][data-v="transfer"]'); if (t) t.click(); }, 80); }, 180); break;
+    case "whyAllow": {
+      const al2 = allowance(thisMK()), ck3 = monthClock(thisMK());
+      const T2 = totalsOf(thisMK());
+      openSheet("الرقم ده جاي منين؟",
+        (al2 ? '<div class="card pad" style="margin-bottom:14px">' +
+          '<div class="ftrow" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>الأساس</span><b style="color:var(--ink)">' +
+          (al2.basis === "budget" ? "حدود الصرف" : al2.basis === "income" ? "دخلك الشهري" : "فلوسك المتاحة") + "</b></div>" +
+          '<div class="ftrow" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>المتاح</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(al2.rem) + "</b></div>" +
+          '<div class="ftrow" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>أيام فاضلة في الشهر</span><b style="color:var(--ink);font-family:var(--ff-display)">' + al2.left + "</b></div>" +
+          '<div class="ftrow" style="padding:4px 0"><span>يبقى في اليوم</span><b style="color:var(--accent);font-family:var(--ff-display);font-size:16px">' + nf(al2.perDay, 0) + "</b></div></div>" +
+          '<p class="sub" style="margin:0 0 14px">' + esc(al2.why) + ".</p>" : "") +
+        '<hr class="sep"><h4 style="margin:0 0 7px;font-family:var(--ff-display);font-size:14.5px">والمتوسط؟</h4>' +
+        '<p class="sub" style="margin:0 0 14px">متوسط اليوم = اللي صرفته الشهر ده (' + nf(T2.exp) + ") مقسوم على عدد الأيام اللي عدت (" + ck3.day + ") = <b>" + nf(ck3.day > 0 ? T2.exp / ck3.day : 0, 0) + "</b> في اليوم. ده رقم فعلي من حركاتك مش تقدير.</p>" +
+        (al2 && al2.basis === "cash" ? '<div class="card pad" style="background:var(--accent-soft);border-color:var(--accent-line)"><p class="sub" style="margin:0;color:var(--ink-2)">إنت مش كاتب دخل شهري ولا حدود صرف، فالتطبيق بيحسب من فلوسك اللي فعلاً متاحة. لو حطيت <b>حدود صرف</b> للبنود من تبويب الحدود، هيبقى الحساب أدق ويقدر ينبهك قبل ما تتعدى.</p></div>' : ""));
+      break;
+    }
     case "goDay": state.ui.tab = "stats"; state.ui.period = "day"; state.ui.day = todayISO(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "period": state.ui.period = v; render(); break;
     case "statW": {
@@ -2890,7 +3354,9 @@ document.addEventListener("click", (ev) => {
       render();
       break;
     }
-    case "pickDay": state.ui.period = "day"; state.ui.day = v; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
+    case "pickDay": closeSheet(); state.ui.tab = "stats"; state.ui.period = "day"; state.ui.day = v; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
+    case "goMonth": closeSheet(); state.ui.tab = "stats"; state.ui.period = "month"; state.ui.mk = v; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
+    case "catDetail": sheetCatDetail(id); break;
     case "pprev": {
       const u = state.ui;
       if (u.period === "day") u.day = shiftDay(u.day, -1);
@@ -2906,11 +3372,68 @@ document.addEventListener("click", (ev) => {
       render(); break;
     }
     case "contrib": sheetContrib(id); break;
+    case "pickSrc":
+      sh.dataset.src = v;
+      if (el("ctFrom")) paintCtSrc();
+      else if (el("wdTo")) paintWdTo();
+      else sh.querySelectorAll('[data-act="pickSrc"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v)));
+      break;
     case "doContrib": {
-      const amt = parseFloat(el("ctAmt").value); if (!(amt > 0)) return toast("اكتب مبلغ");
+      const amt = Math.round((parseFloat(el("ctAmt").value) || 0) * 100) / 100;
+      if (!(amt > 0)) return toast("اكتب مبلغ");
       const g = state.goals.find(x => x.id === id); if (!g) break;
-      g.saved = (g.saved || 0) + amt; g.log = (g.log || []).concat([{ d: todayISO(), a: amt }]).slice(-60);
-      save("goals"); closeSheet(); render(); toast("ضفنا " + money2(amt) + " لـ " + g.name);
+      const src = sh.dataset.src, sw = saveWallets()[0];
+      if (!sw) return toast("مفيش محفظة ادخار");
+      const today = todayISO();
+      if (src === "_alloc") {
+        if (amt > balanceNow().unallocated + 0.004) return toast("مفيش في الادخار غير " + money2(balanceNow().unallocated) + " مش مخصص");
+        g.moves = (g.moves || []).concat([{ id: uid("mv"), date: today, amount: amt, kind: "alloc", at: Date.now() }]);
+        save("goals"); closeSheet(); render();
+        toast("خصّصنا " + money2(amt) + " لـ " + g.name);
+      } else {
+        const wb = walletBalances();
+        if (amt > (wb[src] || 0) + 0.004) return toast("مش معاك غير " + money2(wb[src] || 0) + " في " + walletById(src).name);
+        const tx = { id: uid("t"), type: "transfer", amount: amt, fromWallet: src, toWallet: sw.id, catId: "", walletId: "", date: today, note: "ادخار · " + g.name, goalId: g.id, at: Date.now() };
+        state.txs.push(tx);
+        g.moves = (g.moves || []).concat([{ id: uid("mv"), date: today, amount: amt, kind: "transfer", from: src, to: sw.id, txId: tx.id, at: Date.now() }]);
+        save("goals", "m:" + mkOf(today)); closeSheet(); render();
+        toast("اتحوّل " + money2(amt) + " للادخار — بقى مش متاح للصرف");
+      }
+      break;
+    }
+    case "goalWithdraw": sheetWithdraw(id); break;
+    case "goalHistory": sheetGoalHistory(id); break;
+    case "doWithdraw": {
+      const amt = Math.round((parseFloat(el("wdAmt").value) || 0) * 100) / 100;
+      if (!(amt > 0)) return toast("اكتب مبلغ");
+      const g = state.goals.find(x => x.id === id); if (!g) break;
+      if (amt > goalSaved(g) + 0.004) return toast("الهدف فيه " + money2(goalSaved(g)) + " بس");
+      const dst = sh.dataset.src, sw = saveWallets()[0], today = todayISO();
+      if (dst === "_alloc") {
+        g.moves = (g.moves || []).concat([{ id: uid("mv"), date: today, amount: -amt, kind: "alloc", at: Date.now() }]);
+        save("goals"); closeSheet(); render();
+        toast("رجّعنا " + money2(amt) + " للادخار غير المخصص");
+      } else {
+        const tx = { id: uid("t"), type: "transfer", amount: amt, fromWallet: sw.id, toWallet: dst, catId: "", walletId: "", date: today, note: "سحب من ادخار · " + g.name, goalId: g.id, at: Date.now() };
+        state.txs.push(tx);
+        g.moves = (g.moves || []).concat([{ id: uid("mv"), date: today, amount: -amt, kind: "transfer", from: sw.id, to: dst, txId: tx.id, at: Date.now() }]);
+        save("goals", "m:" + mkOf(today)); closeSheet(); render();
+        toast("رجّع " + money2(amt) + " لـ " + walletById(dst).name + " — بقى متاح للصرف");
+      }
+      break;
+    }
+    case "saveMove": sheetSaveMove(v); break;
+    case "doSaveMove": {
+      const amt = Math.round((parseFloat(el("smAmt").value) || 0) * 100) / 100;
+      if (!(amt > 0)) return toast("اكتب مبلغ");
+      const sw = saveWallets()[0], other = sh.dataset.src, toSave = v === "in", today = todayISO();
+      if (!sw || !other) return toast("اختار المكان");
+      const wb = walletBalances();
+      const from = toSave ? other : sw.id, to = toSave ? sw.id : other;
+      if (amt > (wb[from] || 0) + 0.004) return toast("مش موجود غير " + money2(wb[from] || 0) + " في " + walletById(from).name);
+      state.txs.push({ id: uid("t"), type: "transfer", amount: amt, fromWallet: from, toWallet: to, catId: "", walletId: "", date: today, note: toSave ? "ادخار" : "سحب من الادخار", at: Date.now() });
+      save("m:" + mkOf(today)); closeSheet(); render();
+      toast(toSave ? "اتحوّل " + money2(amt) + " للادخار" : "رجّع " + money2(amt) + " للمتاح للصرف");
       break;
     }
     case "obDone": {
