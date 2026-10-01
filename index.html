@@ -403,14 +403,113 @@ details.more summary::-webkit-details-marker{display:none}
 .numpad button.bio{color:var(--accent)}
 .lockerr{color:var(--down); font-size:13px; min-height:19px; margin-top:16px; font-weight:500}
 
+/* ===== نظام العرض الجديد: دفتر مش كروت ===== */
+.led{background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:18px 18px 16px;
+  box-shadow:var(--shadow); margin-bottom:18px}
+.led .cap{display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted)}
+.led .cap svg{width:13px;height:13px;opacity:.6}
+.led .tot{font-family:var(--ff-display); font-weight:700; font-size:36px; line-height:1.1;
+  letter-spacing:-.03em; margin-top:3px; display:flex; align-items:baseline; gap:7px}
+.led .tot .cu{font-size:15px; font-weight:500; color:var(--muted); letter-spacing:0}
+.stack{display:flex; gap:3px; height:10px; margin:15px 0 11px; border-radius:99px; overflow:hidden}
+.stack i{display:block; border-radius:3px; min-width:4px; transition:width .35s ease}
+.stack.empty{background:var(--track)}
+.ledkeys{display:flex; flex-wrap:wrap; gap:6px 14px}
+.ledkeys button{display:flex; align-items:center; gap:6px; background:transparent; border:0; padding:2px 0;
+  font-size:12.5px; color:var(--muted); font-family:inherit}
+.ledkeys i{width:8px;height:8px;border-radius:2.5px;flex:none}
+.ledkeys b{color:var(--ink); font-family:var(--ff-display); font-weight:600; font-variant-numeric:tabular-nums}
+.ledsplit{display:flex; gap:0; margin-top:15px; padding-top:14px; border-top:1px solid var(--line)}
+.ledsplit > button{flex:1; background:transparent; border:0; padding:0; text-align:right; font-family:inherit}
+.ledsplit > button + button{border-inline-start:1px solid var(--line); padding-inline-start:14px}
+.ledsplit > button:first-child{padding-inline-end:14px}
+.ledsplit .k{font-size:12px; color:var(--muted); display:flex; align-items:center; gap:5px}
+.ledsplit .k svg{width:12px;height:12px}
+.ledsplit .v{font-family:var(--ff-display); font-weight:600; font-size:19px; margin-top:3px; letter-spacing:-.01em}
+
+/* مجموعة: عنوان عادي + جسم */
+.grp{margin-bottom:18px}
+.grp > .gh{display:flex; align-items:baseline; gap:9px; margin:0 2px 9px}
+.grp > .gh h3{margin:0; font-family:var(--ff-display); font-size:15.5px; font-weight:600; letter-spacing:-.01em}
+.grp > .gh .sub2{font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+.grp > .gh .act{margin-inline-start:auto}
+.grp > .gh .act button{background:transparent; border:0; color:var(--accent); font-weight:600; font-size:12.5px;
+  font-family:inherit; padding:2px 4px; display:flex; align-items:center; gap:3px}
+.grp > .gh .act svg{width:13px;height:13px}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden}
+.panel.pad2{padding:15px}
+
+/* صف في قايمة */
+.r{display:flex; align-items:center; gap:11px; width:100%; padding:12px 14px; background:transparent;
+  border:0; border-bottom:1px solid var(--line); text-align:right; color:var(--ink); font-family:inherit; position:relative}
+.r:last-child{border-bottom:0}
+button.r:hover{background:var(--surface-2)}
+.r .ri{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none}
+.r .ri svg{width:17px;height:17px}
+.r .rt{flex:1; min-width:0}
+.r .rn{font-size:14.5px; font-weight:500; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.r .rm{font-size:12px; color:var(--muted); display:block; margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.r .rv{font-family:var(--ff-display); font-weight:600; font-size:15px; white-space:nowrap; font-variant-numeric:tabular-nums; text-align:left}
+.r .rv small{display:block; font-size:11.5px; font-weight:400; color:var(--muted); margin-top:1px}
+.r .rc{color:var(--muted); flex:none; display:flex}
+.r .rc svg{width:15px;height:15px}
+.r.up .rv{color:var(--up)} .r.down .rv{color:var(--ink)}
+
+/* صف مرتّب بشريط خلفه */
+.rank{position:relative; overflow:hidden}
+.rank .fill{position:absolute; inset-block:0; inset-inline-start:0; opacity:.13; pointer-events:none; transition:width .35s ease}
+.rank > *{position:relative}
+
+/* عدّاد اليوم */
+.meter{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:15px; margin-bottom:18px}
+.meter .top{display:flex; align-items:flex-end; gap:10px; margin-bottom:12px}
+.meter .big{font-family:var(--ff-display); font-weight:700; font-size:27px; line-height:1; letter-spacing:-.02em}
+.meter .of{font-size:13px; color:var(--muted); padding-bottom:2px}
+.meter .st{margin-inline-start:auto}
+.meter .track{height:9px; border-radius:99px; background:var(--track); overflow:hidden; position:relative}
+.meter .track i{display:block; height:100%; border-radius:99px; transition:width .4s ease}
+.meter .foot{display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--muted); margin-top:9px}
+.meter .foot b{color:var(--ink); font-family:var(--ff-display); font-variant-numeric:tabular-nums}
+
+/* شريط تنقّل الفترة */
+.perio{display:flex; align-items:center; gap:8px; margin-bottom:14px}
+.perio .seg{display:flex; gap:3px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:3px; flex:none}
+.perio .seg button{border:0; background:transparent; padding:7px 13px; border-radius:9px; font-weight:600;
+  font-size:13px; color:var(--muted); font-family:inherit}
+.perio .seg button[aria-current="true"]{background:var(--accent); color:var(--accent-ink)}
+.perio .nav{flex:1; display:flex; align-items:center; justify-content:space-between; gap:6px;
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:4px 6px; min-width:0}
+.perio .nav b{font-family:var(--ff-display); font-weight:600; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.perio .nav button{width:28px;height:28px;flex:none;border:0;background:transparent;color:var(--muted);border-radius:8px;display:grid;place-items:center}
+.perio .nav button:hover{background:var(--surface-3);color:var(--ink)}
+.perio .nav button svg{width:15px;height:15px}
+.perio .nav button[disabled]{opacity:.25;pointer-events:none}
+
+/* نتيجة كبيرة */
+.bigstat{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:18px}
+.bigstat .lab{font-size:12.5px; color:var(--muted)}
+.bigstat .num2{font-family:var(--ff-display); font-weight:700; font-size:32px; letter-spacing:-.03em;
+  margin-top:3px; display:flex; align-items:baseline; gap:7px}
+.bigstat .num2 .cu{font-size:14px; font-weight:500; color:var(--muted)}
+.bigstat .meta{display:flex; flex-wrap:wrap; gap:7px 16px; margin-top:12px; padding-top:12px; border-top:1px solid var(--line);
+  font-size:12.5px; color:var(--muted)}
+.bigstat .meta b{color:var(--ink); font-family:var(--ff-display); font-variant-numeric:tabular-nums}
+
+.crumb{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); margin-bottom:11px}
+.crumb svg{width:12px;height:12px}
+.crumb b{color:var(--ink)}
+.budrow{border-bottom:1px solid var(--line)}
+.budrow:last-child{border-bottom:0}
+.budrow > .r{border-bottom:0 !important}
+
 /* install banner */
-.instbar{display:flex; align-items:center; gap:11px; padding:12px 13px; border-radius:15px;
-  background:linear-gradient(150deg, var(--accent) 0%, color-mix(in srgb,var(--accent) 74%, #000) 100%);
-  color:#fff; box-shadow:var(--shadow); margin-bottom:14px}
-.instbar .ic{width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}
-.instbar .ic svg{width:19px;height:19px}
-.instbar .x{width:30px;height:30px;flex:none;border:0;border-radius:9px;background:rgba(255,255,255,.14);
-  color:#fff;display:grid;place-items:center}
+.instbar{display:flex; align-items:center; gap:11px; padding:11px 13px; border-radius:14px;
+  background:var(--accent-soft); border:1px solid var(--accent-line); color:var(--ink); margin-bottom:16px}
+.instbar .ic{width:32px;height:32px;border-radius:10px;background:var(--surface);color:var(--accent);display:grid;place-items:center;flex:none}
+.instbar .ic svg{width:17px;height:17px}
+.instbar .x{width:28px;height:28px;flex:none;border:0;border-radius:8px;background:transparent;
+  color:var(--muted);display:grid;place-items:center}
+.instbar .x:hover{background:var(--surface)}
 .instbar .x svg{width:14px;height:14px}
 
 /* update banner */
@@ -474,7 +573,7 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "2.1.0";
 const APP_BUILD = "2026-10-01";
 
 /* ---------- helpers ---------- */
@@ -556,6 +655,20 @@ const P = {
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.8v2.4"/><path d="M12 18.8v2.4"/><path d="M2.8 12h2.4"/><path d="M18.8 12h2.4"/><path d="m5.6 5.6 1.7 1.7"/><path d="m16.7 16.7 1.7 1.7"/><path d="m18.4 5.6-1.7 1.7"/><path d="m7.3 16.7-1.7 1.7"/>',
   handOut: '<path d="M3.4 12.6a2 2 0 0 1 2.6-.4l2.4 1.6h3.2a1.4 1.4 0 0 1 0 2.8h-2.2"/><path d="M9.4 16.6h2.8l5-2.4a1.7 1.7 0 0 1 2 2.7l-4.8 3.4a3 3 0 0 1-1.8.6H6.6l-3.2-2.4"/><circle cx="15.4" cy="6.4" r="3.4"/><path d="M15.4 4.8v3.2"/>',
   handIn: '<path d="M20.6 12.6a2 2 0 0 0-2.6-.4l-2.4 1.6h-3.2a1.4 1.4 0 0 0 0 2.8h2.2"/><path d="M14.6 16.6h-2.8l-5-2.4a1.7 1.7 0 0 0-2 2.7l4.8 3.4a3 3 0 0 0 1.8.6h6l3.2-2.4"/><circle cx="8.6" cy="6.4" r="3.4"/><path d="M8.6 4.8v3.2"/>',
+  leaf: '<path d="M19.4 4.6c0 8-4.6 12.4-10.4 12.4a5.6 5.6 0 0 1-5.6-5.6C3.4 7 9 4.6 19.4 4.6z"/><path d="M4.6 19.4C7 14.6 11 11.4 15.4 9.6"/>',
+  fish: '<path d="M3.6 12c3.2-4.4 7.2-6.4 11.2-6.4 2.4 0 4.2 1 5.6 2.6-1 1.4-1.6 2.6-1.6 3.8s.6 2.4 1.6 3.8c-1.4 1.6-3.2 2.6-5.6 2.6-4 0-8-2-11.2-6.4z"/><circle cx="13.4" cy="10.4" r="1" fill="currentColor" stroke="none"/><path d="M8.4 9.4 6.6 12l1.8 2.6"/>',
+  bread: '<path d="M4.4 10.6c0-2.4 2.4-4.2 7.6-4.2s7.6 1.8 7.6 4.2c0 1.2-.8 2-1.8 2.2v4.4a1.6 1.6 0 0 1-1.6 1.6H7.8a1.6 1.6 0 0 1-1.6-1.6v-4.4c-1-.2-1.8-1-1.8-2.2z"/><path d="M9 10.4v2.6"/><path d="M15 10.4v2.6"/>',
+  plate: '<circle cx="12" cy="12" r="8.4"/><circle cx="12" cy="12" r="4.4"/>',
+  cup: '<path d="M5.4 8.6h11v5.6a4.4 4.4 0 0 1-4.4 4.4H9.8a4.4 4.4 0 0 1-4.4-4.4z"/><path d="M16.4 10.2h1.8a2.2 2.2 0 0 1 0 4.4h-1.8"/><path d="M8.4 5.6V4"/><path d="M12 5.6V4"/>',
+  fuel: '<path d="M4.6 20.4V6a2 2 0 0 1 2-2h5.2a2 2 0 0 1 2 2v14.4"/><path d="M3.6 20.4h11.2"/><path d="M7.4 8.4h3.6"/><path d="M13.8 10.4h3a1.6 1.6 0 0 1 1.6 1.6v4.2a1.6 1.6 0 0 0 1.6 1.6"/>',
+  bus: '<rect x="4.4" y="4.6" width="15.2" height="12.4" rx="2.4"/><path d="M4.4 11.6h15.2"/><circle cx="8.4" cy="14.4" r="1" fill="currentColor" stroke="none"/><circle cx="15.6" cy="14.4" r="1" fill="currentColor" stroke="none"/><path d="M7.4 17v2.4"/><path d="M16.6 17v2.4"/>',
+  tool: '<path d="M14.6 6.4a4 4 0 0 0 5.2 5.2l-8 8a2.6 2.6 0 0 1-3.6-3.6z"/><path d="M6.4 6.4 4 8.8l3.2 3.2"/>',
+  drop: '<path d="M12 3.4c3.2 3.8 5.6 6.8 5.6 9.6a5.6 5.6 0 0 1-11.2 0c0-2.8 2.4-5.8 5.6-9.6z"/>',
+  box: '<path d="M4.4 8.2 12 4.4l7.6 3.8v7.6L12 19.6l-7.6-3.8z"/><path d="M4.4 8.2 12 12l7.6-3.8"/><path d="M12 12v7.6"/>',
+  wifi: '<path d="M4 9.6a12 12 0 0 1 16 0"/><path d="M7 13a7.6 7.6 0 0 1 10 0"/><path d="M10 16.4a3.2 3.2 0 0 1 4 0"/><circle cx="12" cy="19.4" r="1" fill="currentColor" stroke="none"/>',
+  pill: '<rect x="4.6" y="9" width="14.8" height="6" rx="3" transform="rotate(-45 12 12)"/><path d="M9.6 9.6 14.4 14.4"/>',
+  shirt: '<path d="M8.4 4.4 12 6.4l3.6-2 4.4 2.6-2 3.6-1.6-.8v10.2H7.6V9.8l-1.6.8L4 7z"/>',
+  plane: '<path d="M10.4 20.4 12 15.6l7.4-2.2a1.8 1.8 0 0 0 0-3.4L4.6 4.6l1.8 6.2-3 1.6 3 1.6-1.8 6.2z"/>',
   users: '<circle cx="9" cy="8" r="3.4"/><path d="M3.4 20a5.6 5.6 0 0 1 11.2 0"/><path d="M15.6 5.2a3.4 3.4 0 0 1 0 6.4"/><path d="M17 14.8a5.6 5.6 0 0 1 3.6 5.2"/>',
   copy: '<rect x="8.4" y="8.4" width="11.2" height="11.2" rx="2.6"/><path d="M15.6 8.4V6.8a2.4 2.4 0 0 0-2.4-2.4H6.8a2.4 2.4 0 0 0-2.4 2.4v6.4a2.4 2.4 0 0 0 2.4 2.4h1.6"/>',
   split: '<path d="M4.4 5.6h4l7.2 12.8h4"/><path d="M15.6 5.6h4"/><path d="M4.4 18.4h4l2.6-4.6"/><path d="M17.4 3.4l2.4 2.2-2.4 2.2"/><path d="M17.4 16.2l2.4 2.2-2.4 2.2"/>'
@@ -563,16 +676,54 @@ const P = {
 function ico(n, cls) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (cls ? ' class="' + cls + '"' : "") + ">" + (P[n] || P.dots) + "</svg>"; }
 
 /* ---------- defaults ---------- */
+/* البنود على مستويين: بند رئيسي وتحته بنود فرعية */
 const DEFAULT_CATS = [
-  { id: "c_food", name: "أكل وشرب", icon: "food", color: "s2", pct: 25, limit: 0 },
-  { id: "c_trans", name: "مواصلات", icon: "car", color: "s1", pct: 10, limit: 0 },
-  { id: "c_home", name: "بيت وإيجار", icon: "home", color: "s7", pct: 25, limit: 0 },
-  { id: "c_bills", name: "فواتير وإنترنت", icon: "bill", color: "s4", pct: 8, limit: 0 },
-  { id: "c_health", name: "صحة وعلاج", icon: "health", color: "s8", pct: 5, limit: 0 },
-  { id: "c_shop", name: "تسوق وملابس", icon: "bag", color: "s5", pct: 7, limit: 0 },
-  { id: "c_fun", name: "ترفيه وخروج", icon: "fun", color: "s3", pct: 5, limit: 0 },
-  { id: "c_edu", name: "تعليم", icon: "book", color: "s6", pct: 5, limit: 0 },
-  { id: "c_other", name: "حاجات تانية", icon: "dots", color: "s9", pct: 5, limit: 0 }
+  { id: "c_food", name: "أكل وشرب", icon: "food", color: "s2", pct: 25, limit: 0, parent: "" },
+  { id: "c_food_grocery", name: "بقالة وسوبرماركت", icon: "bag", color: "s2", parent: "c_food", limit: 0 },
+  { id: "c_food_veg", name: "خضار وفاكهة", icon: "leaf", color: "s2", parent: "c_food", limit: 0 },
+  { id: "c_food_meat", name: "لحوم وفراخ", icon: "food", color: "s2", parent: "c_food", limit: 0 },
+  { id: "c_food_fish", name: "أسماك", icon: "fish", color: "s2", parent: "c_food", limit: 0 },
+  { id: "c_food_bread", name: "عيش ومخبوزات", icon: "bread", color: "s2", parent: "c_food", limit: 0 },
+  { id: "c_food_rest", name: "مطاعم وطلبات", icon: "plate", color: "s2", parent: "c_food", limit: 0 },
+  { id: "c_food_cafe", name: "قهوة ومشروبات", icon: "cup", color: "s2", parent: "c_food", limit: 0 },
+
+  { id: "c_trans", name: "مواصلات", icon: "car", color: "s1", pct: 10, limit: 0, parent: "" },
+  { id: "c_trans_fuel", name: "بنزين", icon: "fuel", color: "s1", parent: "c_trans", limit: 0 },
+  { id: "c_trans_taxi", name: "تاكسي وأوبر", icon: "car", color: "s1", parent: "c_trans", limit: 0 },
+  { id: "c_trans_pub", name: "مواصلات عامة", icon: "bus", color: "s1", parent: "c_trans", limit: 0 },
+  { id: "c_trans_fix", name: "صيانة العربية", icon: "tool", color: "s1", parent: "c_trans", limit: 0 },
+
+  { id: "c_home", name: "البيت", icon: "home", color: "s7", pct: 25, limit: 0, parent: "" },
+  { id: "c_home_rent", name: "إيجار", icon: "home", color: "s7", parent: "c_home", limit: 0 },
+  { id: "c_home_power", name: "كهربا", icon: "bolt", color: "s7", parent: "c_home", limit: 0 },
+  { id: "c_home_water", name: "مياه وغاز", icon: "drop", color: "s7", parent: "c_home", limit: 0 },
+  { id: "c_home_fix", name: "صيانة وتصليحات", icon: "tool", color: "s7", parent: "c_home", limit: 0 },
+  { id: "c_home_stuff", name: "أدوات ومستلزمات", icon: "box", color: "s7", parent: "c_home", limit: 0 },
+
+  { id: "c_bills", name: "فواتير واشتراكات", icon: "bill", color: "s4", pct: 8, limit: 0, parent: "" },
+  { id: "c_bills_net", name: "إنترنت", icon: "wifi", color: "s4", parent: "c_bills", limit: 0 },
+  { id: "c_bills_phone", name: "موبايل", icon: "phone", color: "s4", parent: "c_bills", limit: 0 },
+  { id: "c_bills_sub", name: "اشتراكات رقمية", icon: "bill", color: "s4", parent: "c_bills", limit: 0 },
+
+  { id: "c_health", name: "صحة", icon: "health", color: "s8", pct: 5, limit: 0, parent: "" },
+  { id: "c_health_med", name: "دوا", icon: "pill", color: "s8", parent: "c_health", limit: 0 },
+  { id: "c_health_doc", name: "كشف وتحاليل", icon: "health", color: "s8", parent: "c_health", limit: 0 },
+
+  { id: "c_shop", name: "تسوق", icon: "bag", color: "s5", pct: 7, limit: 0, parent: "" },
+  { id: "c_shop_clothes", name: "هدوم وأحذية", icon: "shirt", color: "s5", parent: "c_shop", limit: 0 },
+  { id: "c_shop_tech", name: "إلكترونيات", icon: "phone", color: "s5", parent: "c_shop", limit: 0 },
+  { id: "c_shop_self", name: "حاجات شخصية", icon: "bag", color: "s5", parent: "c_shop", limit: 0 },
+
+  { id: "c_fun", name: "ترفيه وخروج", icon: "fun", color: "s3", pct: 5, limit: 0, parent: "" },
+  { id: "c_fun_out", name: "خروجات", icon: "fun", color: "s3", parent: "c_fun", limit: 0 },
+  { id: "c_fun_trip", name: "سفر ورحلات", icon: "plane", color: "s3", parent: "c_fun", limit: 0 },
+  { id: "c_fun_gift", name: "هدايا ومناسبات", icon: "gift", color: "s3", parent: "c_fun", limit: 0 },
+
+  { id: "c_edu", name: "تعليم", icon: "book", color: "s6", pct: 5, limit: 0, parent: "" },
+  { id: "c_edu_fees", name: "مصاريف دراسة", icon: "book", color: "s6", parent: "c_edu", limit: 0 },
+  { id: "c_edu_course", name: "كورسات وكتب", icon: "book", color: "s6", parent: "c_edu", limit: 0 },
+
+  { id: "c_other", name: "حاجات تانية", icon: "dots", color: "s9", pct: 5, limit: 0, parent: "" }
 ];
 const INCOME_CATS = [
   { id: "i_salary", name: "مرتب", icon: "wallet", color: "s6" },
@@ -580,7 +731,8 @@ const INCOME_CATS = [
   { id: "i_gift", name: "هدية أو مساعدة", icon: "gift", color: "s5" },
   { id: "i_other", name: "دخل تاني", icon: "coins", color: "s9" }
 ];
-const ICON_CHOICES = ["food", "car", "home", "bill", "health", "bag", "fun", "book", "coins", "wallet", "gift", "spark", "flag", "dots"];
+const ICON_CHOICES = ["food", "plate", "cup", "bread", "fish", "leaf", "car", "fuel", "bus", "tool", "home", "bolt", "drop", "box",
+  "bill", "wifi", "phone", "health", "pill", "bag", "shirt", "fun", "plane", "book", "coins", "wallet", "gift", "spark", "flag", "dots"];
 const COLOR_CHOICES = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9"];
 
 const DEFAULT_WALLETS = [
@@ -791,6 +943,38 @@ async function connect() {
 /* ---------- derived ---------- */
 const catById = (id) => state.categories.find(c => c.id === id) || INCOME_CATS.find(c => c.id === id) || { id: id, name: "غير محدد", icon: "dots", color: "s9", limit: 0 };
 const walletById = (id) => state.wallets.find(w => w.id === id) || { id: id, name: "غير محدد", icon: "wallet", color: "s9", opening: 0 };
+/* ---------- شجرة البنود: رئيسي وتحته فرعي ---------- */
+const rootCats = () => state.categories.filter(c => !c.parent);
+const childCats = (id) => state.categories.filter(c => c.parent === id);
+const hasKids = (id) => state.categories.some(c => c.parent === id);
+function rootOf(catId) {
+  const c = catById(catId);
+  return c.parent ? catById(c.parent) : c;
+}
+const rootIdOf = (catId) => rootOf(catId).id;
+function catPath(catId) {
+  const c = catById(catId);
+  return c.parent ? catById(c.parent).name + " › " + c.name : c.name;
+}
+/* إجمالي بند + كل اللي تحته */
+function spendByRootIn(r, wf) {
+  const m = {};
+  for (const t of state.txs) {
+    if (t.type !== "expense" || !inRange(t.date, r) || !okW(t, wf)) continue;
+    const k = rootIdOf(t.catId);
+    m[k] = (m[k] || 0) + t.amount;
+  }
+  return m;
+}
+/* كل حركات بند بما فيها فروعه */
+function txOfCat(catId, r, wf) {
+  const kids = childCats(catId).map(c => c.id);
+  const ids = new Set([catId].concat(kids));
+  return state.txs.filter(t => t.type === "expense" && ids.has(t.catId) && inRange(t.date, r) && okW(t, wf));
+}
+function catTotal(catId, r, wf) { return txOfCat(catId, r, wf).reduce((s, t) => s + t.amount, 0); }
+/* الحد الفعلي: حد البند نفسه، وللفرعي يرث من الرئيسي لو مالوش حد */
+function catLimit(c) { return +c.limit || 0; }
 const txOfMonth = (mk) => state.txs.filter(t => mkOf(t.date) === mk);
 
 /* نطاق زمني موحّد: يوم / شهر / سنة */
@@ -958,7 +1142,8 @@ function allowance(mk) {
 }
 function projected(mk) {
   const { exp } = totalsOf(mk), ck = monthClock(mk);
-  if (ck.day < 1) return exp;
+  if (ck.past || ck.day >= ck.dim) return exp;
+  if (ck.day < 4) return 0; // بدري أوي على توقّع له معنى
   return exp / ck.day * ck.dim;
 }
 /* goal.mode: "deadline" = لحد تاريخ | "monthly" = مبلغ ثابت | "percent" = نسبة من الدخل */
@@ -1303,7 +1488,7 @@ function niceMax(v) {
 }
 function donutChart(mk) { return donutRange(rangeOf("month", mk)); }
 function donutRange(r, wf) {
-  const sc = spendByCatIn(r, wf);
+  const sc = spendByRootIn(r, wf);
   let ent = Object.entries(sc).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
   if (!ent.length) return null;
   let parts = ent.slice(0, 6).map(e => ({ c: catById(e[0]), v: e[1] }));
@@ -1417,114 +1602,174 @@ function monthBar() {
     '<button class="mnav" data-act="mnext" aria-label="الشهر الجاي"' + (fwd ? " disabled" : "") + ">" + ico("chevL") + "</button></div>";
 }
 
+/* ---------- مكوّنات العرض ---------- */
+function grp(title, body, opts) {
+  opts = opts || {};
+  return '<section class="grp"><div class="gh"><h3>' + title + "</h3>" +
+    (opts.sub ? '<span class="sub2">' + opts.sub + "</span>" : "") +
+    (opts.act ? '<span class="act">' + opts.act + "</span>" : "") + "</div>" + body + "</section>";
+}
+function actBtn(act, label, extra) {
+  return '<button data-act="' + act + '"' + (extra || "") + ">" + label + ico("chevL") + "</button>";
+}
+function rowEl(o) {
+  const tag = o.act ? "button" : "div";
+  return "<" + tag + ' class="r' + (o.cls ? " " + o.cls : "") + '"' +
+    (o.act ? ' data-act="' + o.act + '"' : "") + (o.id ? ' data-id="' + o.id + '"' : "") + (o.v ? ' data-v="' + o.v + '"' : "") + ">" +
+    (o.fill ? '<i class="fill" style="width:' + o.fill + "%;background:" + (o.fillColor || "var(--accent)") + '"></i>' : "") +
+    (o.icon ? '<span class="ri" style="background:' + (o.iconBg || "var(--surface-2)") + ";color:" + (o.iconColor || "var(--muted)") + '">' + ico(o.icon) + "</span>" : "") +
+    '<span class="rt"><span class="rn">' + o.name + "</span>" + (o.meta ? '<span class="rm">' + o.meta + "</span>" : "") + "</span>" +
+    (o.badge || "") +
+    (o.value != null ? '<span class="rv">' + o.value + (o.sub ? "<small>" + o.sub + "</small>" : "") + "</span>" : "") +
+    (o.act && o.chev !== false ? '<span class="rc">' + ico("chevL") + "</span>" : "") +
+    "</" + tag + ">";
+}
+function catRowEl(c, amount, total, extra) {
+  extra = extra || {};
+  return rowEl({
+    act: extra.act || "catDetail", id: c.id,
+    icon: c.icon, iconBg: "color-mix(in srgb,var(--" + c.color + ") 14%, var(--surface))", iconColor: "var(--" + c.color + ")",
+    name: esc(c.name), meta: extra.meta,
+    value: nf(amount), sub: total > 0 ? Math.round(amount / total * 100) + "%" : "",
+    fill: total > 0 ? (amount / total * 100).toFixed(1) : 0, fillColor: "var(--" + c.color + ")",
+    cls: "rank"
+  });
+}
+
 function viewHome() {
-  const mk = state.ui.mk, T = totalsOf(mk), B = balanceNow(), ck = monthClock(mk), al = allowance(mk), bt = budgetTotal();
-  const ins = insights(mk);
-  let h = "";
-  h += installBanner();
-  const greet = state.settings.name ? "أهلاً " + esc(state.settings.name) + " — معاك دلوقتي" : "معاك دلوقتي";
-  h += '<button class="hero" data-act="editBalance"><div class="cap">' + greet + ico("edit", "heroedit") + '</div><div class="big">' + nf(B.total) + ' <span class="cur">' + esc(state.settings.currency) + "</span></div>" +
-    '<div class="split"><div class="qt"><div class="k">متاح للصرف</div><div class="v">' + nf(B.free) + '</div></div><div class="qt"><div class="k">في الادخار</div><div class="v">' + nf(B.locked) + "</div></div></div></button>";
+  const mk = thisMK(), T = totalsOf(mk), B = balanceNow(), ck = monthClock(mk), al = allowance(mk);
+  const cur = esc(state.settings.currency);
+  let h = installBanner();
 
-  h += '<div class="tiles" style="margin-top:14px"><div class="tile"><div class="k">' + ico("up") + '<span>دخل الشهر</span></div><div class="v up">' + nf(T.inc) + '</div></div>' +
-    '<div class="tile"><div class="k">' + ico("down") + '<span>مصروف الشهر</span></div><div class="v down">' + nf(T.exp) + '</div></div>' +
-    '<div class="tile"><div class="k">' + ico("coins") + '<span>الفرق</span></div><div class="v ' + (T.net >= 0 ? "up" : "down") + '">' + nf(T.net) + "</div></div></div>";
+  // دفتر الرصيد: الإجمالي ثم توزيعه على الأماكن
+  const wallets = state.wallets.slice().sort((a, b) => (isSaveW(a) ? 1 : 0) - (isSaveW(b) ? 1 : 0));
+  const pos = wallets.filter(w => (B.byWallet[w.id] || 0) > 0);
+  const sumPos = pos.reduce((s, w) => s + B.byWallet[w.id], 0);
+  h += '<div class="led"><div class="cap">' + (state.settings.name ? "أهلاً " + esc(state.settings.name) + " — معاك دلوقتي" : "معاك دلوقتي") + ico("edit") + "</div>" +
+    '<button class="tot" data-act="editBalance" style="background:transparent;border:0;padding:0;font-family:var(--ff-display);color:inherit">' +
+    nf(B.total) + '<span class="cu">' + cur + "</span></button>" +
+    (sumPos > 0
+      ? '<div class="stack">' + pos.map(w => '<i style="width:' + (B.byWallet[w.id] / sumPos * 100).toFixed(2) + '%;background:var(--' + w.color + ')"></i>').join("") + "</div>" +
+      '<div class="ledkeys">' + pos.map(w => '<button data-act="editWallet" data-id="' + w.id + '"><i style="background:var(--' + w.color + ')"></i>' + esc(w.name) + " <b>" + nf(B.byWallet[w.id]) + "</b></button>").join("") +
+      '<button data-act="wallets" style="color:var(--accent)">' + ico("plus") + "إدارة</button></div>"
+      : '<div class="stack empty"></div><div class="ledkeys"><button data-act="wallets" style="color:var(--accent)">' + ico("plus") + "حدّد أماكن فلوسك</button></div>") +
+    '<div class="ledsplit">' +
+    '<button data-act="goStats"><span class="k">' + ico("coins") + "متاح للصرف</span><span class=\"v\">" + nf(B.free) + "</span></button>" +
+    '<button data-act="goGoals"><span class="k">' + ico("tabTarget") + "في الادخار</span><span class=\"v\">" + nf(B.locked) + "</span></button>" +
+    "</div></div>";
 
-  // اللي اتصرف النهاردة
-  const tSpent = spentOnDay(todayISO()), ySpent = spentOnDay(shiftDay(todayISO(), -1));
-  const ck2 = monthClock(thisMK());
-  const avgDay = ck2.day > 0 ? totalsOf(thisMK()).exp / ck2.day : 0;
-  h += '<div style="margin-top:12px"><button class="today" style="width:100%" data-act="goDay"><span class="ic">' + ico("sun") + "</span>" +
-    '<span style="flex:1;text-align:right"><span class="v" style="display:block">' + nf(tSpent) + " " + esc(state.settings.currency) + "</span>" +
-    '<span class="t" style="display:block">صرفت النهاردة' + (avgDay > 0 ? " · متوسطك " + nf(avgDay, 0) + " في اليوم على مدار " + ck2.day + " يوم" : "") + "</span></span>" +
-    (ySpent > 0 || tSpent > 0 ? '<span style="margin-inline-start:auto">' + (tSpent > avgDay * 1.25 && avgDay > 0 ? pill("warn", "أعلى من متوسطك") : tSpent === 0 ? pill("good", "لسه ما صرفتش") : pill("good", "في الطبيعي")) + "</span>" : "") +
-    "</button></div>";
+  // عدّاد اليوم
+  const tSpent = spentOnDay(todayISO());
+  const avgDay = ck.day > 0 ? T.exp / ck.day : 0;
+  const cap = al && !al.over ? al.perDay : 0;
+  const ratio = cap > 0 ? clamp(tSpent / cap * 100, 0, 100) : (avgDay > 0 ? clamp(tSpent / (avgDay * 2) * 100, 0, 100) : 0);
+  const tone = cap > 0 ? (tSpent > cap ? "var(--crit)" : tSpent > cap * 0.8 ? "var(--warn)" : "var(--good)")
+    : (avgDay > 0 && tSpent > avgDay * 1.25 ? "var(--warn)" : "var(--accent)");
+  h += '<button class="meter" style="width:100%;text-align:right;font-family:inherit;color:inherit" data-act="goDay">' +
+    '<div class="top"><span class="big">' + nf(tSpent) + "</span>" +
+    (cap > 0 ? '<span class="of">من ' + nf(cap, 0) + " " + cur + " مسموحين النهاردة</span>" : '<span class="of">اتصرفوا النهاردة</span>') +
+    '<span class="st">' + (cap > 0
+      ? (tSpent > cap ? pill("crit", "عديت بـ " + nf(tSpent - cap, 0)) : pill("good", "فاضل " + nf(cap - tSpent, 0)))
+      : (avgDay > 0 ? (tSpent > avgDay * 1.25 ? pill("warn", "فوق متوسطك") : pill("good", "في الطبيعي")) : "")) + "</span></div>" +
+    '<div class="track"><i style="width:' + ratio.toFixed(1) + "%;background:" + tone + '"></i></div>' +
+    '<div class="foot"><span>متوسطك <b>' + nf(avgDay, 0) + "</b> في اليوم</span>" +
+    "<span>" + (al ? (al.basis === "cash" ? "محسوب من فلوسك المتاحة" : al.basis === "budget" ? "محسوب من حدود الصرف" : "محسوب من دخلك") : "حدّد حدود صرف عشان نحسبلك") + "</span></div></button>";
 
-  if (al && !ck.past && !ck.future) {
-    h += '<div style="margin-top:10px"><button class="allow" style="width:100%;text-align:right;border-width:1px" data-act="whyAllow"><div class="ic">' + ico(al.over ? "alert" : "clock") + "</div><div style=\"flex:1\"><div class=\"v\">" +
-      (al.over ? "عديت الميزانية بـ " + nf(-al.rem) + " " + esc(state.settings.currency) : nf(al.perDay, 0) + " " + esc(state.settings.currency) + " في اليوم") +
-      '</div><div class="t">' + (al.over ? "أي صرف زيادة هياكل من الادخار" : "تقدر تصرفها على باقي " + al.left + " يوم · " + (al.basis === "cash" ? "محسوبة من فلوسك" : al.basis === "budget" ? "محسوبة من حدودك" : "محسوبة من دخلك")) + "</div></div><span style=\"width:18px;height:18px;flex:none;opacity:.55\">" + ico("info") + "</span></button></div>";
+  // الشهر
+  const bt = budgetTotal();
+  const prevExp = totalsOf(mkShift(mk, -1)).exp;
+  const dpc = prevExp > 0 ? (T.exp - prevExp) / prevExp * 100 : null;
+  h += grp("شهر " + AR_MONTHS[+mk.slice(5, 7) - 1],
+    '<div class="bigstat" style="margin-bottom:0"><div class="lab">اتصرف لحد دلوقتي</div>' +
+    '<div class="num2">' + nf(T.exp) + '<span class="cu">' + cur + "</span></div>" +
+    (bt > 0 ? '<div class="bar" style="margin-top:12px"><i class="' + progClass(T.exp / bt * 100) + '" style="width:' + clamp(T.exp / bt * 100, 0, 100) + '%"></i></div>' : "") +
+    '<div class="meta">' +
+    (bt > 0 ? "<span>من حد <b>" + nf(bt) + "</b></span>" : "") +
+    (T.inc > 0 ? "<span>دخل <b>" + nf(T.inc) + "</b></span>" : "") +
+    (projected(mk) > 0 ? (projected(mk) > 0 ? "<span>متوقع آخر الشهر <b>" + nf(projected(mk), 0) + "</b></span>" : "") : "") +
+    (dpc !== null && Math.abs(dpc) >= 3 ? "<span>" + (dpc > 0 ? "أعلى" : "أقل") + " من الشهر اللي فات بـ <b>" + Math.round(Math.abs(dpc)) + "%</b></span>" : "") +
+    "</div></div>",
+    { act: actBtn("goStats", "التحليل") });
+
+  // أكتر البنود
+  const r = rangeOf("month", mk);
+  const sc = spendByRootIn(r);
+  const ent = Object.entries(sc).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
+  if (ent.length) {
+    const tot = ent.reduce((s, e) => s + e[1], 0);
+    const top = ent.slice(0, 5);
+    h += grp("فلوسك راحت فين",
+      '<div class="panel">' + top.map(([id, v]) => {
+        const c = catById(id);
+        const kids = childCats(id);
+        let meta = "";
+        if (kids.length) {
+          const kk = kids.map(k => ({ k: k, v: catTotal(k.id, r) })).filter(x => x.v > 0).sort((a, b) => b.v - a.v);
+          if (kk.length) meta = kk.slice(0, 3).map(x => esc(x.k.name)).join(" · ");
+        }
+        return catRowEl(c, v, tot, { meta: meta });
+      }).join("") + "</div>",
+      { sub: ent.length > 5 ? "أعلى 5 من " + ent.length : "", act: actBtn("goStats", "الكل") });
   }
-
-  // أماكن الفلوس
-  const wb = B.byWallet;
-  h += '<h2 class="sec">فلوسك فين<span class="hint"><button class="btn ghost" style="padding:2px 6px;font-size:12px" data-act="wallets">إدارة</button></span></h2>' +
-    '<div class="wrail">' + state.wallets.slice().sort((a, b) => (isSaveW(a) ? 1 : 0) - (isSaveW(b) ? 1 : 0)).map(w =>
-      '<button class="wcard" data-act="editWallet" data-id="' + w.id + '">' +
-      '<span class="wt"><i style="background:color-mix(in srgb,var(--' + w.color + ') 15%, var(--surface));color:var(--' + w.color + ')">' + ico(w.icon) + "</i>" + esc(w.name) + "</span>" +
-      '<span class="wv' + ((wb[w.id] || 0) < 0 ? " neg" : "") + '">' + nf(wb[w.id] || 0) + "</span>" +
-      (isSaveW(w) ? '<span class="wtag">مش للصرف</span>' : "") + "</button>").join("") +
-    '<button class="wcard add" data-act="newWallet" aria-label="مكان جديد">' + ico("plus") + "</button></div>";
 
   // سلف وديون
   const D = B.debts;
   if (D.owedToMe > 0 || D.iOwe > 0) {
-    h += '<h2 class="sec">سلف وديون<span class="hint"><button class="btn ghost" style="padding:2px 6px;font-size:12px" data-act="debts">الكل</button></span></h2>' +
-      '<div class="tiles" style="grid-template-columns:1fr 1fr">' +
-      '<button class="tile" style="text-align:right" data-act="debts"><div class="k">' + ico("handOut") + '<span>ليك عند الناس</span></div><div class="v up">' + nf(D.owedToMe) + "</div></button>" +
-      '<button class="tile" style="text-align:right" data-act="debts"><div class="k">' + ico("handIn") + '<span>عليك للناس</span></div><div class="v down">' + nf(D.iOwe) + "</div></button></div>" +
-      '<p class="sub" style="margin:9px 2px 0">الفلوس دي مش محسوبة في مصاريفك — لو حسبت كل حاجة، معاك فعلياً ' + money2(B.net) + ".</p>";
+    h += grp("سلف وديون",
+      '<div class="panel">' +
+      (D.owedToMe > 0 ? rowEl({ act: "debts", icon: "handOut", iconBg: "color-mix(in srgb,var(--s3) 14%, var(--surface))", iconColor: "var(--s3)", name: "ليك عند الناس", meta: people(D.countOut), value: nf(D.owedToMe) }) : "") +
+      (D.iOwe > 0 ? rowEl({ act: "debts", icon: "handIn", iconBg: "color-mix(in srgb,var(--s4) 14%, var(--surface))", iconColor: "var(--s4)", name: "عليك للناس", meta: people(D.countIn), value: nf(D.iOwe) }) : "") +
+      "</div>",
+      { sub: "لو حسبتهم معاك " + nf(B.net) });
   } else {
-    h += '<h2 class="sec">سلف وديون</h2><button class="today" style="width:100%" data-act="debts">' +
-      '<span class="ic">' + ico("handOut") + '</span><span style="flex:1;text-align:right">' +
-      '<span style="display:block;font-weight:600;font-size:14.5px">سجّل سلفة أو دين</span>' +
-      '<span class="t" style="display:block">دفعت لحد؟ سلّفت حد؟ الفلوس دي مش مصروف</span></span>' + ico("chevL") + "</button>";
+    h += grp("سلف وديون",
+      '<div class="panel">' + rowEl({ act: "debts", icon: "handOut", name: "سجّل سلفة أو دين", meta: "دفعت لحد؟ الفلوس دي مش مصروف" }) + "</div>");
   }
 
-  if (bt > 0) {
-    const p = T.exp / bt * 100, pr = projected(mk);
-    h += '<h2 class="sec">ميزانية الشهر<span class="hint">' + nf(T.exp) + " من " + nf(bt) + "</span></h2>" +
-      '<div class="card pad"><div class="bar"><i class="' + progClass(p) + '" style="width:' + clamp(p, 0, 100) + '%"></i></div>' +
-      '<div class="ftrow" style="padding-top:9px"><span>' + Math.round(p) + "% اتصرفوا</span><span>" +
-      (ck.past ? "الشهر خلص" : "متوقع آخر الشهر " + nf(pr) + " " + esc(state.settings.currency)) + "</span></div>";
-    const sp = sparkMonth(mk);
-    if (sp) h += '<div class="chartbox" style="margin-top:6px">' + sp + "</div>";
-    h += "</div>";
+  // نصايح
+  const ins = insights(mk);
+  const top3 = ins.slice(0, 3);
+  if (top3.length) {
+    h += grp("على بالك",
+      '<div class="panel">' + top3.map(t => {
+        const tone2 = tipTone(t.lv);
+        return rowEl({ icon: t.ic || tone2[2], iconBg: tone2[1], iconColor: tone2[0], name: esc(t.t), meta: esc(t.x) });
+      }).join("") + "</div>",
+      { act: ins.length > 3 ? actBtn("allTips", "كلها (" + ins.length + ")") : "" });
   }
 
-  const top = ins.slice(0, 4);
-  if (top.length) {
-    h += '<h2 class="sec">نصايح على مصاريفك' + (ins.length > 4 ? '<span class="hint"><button class="btn ghost" style="padding:2px 6px;font-size:12px" data-act="allTips">كل النصايح (' + ins.length + ")</button></span>" : "") + "</h2>" +
-      '<div class="card">' + top.map(t => {
-        const [fg, bg, ic] = tipTone(t.lv);
-        return '<div class="tip"><span class="bullet" style="background:' + bg + ";color:" + fg + '">' + ico(t.ic || ic) + "</span><div><h4>" + esc(t.t) + "</h4><p>" + esc(t.x) + "</p></div></div>";
-      }).join("") + "</div>";
-  }
+  // آخر الحركات
+  const recent = txOfMonth(mk).sort((a, b) => b.date.localeCompare(a.date) || (b.at || 0) - (a.at || 0)).slice(0, 5);
+  h += grp("آخر الحركات",
+    recent.length ? '<div class="panel">' + recent.map(t => txRow(t)).join("") + "</div>"
+      : '<div class="panel"><div class="empty"><div class="eic">' + ico("plus") + "</div><h4>ابدأ بأول حركة</h4><p>دوس على زرار + تحت وسجّل أول مصروف. كل ما تسجل أول بأول، الأرقام بتبقى أدق.</p></div></div>",
+    { act: recent.length ? actBtn("goTx", "الكل") : "" });
 
-  const recent = txOfMonth(mk).sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id)).slice(0, 5);
-  h += '<h2 class="sec">آخر الحركات<span class="hint"><button class="btn ghost" style="padding:2px 6px;font-size:12px" data-act="goTx">الكل</button></span></h2>';
-  h += recent.length ? '<div class="card list">' + recent.map(txRow).join("") + "</div>" :
-    '<div class="card"><div class="empty"><div class="eic">' + ico("plus") + "</div><h4>ما فيش حركات الشهر ده</h4><p>دوس على زرار + وسجّل أول مصروف أو دخل. كل ما تسجل أول بأول، التحليل بيبقى أدق.</p></div></div>";
-
-  if (state.goals.length) {
-    h += '<h2 class="sec">أهداف الادخار<span class="hint"><button class="btn ghost" style="padding:2px 6px;font-size:12px" data-act="goGoals">التفاصيل</button></span></h2><div class="card">' +
-      state.goals.slice(0, 2).map(g => {
-        const st = goalStatus(g);
-        return '<div class="goal"><div class="ringwrap">' + ring(st.pct, st.done ? "var(--good)" : st.gap < 0 ? "var(--warn)" : "var(--accent)") +
-          '<div style="flex:1"><div class="gname">' + esc(g.name) + '</div><div class="gmeta">' + nf(goalSaved(g)) + " من " + nf(g.target) + " " + esc(state.settings.currency) +
-          (g.deadline ? " · فاضل " + st.mLeft + " شهر" : "") + "</div></div>" +
-          '<button class="btn" data-act="contrib" data-id="' + g.id + '">' + ico("plus") + "ضيف</button></div></div>";
-      }).join("") + "</div>";
-  }
   h += '<div class="statusline" id="storLine"></div>';
   return h;
 }
+
 function txRow(t, opts) {
   opts = opts || {};
   const showDate = opts.date !== false;
   if (t.type === "transfer") {
     const a = walletById(t.fromWallet), b = walletById(t.toWallet);
-    return '<button class="item" data-act="editTx" data-id="' + t.id + '">' +
-      '<span class="ic" style="background:var(--surface-3);color:var(--muted)">' + ico("swap") + "</span>" +
-      '<span style="flex:1;min-width:0"><span class="nm">تحويل من ' + esc(a.name) + " لـ " + esc(b.name) + "</span>" +
-      '<span class="mt" style="display:block">' + (t.note ? esc(t.note) + " · " : "") + (showDate ? dayLabel(t.date) : "") + "</span></span>" +
-      '<span class="amt" style="color:var(--muted)"><span class="num">' + nf(t.amount) + "</span></span></button>";
+    return rowEl({
+      act: "editTx", id: t.id, chev: false, icon: "swap",
+      name: "تحويل · " + esc(a.name) + " ← " + esc(b.name),
+      meta: [t.note ? esc(t.note) : "", showDate ? dayLabel(t.date) : ""].filter(Boolean).join(" · "),
+      value: '<span style="color:var(--muted)"><span class="num">' + nf(t.amount) + "</span></span>"
+    });
   }
   const c = catById(t.catId), inc = t.type === "income", w = walletById(t.walletId);
   const meta = [t.note ? esc(t.note) : "", esc(w.name), showDate ? dayLabel(t.date) : ""].filter(Boolean).join(" · ");
-  return '<button class="item" data-act="editTx" data-id="' + t.id + '">' + catDot(c) +
-    '<span style="flex:1;min-width:0"><span class="nm">' + esc(c.name) + '</span><span class="mt" style="display:block">' + meta + "</span></span>" +
-    '<span class="amt ' + (inc ? "up" : "down") + '"><span class="num">' + (inc ? "+" : "−") + nf(t.amount) + "</span></span></button>";
+  return rowEl({
+    act: "editTx", id: t.id, chev: false,
+    icon: c.icon, iconBg: "color-mix(in srgb,var(--" + c.color + ") 14%, var(--surface))", iconColor: "var(--" + c.color + ")",
+    name: esc(c.parent && !opts.cat ? catById(c.parent).name + " › " + c.name : c.name),
+    meta: meta,
+    value: '<span style="color:' + (inc ? "var(--up)" : "var(--ink)") + '"><span class="num">' + (inc ? "+" : "−") + nf(t.amount) + "</span></span>"
+  });
 }
 
 function viewTx() {
@@ -1558,39 +1803,72 @@ function viewTx() {
 }
 
 function viewBudget() {
-  const mk = state.ui.mk, sc = spendByCat(mk), bt = budgetTotal(), T = totalsOf(mk), ck = monthClock(mk);
-  const inc = +state.settings.income || 0;
-  let h = '<div class="card pad">' +
-    '<div class="row"><div><div class="lbl">إجمالي الحدود الشهرية</div><div style="font-family:var(--ff-display);font-weight:700;font-size:24px;letter-spacing:-.02em">' + nf(bt) + ' <span style="font-size:14px;font-weight:500;color:var(--muted)">' + esc(state.settings.currency) + '</span></div></div>' +
-    '<div style="margin-inline-start:auto;text-align:left">' + (inc > 0 ? (bt > inc ? pill("crit", "أعلى من دخلك") : bt > 0 ? pill("good", "يسيب " + nf(inc - bt) + " للادخار") : pill("info", "ما فيش حدود")) : pill("info", "حدّد دخلك في الإعدادات")) + "</div></div>";
-  if (bt > 0) h += '<div class="bar" style="margin-top:12px"><i class="' + progClass(T.exp / bt * 100) + '" style="width:' + clamp(T.exp / bt * 100, 0, 100) + '%"></i></div>' +
-    '<div class="ftrow" style="padding-top:8px"><span>اتصرف ' + nf(T.exp) + "</span><span>فاضل " + nf(Math.max(0, bt - T.exp)) + "</span></div>";
-  h += '<div class="btnrow" style="margin-top:13px"><button class="btn" data-act="suggest">' + ico("spark") + 'اقترح حدود من دخلي</button><button class="btn" data-act="newCat">' + ico("plus") + "بند جديد</button></div></div>";
+  const mk = state.ui.mk, r = rangeOf("month", mk), T = totalsOf(mk), ck = monthClock(mk);
+  const bt = budgetTotal(), inc = +state.settings.income || 0, cur = esc(state.settings.currency);
+  const open = state.ui.openCat || "";
+  let h = "";
 
-  h += '<h2 class="sec">الحدود لكل بند<span class="hint">دوس على بند عشان تعدّله</span></h2><div class="card">';
-  const rows = state.categories.map(c => ({ c: c, sp: sc[c.id] || 0 })).sort((a, b) => {
-    const pa = a.c.limit > 0 ? a.sp / a.c.limit : -1, pb = b.c.limit > 0 ? b.sp / b.c.limit : -1;
+  h += '<div class="bigstat"><div class="lab">إجمالي الحدود الشهرية</div>' +
+    '<div class="num2">' + nf(bt) + '<span class="cu">' + cur + "</span></div>" +
+    (bt > 0 ? '<div class="bar" style="margin-top:12px"><i class="' + progClass(T.exp / bt * 100) + '" style="width:' + clamp(T.exp / bt * 100, 0, 100) + '%"></i></div>' : "") +
+    '<div class="meta">' +
+    (bt > 0 ? "<span>اتصرف <b>" + nf(T.exp) + "</b></span><span>فاضل <b>" + nf(Math.max(0, bt - T.exp)) + "</b></span>" +
+      (projected(mk) > 0 ? "<span>متوقع آخر الشهر <b>" + nf(projected(mk), 0) + "</b></span>" : "") : "<span>حدّد حد لكل بند عشان التطبيق ينبهك قبل ما تتعدى</span>") +
+    (inc > 0 && bt > 0 ? "<span>" + (bt > inc ? "أعلى من دخلك" : "يسيب <b>" + nf(inc - bt) + "</b> للادخار") + "</span>" : "") +
+    "</div>" +
+    '<div class="btnrow" style="margin-top:14px">' +
+    (inc > 0 ? '<button class="btn" data-act="suggest">' + ico("spark") + "اقترح حدود من دخلي</button>" : "") +
+    '<button class="btn" data-act="newCat">' + ico("plus") + "بند رئيسي</button></div></div>";
+
+  const roots = rootCats().map(c => {
+    const sp = catTotal(c.id, r);
+    return { c: c, sp: sp, lim: catLimit(c) };
+  }).sort((a, b) => {
+    const pa = a.lim > 0 ? a.sp / a.lim : -1, pb = b.lim > 0 ? b.sp / b.lim : -1;
     return pb - pa || b.sp - a.sp;
   });
-  h += rows.map(({ c, sp }) => {
-    const lim = +c.limit || 0, p = lim > 0 ? sp / lim * 100 : 0;
-    const pr = !ck.past && ck.day > 2 ? sp / ck.day * ck.dim : null;
-    let badge = "";
-    if (lim <= 0) badge = pill("info", "ما فيش حد");
+
+  h += grp("الحدود لكل بند", '<div class="panel">' + roots.map(({ c, sp, lim }) => {
+    const p = lim > 0 ? sp / lim * 100 : 0;
+    const pr2 = !ck.past && ck.day >= 4 ? sp / ck.day * ck.dim : null;
+    let badge;
+    if (lim <= 0) badge = pill("flat", "من غير حد");
     else if (sp > lim) badge = pill("crit", "زيادة " + nf(sp - lim));
     else if (p >= 80) badge = pill("warn", "قربت تخلص");
-    else if (pr && pr > lim * 1.05) badge = pill("warn", "المعدل عالي");
+    else if (pr2 && pr2 > lim * 1.05) badge = pill("warn", "المعدل عالي");
     else badge = pill("good", "تمام");
-    return '<button class="bud" style="display:block;width:100%;text-align:right;background:transparent;border-inline:0;border-top:0;cursor:pointer" data-act="editCat" data-id="' + c.id + '">' +
-      '<div class="hd">' + catDot(c, 34) + '<span class="nm">' + esc(c.name) + "</span>" + badge +
-      '<span class="rt"><b>' + nf(sp) + "</b><small>" + (lim > 0 ? "الحد " + nf(lim) : "من غير حد") + "</small></span></div>" +
-      (lim > 0 ? '<div class="bar thin"><i class="' + progClass(p) + '" style="width:' + clamp(p, 0, 100) + '%"></i></div>' +
-        '<div class="ft"><span>' + (sp > lim ? "عديت الحد" : "فاضل " + nf(lim - sp)) + "</span><span>" + (pr ? "متوقع " + nf(pr) : "") + "</span></div>"
-        : '<div class="ft" style="margin-top:0"><span>اتصرف ' + nf(sp) + " الشهر ده — حدّد حد عشان نقدر ننبهك</span></div>") + "</button>";
-  }).join("") + "</div>";
+    const kids = childCats(c.id);
+    const isOpen = open === c.id;
+    let row = '<div class="budrow">' +
+      '<button class="r" data-act="toggleCat" data-id="' + c.id + '" style="border-bottom:' + (isOpen ? "1px solid var(--line)" : "1px solid var(--line)") + '">' +
+      '<span class="ri" style="background:color-mix(in srgb,var(--' + c.color + ') 14%, var(--surface));color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" +
+      '<span class="rt"><span class="rn">' + esc(c.name) + "</span>" +
+      '<span class="rm">' + (lim > 0 ? "الحد " + nf(lim) + " · " + (sp > lim ? "عديته" : "فاضل " + nf(lim - sp)) : kids.length ? kids.length + " بند فرعي" : "حدّد حد شهري") +
+      (pr2 > 0 && lim > 0 ? " · متوقع " + nf(pr2, 0) : "") + "</span></span>" +
+      badge +
+      '<span class="rv">' + nf(sp) + "</span>" +
+      '<span class="rc" style="transform:rotate(' + (isOpen ? "-90deg" : "0") + ');transition:.2s">' + ico("chevL") + "</span></button>";
+    if (lim > 0) row += '<div style="padding:0 14px 10px"><div class="bar thin"><i class="' + progClass(p) + '" style="width:' + clamp(p, 0, 100) + '%"></i></div></div>';
+    if (isOpen) {
+      row += '<div style="background:var(--surface-2);padding:2px 0 8px">' +
+        kids.map(k => {
+          const ksp = catTotal(k.id, r), klim = catLimit(k);
+          return rowEl({
+            act: "editCat", id: k.id, chev: false,
+            icon: k.icon, iconBg: "var(--surface)", iconColor: "var(--" + k.color + ")",
+            name: esc(k.name), meta: klim > 0 ? "حد " + nf(klim) : "",
+            value: nf(ksp), sub: ksp > 0 && sp > 0 ? Math.round(ksp / sp * 100) + "%" : ""
+          });
+        }).join("") +
+        '<div style="display:flex;gap:8px;padding:9px 14px 2px">' +
+        '<button class="btn" style="flex:1;padding:8px;font-size:13px" data-act="newSubCat" data-id="' + c.id + '">' + ico("plus") + "بند فرعي</button>" +
+        '<button class="btn" style="flex:1;padding:8px;font-size:13px" data-act="editCat" data-id="' + c.id + '">' + ico("edit") + "عدّل الحد</button></div></div>";
+    }
+    return row + "</div>";
+  }).join("") + "</div>", { sub: "دوس على بند تشوف فروعه" });
+
   return h;
 }
-
 const MODE_LABEL = { deadline: "لحد معاد", monthly: "مبلغ شهري", percent: "نسبة من الدخل" };
 function viewGoals() {
   const B = balanceNow(), inc = +state.settings.income || 0, bt = budgetTotal();
@@ -1674,12 +1952,12 @@ function periodNav() {
   const anchor = p === "day" ? u.day : p === "year" ? u.year : u.mk;
   const r = rangeOf(p, anchor);
   const atEnd = p === "day" ? u.day >= todayISO() : p === "year" ? u.year >= todayISO().slice(0, 4) : u.mk >= thisMK();
-  return '<div class="psegs">' +
+  return '<div class="perio"><div class="seg">' +
     [["day", "يوم"], ["month", "شهر"], ["year", "سنة"]].map(x =>
       '<button data-act="period" data-v="' + x[0] + '" aria-current="' + (p === x[0]) + '">' + x[1] + "</button>").join("") + "</div>" +
-    '<div class="monthbar"><button class="mnav" data-act="pprev" aria-label="السابق">' + ico("chevR") + "</button>" +
+    '<div class="nav"><button data-act="pprev" aria-label="السابق">' + ico("chevR") + "</button>" +
     "<b>" + r.label + "</b>" +
-    '<button class="mnav" data-act="pnext" aria-label="التالي"' + (atEnd ? " disabled" : "") + ">" + ico("chevL") + "</button></div>";
+    '<button data-act="pnext" aria-label="التالي"' + (atEnd ? " disabled" : "") + ">" + ico("chevL") + "</button></div></div>";
 }
 /* أعمدة: أيام الشهر أو شهور السنة */
 function periodBars(r, wf) {
@@ -1728,76 +2006,88 @@ function walletFilterBar() {
     (wf ? '<p class="sub" style="margin:9px 2px 0">الأرقام تحت من <b style="color:var(--ink)">' + esc(statWLabel()) + "</b> بس — مش كل فلوسك.</p>" : "") + "</div>";
 }
 /* ---------- قايمة البنود القابلة للفتح ---------- */
-function catList(r, wf) {
-  const sc = spendByCatIn(r, wf);
-  const ent = Object.entries(sc).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
+function catList(r, wf, parentId) {
+  const inRoot = !!parentId;
+  let ent;
+  if (inRoot) {
+    const kids = childCats(parentId);
+    const own = state.txs.filter(t => t.type === "expense" && t.catId === parentId && inRange(t.date, r) && okW(t, wf)).reduce((s, t) => s + t.amount, 0);
+    ent = kids.map(k => [k.id, catTotal(k.id, r, wf)]).filter(e => e[1] > 0);
+    if (own > 0) ent.push([parentId, own]);
+    ent.sort((a, b) => b[1] - a[1]);
+  } else {
+    ent = Object.entries(spendByRootIn(r, wf)).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
+  }
   if (!ent.length) return "";
   const total = ent.reduce((s, e) => s + e[1], 0);
-  const days = Math.max(1, elapsedDays(r));
-  return '<div class="card list">' + ent.map(([id, v]) => {
-    const c = catById(id), pct = v / total * 100;
-    return '<button class="bud" style="display:block;width:100%;text-align:right;background:transparent;border-inline:0;border-top:0" data-act="catDetail" data-id="' + id + '">' +
-      '<div class="hd">' + catDot(c, 34) + '<span class="nm">' + esc(c.name) + "</span>" +
-      '<span class="rt"><b>' + nf(v) + "</b><small>" + Math.round(pct) + "% · " + nf(v / days, 0) + " في اليوم</small></span></div>" +
-      '<div class="bar thin"><i style="width:' + pct.toFixed(1) + '%;background:var(--' + c.color + ')"></i></div></button>';
+  return '<div class="panel">' + ent.map(([id, v]) => {
+    const c = catById(id);
+    let meta = "";
+    if (!inRoot) {
+      const kk = childCats(id).map(k => ({ n: k.name, v: catTotal(k.id, r, wf) })).filter(x => x.v > 0).sort((a, b) => b.v - a.v);
+      if (kk.length) meta = kk.length + (kk.length <= 2 ? " بند: " : " بنود: ") + kk.slice(0, 3).map(x => esc(x.n)).join(" · ");
+    } else if (id === parentId) meta = "من غير تحديد أدق";
+    return catRowEl(c, v, total, { meta: meta });
   }).join("") + "</div>";
 }
 function elapsedDays(r) {
   if (r.kind === "day") return 1;
   const t = todayISO();
   if (r.to < t) return r.days;
-  // آخر يوم فيه حركة في الفترة، لو بعد النهاردة
   let last = "";
   for (const x of state.txs) if (inRange(x.date, r) && x.date > last) last = x.date;
   const end = (last && last > t) ? last : t;
   if (r.from > end) return 1;
   return clamp(daysBetween(r.from, end) + 1, 1, r.days);
 }
-/* تفاصيل بند في فترة: الإجمالي ثم الأيام ثم الحركات */
+/* تفاصيل بند: الفروع ثم الأيام ثم الحركات */
 function sheetCatDetail(catId) {
   const wf = statWSet(), r = curRange(), c = catById(catId), cur = esc(state.settings.currency);
-  const list = state.txs.filter(t => t.type === "expense" && t.catId === catId && inRange(t.date, r) && okW(t, wf))
-    .sort((a, b) => b.date.localeCompare(a.date) || (b.at || 0) - (a.at || 0));
+  const list = txOfCat(catId, r, wf).sort((a, b) => b.date.localeCompare(a.date) || (b.at || 0) - (a.at || 0));
   const total = list.reduce((s, t) => s + t.amount, 0);
   const days = Math.max(1, elapsedDays(r));
   const prev = prevRange(r);
-  const pTotal = state.txs.filter(t => t.type === "expense" && t.catId === catId && inRange(t.date, prev) && okW(t, wf)).reduce((s, t) => s + t.amount, 0);
+  const pTotal = catTotal(catId, prev, wf);
   const diff = pTotal > 0 ? (total - pTotal) / pTotal * 100 : null;
-  const lim = +c.limit || 0;
+  const lim = catLimit(c);
+  const kids = childCats(catId);
 
-  // تجميع: بالشهور لو السنة، وإلا بالأيام
+  let h = (c.parent ? '<div class="crumb">' + ico("chevR") + "<b>" + esc(catById(c.parent).name) + "</b> › " + esc(c.name) + "</div>" : "") +
+    '<div class="bigstat"><div class="lab">' + r.label + "</div>" +
+    '<div class="num2">' + nf(total) + '<span class="cu">' + cur + "</span></div>" +
+    (lim > 0 && r.kind === "month" ? '<div class="bar" style="margin-top:12px"><i class="' + progClass(total / lim * 100) + '" style="width:' + clamp(total / lim * 100, 0, 100) + '%"></i></div>' : "") +
+    '<div class="meta"><span>متوسط اليوم <b>' + nf(total / days, 0) + "</b></span>" +
+    "<span><b>" + list.length + "</b> حركة</span>" +
+    (pTotal > 0 ? "<span>" + prev.label + " <b>" + nf(pTotal) + "</b></span>" : "") +
+    (diff !== null && Math.abs(diff) >= 1 ? "<span>" + (diff > 0 ? "أعلى" : "أقل") + " بـ <b>" + Math.round(Math.abs(diff)) + "%</b></span>" : "") +
+    (lim > 0 && r.kind === "month" ? "<span>" + (total > lim ? "عديت الحد بـ <b>" + nf(total - lim) + "</b>" : "فاضل من الحد <b>" + nf(lim - total) + "</b>") + "</span>" : "") +
+    "</div></div>";
+
+  // الفروع
+  if (kids.length) {
+    const sub = catList(r, wf, catId);
+    if (sub) h += grp("على البنود الفرعية", sub);
+    else h += grp("على البنود الفرعية", '<div class="panel"><div class="empty"><p>ما فيش صرف على فروع البند ده في الفترة دي.</p></div></div>');
+  }
+
+  // الأيام أو الشهور
   const groups = {};
   list.forEach(t => { const k = r.kind === "year" ? t.date.slice(0, 7) : t.date; groups[k] = (groups[k] || 0) + t.amount; });
   const gk = Object.keys(groups).sort((a, b) => b.localeCompare(a));
   const gmax = Math.max(1, ...Object.values(groups));
-
-  let h = '<div class="card pad" style="margin-bottom:14px">' +
-    '<div class="row" style="align-items:center;gap:10px">' + catDot(c, 38) +
-    '<div style="flex:1"><div class="lbl">' + r.label + "</div>" +
-    '<div style="font-family:var(--ff-display);font-weight:700;font-size:26px;letter-spacing:-.02em">' + nf(total) + ' <span style="font-size:14px;font-weight:500;color:var(--muted)">' + cur + "</span></div></div>" +
-    (diff !== null && Math.abs(diff) >= 1 ? pill(diff > 0 ? "warn" : "good", (diff > 0 ? "+" : "−") + Math.round(Math.abs(diff)) + "%") : "") + "</div>" +
-    '<hr class="sep" style="margin:12px 0">' +
-    '<div class="ftrow" style="padding:3px 0"><span>متوسط اليوم</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(total / days, 0) + "</b></div>" +
-    '<div class="ftrow" style="padding:6px 0 0"><span>عدد الحركات</span><b style="color:var(--ink);font-family:var(--ff-display)">' + list.length + "</b></div>" +
-    (pTotal > 0 ? '<div class="ftrow" style="padding:6px 0 0"><span>' + prev.label + '</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(pTotal) + "</b></div>" : "") +
-    (lim > 0 && r.kind === "month" ? '<hr class="sep" style="margin:12px 0"><div class="bar"><i class="' + progClass(total / lim * 100) + '" style="width:' + clamp(total / lim * 100, 0, 100) + '%"></i></div>' +
-      '<div class="ftrow" style="padding-top:8px"><span>الحد الشهري ' + nf(lim) + "</span><span>" + (total > lim ? "عديته بـ " + nf(total - lim) : "فاضل " + nf(lim - total)) + "</span></div>" : "") +
-    "</div>";
-
   if (gk.length > 1) {
-    h += '<h2 class="sec" style="margin-top:0">' + (r.kind === "year" ? "على الشهور" : "على الأيام") + '<span class="hint">دوس عشان تشوف الفترة</span></h2><div class="card list">' +
-      gk.map(k => {
-        const v = groups[k];
-        return '<button class="item" style="gap:11px" data-act="' + (r.kind === "year" ? "goMonth" : "pickDay") + '" data-v="' + k + '">' +
-          '<span style="width:84px;flex:none;font-size:12.5px;color:var(--muted);white-space:nowrap">' + (r.kind === "year" ? mkLabel(k) : dayLabel(k)) + "</span>" +
-          '<span style="flex:1"><span class="bar thin"><i style="width:' + (v / gmax * 100).toFixed(1) + '%;background:var(--' + c.color + ')"></i></span></span>' +
-          '<span class="amt" style="font-size:13.5px;min-width:54px;text-align:left">' + nf(v) + "</span></button>";
-      }).join("") + "</div>";
+    h += grp(r.kind === "year" ? "على الشهور" : "على الأيام",
+      '<div class="panel">' + gk.map(k => rowEl({
+        act: r.kind === "year" ? "goMonth" : "pickDay", v: k,
+        name: r.kind === "year" ? mkLabel(k) : dayLabel(k),
+        value: nf(groups[k]),
+        fill: (groups[k] / gmax * 100).toFixed(1), fillColor: "var(--" + c.color + ")", cls: "rank"
+      })).join("") + "</div>", { sub: "دوس عشان تفتح الفترة" });
   }
 
-  h += '<h2 class="sec">الحركات<span class="hint">' + list.length + "</span></h2>" +
-    (list.length ? '<div class="card list">' + list.map(t => txRow(t)).join("") + "</div>"
-      : '<div class="card"><div class="empty"><p>ما فيش حركات في الفترة دي.</p></div></div>');
+  h += grp("الحركات", list.length
+    ? '<div class="panel">' + list.map(t => txRow(t, { cat: !!kids.length })).join("") + "</div>"
+    : '<div class="panel"><div class="empty"><p>ما فيش حركات في الفترة دي.</p></div></div>', { sub: String(list.length) });
   openSheet(esc(c.name), h);
 }
 function viewStats() {
@@ -1805,105 +2095,91 @@ function viewStats() {
   const r = curRange(), pr = prevRange(r), T = totalsIn(r, wf), P = totalsIn(pr, wf);
   const list = txIn(r, wf).filter(t => t.type === "expense");
   const cur = esc(state.settings.currency);
-  let h = periodNav() + walletFilterBar();
-
-  // headline
   const elapsed = elapsedDays(r);
   const diff = P.exp > 0 ? (T.exp - P.exp) / P.exp * 100 : null;
-  h += '<div class="card pad"><div class="lbl">' + (r.kind === "day" ? "صرفت في اليوم ده" : r.kind === "year" ? "صرفت في السنة دي" : "صرفت في الشهر ده") + (wf ? " · " + esc(statWLabel()) : "") + "</div>" +
-    '<div class="row" style="align-items:baseline;gap:8px;margin-top:2px"><div style="font-family:var(--ff-display);font-weight:700;font-size:30px;letter-spacing:-.02em">' + nf(T.exp) + "</div>" +
-    '<span style="font-size:14px;color:var(--muted)">' + cur + "</span>" +
-    (diff !== null && Math.abs(diff) >= 1 ? '<span style="margin-inline-start:auto">' + pill(diff > 0 ? "warn" : "good", (diff > 0 ? "أعلى" : "أقل") + " " + Math.round(Math.abs(diff)) + "% عن " + pr.label) + "</span>" : "") + "</div>" +
-    '<div class="ftrow" style="padding-top:11px"><span>دخل ' + nf(T.inc) + "</span><span>" + (r.kind === "day" ? "" : "متوسط اليوم " + nf(T.exp / elapsed, 0)) + "</span></div></div>";
+  let h = periodNav() + walletFilterBar();
 
-  if (r.kind !== "day") h += '<h2 class="sec">' + (r.kind === "year" ? "الصرف على شهور السنة" : "الصرف يوم بيوم") + "</h2><div class=\"card pad\">" + periodBars(r, wf) + "</div>";
+  h += '<div class="bigstat"><div class="lab">' +
+    (r.kind === "day" ? "صرفت في اليوم ده" : r.kind === "year" ? "صرفت في السنة دي" : "صرفت في الشهر ده") +
+    (wf ? " · " + esc(statWLabel()) : "") + "</div>" +
+    '<div class="num2">' + nf(T.exp) + '<span class="cu">' + cur + "</span></div>" +
+    '<div class="meta">' +
+    (r.kind !== "day" ? "<span>متوسط اليوم <b>" + nf(T.exp / elapsed, 0) + "</b></span>" : "") +
+    "<span><b>" + list.length + "</b> حركة</span>" +
+    (T.inc > 0 ? "<span>دخل <b>" + nf(T.inc) + "</b></span>" : "") +
+    (diff !== null && Math.abs(diff) >= 1 ? "<span>" + (diff > 0 ? "أعلى" : "أقل") + " من " + pr.label + " بـ <b>" + Math.round(Math.abs(diff)) + "%</b></span>" : "") +
+    "</div></div>";
 
-  // donut
-  const d = donutRange(r, wf);
-  h += '<h2 class="sec">المصاريف على البنود<span class="hint">' + r.label + "</span></h2>";
-  h += '<div class="card pad">' + (d ? d.html : '<div class="empty"><div class="eic">' + ico("pie") + "</div><h4>ما فيش مصاريف في الفترة دي</h4><p>غيّر الفترة أو سجّل حركات عشان نقدر نطلعلك التوزيع.</p></div>") + "</div>";
+  if (r.kind !== "day") h += grp(r.kind === "year" ? "الصرف على الشهور" : "الصرف يوم بيوم",
+    '<div class="panel pad2">' + periodBars(r, wf) + "</div>");
+
   const cl = catList(r, wf);
-  if (cl) h += '<p class="sub" style="margin:10px 2px 8px">دوس على أي بند تشوف تفاصيله يوم بيوم.</p>' + cl;
+  if (cl) h += grp("فلوسك راحت فين", cl, { sub: "دوس على بند تشوف تفاصيله" });
+  else h += grp("فلوسك راحت فين", '<div class="panel"><div class="empty"><div class="eic">' + ico("pie") + "</div><h4>ما فيش مصاريف في الفترة دي</h4><p>غيّر الفترة أو سجّل حركات.</p></div></div>");
 
   if (r.kind === "day") {
     const dl = txIn(r, wf).sort((a, b) => (b.at || 0) - (a.at || 0));
-    h += '<h2 class="sec">حركات اليوم<span class="hint">' + dl.length + "</span></h2>" +
-      (dl.length ? '<div class="card list">' + dl.map(t => txRow(t, { date: false })).join("") + "</div>"
-        : '<div class="card"><div class="empty"><p>ما فيش حركات في اليوم ده.</p></div></div>');
+    h += grp("حركات اليوم", dl.length
+      ? '<div class="panel">' + dl.map(t => txRow(t, { date: false })).join("") + "</div>"
+      : '<div class="panel"><div class="empty"><p>ما فيش حركات في اليوم ده.</p></div></div>', { sub: String(dl.length) });
     const week = []; for (let i = 6; i >= 0; i--) { const iso = shiftDay(r.from, -i); week.push({ iso: iso, v: spentOnDay(iso, wf) }); }
     const wmax = Math.max(1, ...week.map(x => x.v));
-    h += '<h2 class="sec">آخر 7 أيام</h2><div class="card list">' + week.map(x => {
+    h += grp("آخر 7 أيام", '<div class="panel">' + week.map(x => {
       const dt = new Date(x.iso + "T00:00:00");
       const lbl = x.iso === todayISO() ? "النهاردة" : AR_DAYS[dt.getDay()].replace("الأ", "أ") + " " + dt.getDate();
-      return '<button class="item" style="gap:12px" data-act="pickDay" data-v="' + x.iso + '">' +
-        '<span style="width:66px;flex:none;font-size:12.5px;white-space:nowrap;text-align:right;color:' + (x.iso === r.from ? "var(--accent)" : "var(--muted)") + ';font-weight:' + (x.iso === r.from ? 600 : 400) + '">' + lbl + "</span>" +
-        '<span style="flex:1"><span class="bar thin"><i style="width:' + (x.v / wmax * 100).toFixed(1) + '%;background:' + (x.iso === r.from ? "var(--accent)" : "var(--s1)") + '"></i></span></span>' +
-        '<span class="amt" style="font-size:13.5px;min-width:52px;text-align:left">' + nf(x.v) + "</span></button>";
-    }).join("") + "</div>";
+      return rowEl({ act: "pickDay", v: x.iso, name: lbl, value: nf(x.v), cls: "rank",
+        fill: (x.v / wmax * 100).toFixed(1), fillColor: x.iso === r.from ? "var(--accent)" : "var(--s1)" });
+    }).join("") + "</div>");
   } else {
-    // الأيام (أو الشهور) كقايمة قابلة للفتح
     const unit = r.kind === "year" ? "month" : "day";
     const tot = {};
-    txIn(r, wf).filter(t => t.type === "expense").forEach(t => {
-      const k = unit === "month" ? t.date.slice(0, 7) : t.date;
-      tot[k] = (tot[k] || 0) + t.amount;
-    });
+    list.forEach(t => { const k = unit === "month" ? t.date.slice(0, 7) : t.date; tot[k] = (tot[k] || 0) + t.amount; });
     const keys = Object.keys(tot).sort((a, b) => b.localeCompare(a));
     if (keys.length) {
       const mx = Math.max(1, ...Object.values(tot));
-      h += '<h2 class="sec">' + (unit === "month" ? "الشهور" : "الأيام") + '<span class="hint">دوس عشان تفتح</span></h2><div class="card list">' +
-        keys.map(k => '<button class="item" style="gap:11px" data-act="' + (unit === "month" ? "goMonth" : "pickDay") + '" data-v="' + k + '">' +
-          '<span style="width:84px;flex:none;font-size:12.5px;color:var(--muted);white-space:nowrap">' + (unit === "month" ? mkLabel(k) : dayLabel(k)) + "</span>" +
-          '<span style="flex:1"><span class="bar thin"><i style="width:' + (tot[k] / mx * 100).toFixed(1) + '%;background:var(--accent)"></i></span></span>' +
-          '<span class="amt" style="font-size:13.5px;min-width:54px;text-align:left">' + nf(tot[k]) + "</span></button>").join("") + "</div>";
+      h += grp(unit === "month" ? "الشهور" : "الأيام",
+        '<div class="panel">' + keys.map(k => rowEl({
+          act: unit === "month" ? "goMonth" : "pickDay", v: k,
+          name: unit === "month" ? mkLabel(k) : dayLabel(k), value: nf(tot[k]),
+          cls: "rank", fill: (tot[k] / mx * 100).toFixed(1), fillColor: "var(--accent)"
+        })).join("") + "</div>", { sub: "دوس عشان تفتح" });
     }
-    h += '<h2 class="sec">الدخل والمصروف<span class="hint">آخر 6 شهور</span></h2><div class="card pad">' + barsChart(r.kind === "year" ? r.to.slice(0, 7) : r.from.slice(0, 7), wf) + "</div>";
   }
 
-  // wallets share
+  // اتصرف من فين
   const byW = {};
   list.forEach(t => byW[t.walletId] = (byW[t.walletId] || 0) + t.amount);
   const wEnt = Object.entries(byW).sort((a, b) => b[1] - a[1]);
   if (wEnt.length > 1 && !wf) {
-    h += '<h2 class="sec">اتصرف من فين</h2><div class="card list">' + wEnt.map(([id, v]) => {
+    h += grp("اتصرف من فين", '<div class="panel">' + wEnt.map(([id, v]) => {
       const w = walletById(id);
-      return '<div class="item" style="cursor:default">' +
-        '<span class="ic" style="background:color-mix(in srgb,var(--' + w.color + ') 15%, var(--surface));color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" +
-        '<span style="flex:1"><span class="nm">' + esc(w.name) + '</span><span class="mt" style="display:block">' + Math.round(v / T.exp * 100) + "% من الصرف</span></span>" +
-        '<span class="amt">' + nf(v) + "</span></div>";
-    }).join("") + "</div>";
+      return rowEl({ icon: w.icon, iconBg: "color-mix(in srgb,var(--" + w.color + ") 14%, var(--surface))", iconColor: "var(--" + w.color + ")",
+        name: esc(w.name), value: nf(v), sub: Math.round(v / T.exp * 100) + "%",
+        cls: "rank", fill: (v / T.exp * 100).toFixed(1), fillColor: "var(--" + w.color + ")" });
+    }).join("") + "</div>");
   }
 
-  // quick numbers
-  const dayTot = {}; list.forEach(t => dayTot[t.date] = (dayTot[t.date] || 0) + t.amount);
-  const topDay = Object.entries(dayTot).sort((a, b) => b[1] - a[1])[0];
-  const big = list.slice().sort((a, b) => b.amount - a.amount)[0];
-  h += '<h2 class="sec">أرقام سريعة</h2><div class="tiles">' +
-    '<div class="tile"><div class="k">' + ico("clock") + '<span>متوسط اليوم</span></div><div class="v">' + nf(T.exp / elapsed, 0) + "</div></div>" +
-    '<div class="tile"><div class="k">' + ico("tabList") + '<span>عدد الحركات</span></div><div class="v">' + list.length + "</div></div>" +
-    '<div class="tile"><div class="k">' + ico("tUp") + '<span>' + (r.kind === "year" ? "أعلى شهر" : "أعلى يوم") + '</span></div><div class="v">' +
-    (r.kind === "year" ? nf(Math.max(0, ...Array.from({ length: 12 }, (_, i) => totalsIn(rangeOf("month", r.from.slice(0, 4) + "-" + String(i + 1).padStart(2, "0")), wf).exp)))
-      : topDay ? nf(topDay[1]) : "0") + "</div></div></div>";
-  if (big) h += '<p class="sub" style="margin:9px 2px 0">' +
-    (topDay && r.kind !== "year" ? "أعلى يوم صرف كان " + dayLabel(topDay[0]) + " بمبلغ " + money2(topDay[1]) + ". " : "") +
-    "أكبر حركة: " + money2(big.amount) + " في " + esc(catById(big.catId).name) + ".</p>";
-
-  // movers
-  const cs = spendByCatIn(r, wf), ps = spendByCatIn(pr, wf);
+  // مقارنة
+  const cs = spendByRootIn(r, wf), ps = spendByRootIn(pr, wf);
   const ids = [...new Set([...Object.keys(cs), ...Object.keys(ps)])];
   const mov = ids.map(id => ({ c: catById(id), d: (cs[id] || 0) - (ps[id] || 0), a: cs[id] || 0, b: ps[id] || 0 }))
     .filter(m => Math.abs(m.d) > 0).sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 5);
   if (mov.length) {
-    h += '<h2 class="sec">مقارنة بـ ' + pr.label + "</h2><div class=\"card list\">" + mov.map(m =>
-      '<div class="item" style="cursor:default">' + catDot(m.c, 34) +
-      '<span style="flex:1"><span class="nm">' + esc(m.c.name) + '</span><span class="mt" style="display:block"><span class="num">' + nf(m.b) + " ← " + nf(m.a) + "</span></span></span>" +
-      '<span class="amt" style="color:' + (m.d > 0 ? "var(--down)" : "var(--up)") + '"><span class="num">' + (m.d > 0 ? "+" : "−") + nf(Math.abs(m.d)) + "</span></span></div>").join("") + "</div>";
+    h += grp("مقارنة بـ " + pr.label, '<div class="panel">' + mov.map(m => rowEl({
+      act: "catDetail", id: m.c.id,
+      icon: m.c.icon, iconBg: "color-mix(in srgb,var(--" + m.c.color + ") 14%, var(--surface))", iconColor: "var(--" + m.c.color + ")",
+      name: esc(m.c.name), meta: '<span class="num">' + nf(m.b) + " ← " + nf(m.a) + "</span>",
+      value: '<span style="color:' + (m.d > 0 ? "var(--down)" : "var(--up)") + '"><span class="num">' + (m.d > 0 ? "+" : "−") + nf(Math.abs(m.d)) + "</span></span>"
+    })).join("") + "</div>");
   }
+
+  // الدونت كعرض ثانوي
+  const d = donutRange(r, wf);
+  if (d) h += grp("التوزيع", '<div class="panel pad2">' + d.html + "</div>");
+
   h += '<div id="aiSlot"></div>';
   return h;
 }
-
-/* ---------- onboarding ---------- */
 function viewOnboard() {
   return '<div class="ob"><div class="obhead"><div class="mark">' + ico("coins") + "</div>" +
     "<h1>مصروفي</h1><p>سجّل مصاريفك، حط حد لكل بند، واعمل خطة ادخار ليها معاد. كل الحسابات بتتعمل لك أول بأول.</p></div>" +
@@ -2034,6 +2310,7 @@ function sheetTx(id) {
     '<div class="keypad" style="margin:-6px 0 14px">' + [10, 25, 50, 100, 200, 500, 1000, "مسح"].map(v =>
       '<button data-act="quick" data-v="' + v + '">' + (v === "مسح" ? "مسح" : '<span class="num">+' + v + "</span>") + "</button>").join("") + "</div>" +
     '<div class="field" id="fCats"><label>البند</label><div class="chips" id="txCats"></div></div>' +
+    '<div class="field" id="txSubs" hidden></div>' +
     '<div class="field" id="fWallet"><label id="lblWallet">الفلوس من فين؟</label><div class="chips" id="txWallets"></div></div>' +
     '<div class="field" id="fTo"><label>لفين؟</label><div class="chips" id="txTo"></div></div>' +
     (id ? "" : '<div class="field" id="fSplit"><button class="btn block" data-act="splitToggle" id="splitBtn">' + ico("users") + "الحساب ده فيه ناس تانية</button>" +
@@ -2125,11 +2402,32 @@ function paintTxForm() {
   }
   el("lblWallet").textContent = transfer ? "من فين؟" : type === "income" ? "الفلوس راحت فين؟" : "الفلوس من فين؟";
   if (!transfer) {
-    const cats = type === "income" ? INCOME_CATS : state.categories;
-    if (!cats.some(c => c.id === sh.dataset.cat)) sh.dataset.cat = cats[0] ? cats[0].id : "";
-    el("txCats").innerHTML = cats.map(c =>
-      '<button class="chip" data-act="pickCat" data-v="' + c.id + '" aria-pressed="' + (c.id === sh.dataset.cat) + '" style="' + (c.id === sh.dataset.cat ? "color:var(--" + c.color + ")" : "") + '">' +
-      '<span style="color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" + esc(c.name) + "</button>").join("");
+    if (type === "income") {
+      if (!INCOME_CATS.some(c => c.id === sh.dataset.cat)) sh.dataset.cat = INCOME_CATS[0].id;
+      el("txCats").innerHTML = INCOME_CATS.map(c =>
+        '<button class="chip" data-act="pickCat" data-v="' + c.id + '" aria-pressed="' + (c.id === sh.dataset.cat) + '" style="' + (c.id === sh.dataset.cat ? "color:var(--" + c.color + ")" : "") + '">' +
+        '<span style="color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" + esc(c.name) + "</button>").join("");
+      el("txSubs").hidden = true;
+    } else {
+      const roots = rootCats();
+      let cur = state.categories.find(c => c.id === sh.dataset.cat);
+      if (!cur) { cur = roots[0]; sh.dataset.cat = cur ? cur.id : ""; }
+      const rootId = cur && cur.parent ? cur.parent : (cur ? cur.id : "");
+      el("txCats").innerHTML = roots.map(c =>
+        '<button class="chip" data-act="pickRoot" data-v="' + c.id + '" aria-pressed="' + (c.id === rootId) + '" style="' + (c.id === rootId ? "color:var(--" + c.color + ")" : "") + '">' +
+        '<span style="color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" + esc(c.name) + "</button>").join("");
+      const kids = childCats(rootId);
+      const sub = el("txSubs");
+      sub.hidden = !kids.length;
+      if (kids.length) {
+        const r = catById(rootId);
+        sub.innerHTML = '<label>تحديد أدق <span style="color:var(--muted);font-weight:400">(اختياري)</span></label><div class="chips">' +
+          '<button class="chip" data-act="pickCat" data-v="' + rootId + '" aria-pressed="' + (sh.dataset.cat === rootId) + '">' + esc(r.name) + " عام</button>" +
+          kids.map(c => '<button class="chip" data-act="pickCat" data-v="' + c.id + '" aria-pressed="' + (c.id === sh.dataset.cat) + '" style="' + (c.id === sh.dataset.cat ? "color:var(--" + c.color + ")" : "") + '">' +
+            '<span style="color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" + esc(c.name) + "</button>").join("") +
+          '<button class="chip" data-act="newSub" data-v="' + rootId + '" style="color:var(--accent)">' + ico("plus") + "بند فرعي</button></div>";
+      }
+    }
   }
   if (!state.wallets.some(w => w.id === sh.dataset.wallet)) sh.dataset.wallet = (state.wallets[0] || {}).id || "";
   walletChips("txWallets", sh.dataset.wallet, "pickWallet");
@@ -2140,10 +2438,13 @@ function paintTxForm() {
   }
 }
 
-function sheetCat(id) {
+function sheetCat(id, parentId) {
   const c = id ? state.categories.find(x => x.id === id) : null;
+  const par = c ? c.parent : (parentId || "");
+  const parName = par ? catById(par).name : "";
   const body =
-    '<div class="field"><label for="cName">اسم البند</label><input class="inp" id="cName" value="' + esc(c ? c.name : "") + '" placeholder="مثلاً: قهوة"></div>' +
+    (par ? '<p class="sub" style="margin:0 0 13px">بند فرعي تحت <b style="color:var(--ink)">' + esc(parName) + "</b> — صرفه بيتحسب ضمنه.</p>" : "") +
+    '<div class="field"><label for="cName">اسم البند</label><input class="inp" id="cName" value="' + esc(c ? c.name : "") + '" placeholder="' + (par ? "مثلاً: خضار وفاكهة" : "مثلاً: قهوة") + '"></div>' +
     '<div class="field"><label for="cLimit">الحد الشهري (0 = من غير حد)</label><input class="inp" id="cLimit" type="number" inputmode="decimal" value="' + (c ? c.limit || 0 : 0) + '"></div>' +
     '<div class="field"><label>الشكل</label><div class="chips" id="cIcons">' + ICON_CHOICES.map(i =>
       '<button class="chip" data-act="pickIcon" data-v="' + i + '" aria-pressed="' + (c && c.icon === i) + '">' + ico(i) + "</button>").join("") + "</div></div>" +
@@ -2151,10 +2452,13 @@ function sheetCat(id) {
       '<button class="chip" data-act="pickColor" data-v="' + k + '" aria-pressed="' + (c && c.color === k) + '" style="padding:7px"><i style="width:18px;height:18px;border-radius:6px;display:block;background:var(--' + k + ')"></i></button>').join("") + "</div></div>" +
     '<div class="btnrow"><button class="btn pri" style="flex:1" data-act="saveCat" data-id="' + (id || "") + '">' + ico("check") + "حفظ</button>" +
     (id ? '<button class="btn danger" data-act="delCat" data-id="' + id + '">' + ico("trash") + "حذف</button>" : "") + "</div>";
-  openSheet(c ? "تعديل بند" : "بند جديد", body, () => {
+  openSheet(c ? "تعديل « " + c.name + " »" : par ? "بند فرعي جديد" : "بند رئيسي جديد", body, () => {
     const sh = el("sheet");
-    sh.dataset.icon = c ? c.icon : "dots"; sh.dataset.color = c ? c.color : "s9";
+    sh.dataset.parent = par;
+    sh.dataset.icon = c ? c.icon : (par ? catById(par).icon : "dots");
+    sh.dataset.color = c ? c.color : (par ? catById(par).color : "s9");
     repaintPick("cIcons", sh.dataset.icon); repaintPick("cColors", sh.dataset.color);
+    setTimeout(() => { const n = el("cName"); if (n && !c) n.focus(); }, 60);
   });
 }
 function repaintPick(boxId, val) { const b = el(boxId); if (!b) return; b.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === val))); }
@@ -3130,7 +3434,8 @@ document.addEventListener("click", (ev) => {
     case "tab": state.ui.tab = v; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "mprev": state.ui.mk = mkShift(state.ui.mk, -1); render(); break;
     case "mnext": if (state.ui.mk < thisMK()) { state.ui.mk = mkShift(state.ui.mk, 1); render(); } break;
-    case "goTx": state.ui.tab = "tx"; render(); break;
+    case "goTx": state.ui.tab = "tx"; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
+    case "goStats": state.ui.tab = "stats"; state.ui.period = "month"; state.ui.mk = thisMK(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "goGoals": state.ui.tab = "goals"; render(); break;
     case "filter": state.ui.filter = v; render(); break;
     case "wfilter": state.ui.wallet = v; render(); break;
@@ -3140,6 +3445,13 @@ document.addEventListener("click", (ev) => {
     case "editTx": sheetTx(id); break;
     case "txType": sh.dataset.type = v; sh.querySelectorAll('[data-act="txType"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); paintTxForm(); break;
     case "pickCat": sh.dataset.cat = v; paintTxForm(); break;
+    case "pickRoot": {
+      const kids = childCats(v);
+      sh.dataset.cat = v;
+      paintTxForm();
+      break;
+    }
+    case "newSub": { const pid = v; closeSheet(); setTimeout(() => { sheetCat(null, pid); const t = el("sheet"); if (t) t.dataset.backTx = "1"; }, 180); break; }
     case "pickWallet": sh.dataset.wallet = v; paintTxForm(); break;
     case "pickTo": sh.dataset.towallet = v; paintTxForm(); break;
     case "splitToggle": {
@@ -3174,6 +3486,8 @@ document.addEventListener("click", (ev) => {
       break;
     }
     case "newCat": sheetCat(); break;
+    case "newSubCat": sheetCat(null, id); break;
+    case "toggleCat": state.ui.openCat = state.ui.openCat === id ? "" : id; render(); break;
     case "editCat": sheetCat(id); break;
     case "pickIcon": sh.dataset.icon = v; repaintPick("cIcons", v); break;
     case "pickColor": sh.dataset.color = v; repaintPick("cColors", v); break;
@@ -3181,11 +3495,20 @@ document.addEventListener("click", (ev) => {
       const name = el("cName").value.trim(); if (!name) return toast("اكتب اسم البند");
       const lim = Math.max(0, parseFloat(el("cLimit").value) || 0);
       if (id) { const c = state.categories.find(x => x.id === id); Object.assign(c, { name: name, limit: lim, icon: sh.dataset.icon, color: sh.dataset.color }); }
-      else state.categories.push({ id: uid("c"), name: name, limit: lim, icon: sh.dataset.icon, color: sh.dataset.color, pct: 0 });
+      else {
+        const nc = { id: uid("c"), name: name, limit: lim, icon: sh.dataset.icon, color: sh.dataset.color, pct: 0, parent: sh.dataset.parent || "" };
+        state.categories.push(nc);
+        const back = sh.dataset.backTx === "1";
+        save("categories"); closeSheet(); render();
+        toast("اتضاف " + name);
+        if (back) setTimeout(() => { sheetTx(); setTimeout(() => { const t = el("sheet"); if (t) { t.dataset.cat = nc.id; paintTxForm(); } }, 90); }, 180);
+        break;
+      }
       save("categories"); closeSheet(); render(); toast("اتحفظ");
       break;
     }
     case "delCat": {
+      if (hasKids(id)) return toast("البند ده تحته بنود فرعية — امسحها الأول");
       const used = state.txs.some(t => t.catId === id);
       if (used) return toast("البند ده عليه حركات — امسح حركاته الأول أو سيبه بحد 0");
       state.categories = state.categories.filter(c => c.id !== id); save("categories"); closeSheet(); render(); toast("اتمسح");
