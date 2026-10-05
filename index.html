@@ -499,9 +499,66 @@ button.r:hover{background:var(--surface-2)}
   font-size:12.5px; color:var(--muted)}
 .bigstat .meta b{color:var(--ink); font-family:var(--ff-display); font-variant-numeric:tabular-nums}
 
+/* أقسام التحليل */
+.sview{margin-bottom:16px}
+.sview .segs button{font-size:13px; padding:9px 2px}
+/* مربعات الأرقام */
+.kgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:9px; margin-bottom:18px}
+.kgrid .k{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:12px 13px;
+  text-align:start; width:100%; display:block; font:inherit; color:inherit}
+.kgrid button.k:active{background:var(--surface-2)}
+.kgrid .k .kl{display:flex; align-items:center; gap:5px; font-size:11.5px; color:var(--muted); line-height:1.3}
+.kgrid .k .kl svg{width:13px; height:13px; flex:none}
+.kgrid .k .kv{display:block; font-family:var(--ff-display); font-weight:700; font-size:19.5px; letter-spacing:-.02em;
+  margin-top:6px; font-variant-numeric:tabular-nums; direction:ltr; text-align:right; unicode-bidi:isolate}
+.kgrid .k .ks{display:block; font-size:11.5px; color:var(--muted); margin-top:3px; line-height:1.45}
+.kgrid .k.wide{grid-column:1 / -1}
+/* قراءات التحليل */
+.ins{display:flex; gap:11px; align-items:flex-start; width:100%; text-align:start; background:transparent;
+  border:0; border-bottom:1px solid var(--line); padding:13px 14px; font:inherit; color:inherit}
+.panel .ins:last-child{border-bottom:0}
+button.ins:active{background:var(--surface-2)}
+.ins .ii{width:30px; height:30px; flex:none; border-radius:9px; display:grid; place-items:center}
+.ins .ii svg{width:16px; height:16px}
+.ins .it{flex:1; min-width:0}
+.ins p{margin:0; font-size:13.5px; line-height:1.68; color:var(--ink)}
+.ins p b{font-family:var(--ff-display); font-weight:600; font-variant-numeric:tabular-nums}
+.ins .rc{flex:none; color:var(--muted); display:grid; place-items:center; align-self:center}
+.ins .rc svg{width:15px; height:15px}
+
 .crumb{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); margin-bottom:11px}
 .crumb svg{width:12px;height:12px}
 .crumb b{color:var(--ink)}
+/* سجّل بضغطة */
+.qrail{display:flex; gap:9px; overflow-x:auto; padding-bottom:3px; scrollbar-width:none}
+.qrail::-webkit-scrollbar{display:none}
+.qchip{flex:0 0 auto; display:flex; flex-direction:column; align-items:flex-start; gap:6px;
+  min-width:104px; max-width:150px; background:var(--surface); border:1px solid var(--line);
+  border-radius:14px; padding:11px 12px; text-align:right; font-family:inherit; color:inherit;
+  box-shadow:var(--shadow-sm)}
+.qchip:active{transform:scale(.97)}
+.qchip:hover{border-color:var(--accent-line)}
+.qchip .qi{width:28px;height:28px;border-radius:9px;display:grid;place-items:center}
+.qchip .qi svg{width:15px;height:15px}
+.qchip .qn{font-size:12.5px; color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%}
+.qchip .qa{font-family:var(--ff-display); font-weight:700; font-size:16px; letter-spacing:-.01em}
+.qchip.sm{min-width:92px; padding:9px 10px; gap:5px}
+.qchip.sm .qi{width:24px;height:24px;border-radius:8px}
+.qchip.sm .qi svg{width:13px;height:13px}
+.qchip.sm .qa{font-size:14.5px}
+.qchip.add{min-width:0; justify-content:center; align-items:center; color:var(--accent);
+  border-style:dashed; padding-inline:16px}
+.qchip.add svg{width:20px;height:20px}
+
+/* تراجع في التنبيه */
+.toast.hasbtn{display:flex; align-items:center; gap:14px; padding-inline-end:8px; pointer-events:auto}
+.toast .undo{background:transparent; border:0; color:var(--accent); font-weight:700; font-size:13.5px;
+  font-family:inherit; padding:6px 10px; border-radius:9px; flex:none}
+.toast .undo:hover{background:rgba(255,255,255,.1)}
+
+.chk{display:flex; align-items:center; gap:9px; padding:11px 13px; border:1px solid var(--line);
+  border-radius:12px; background:var(--surface-2); font-size:14px; margin-bottom:4px; cursor:pointer}
+.chk input{width:19px;height:19px;accent-color:var(--accent);flex:none}
 .budrow{border-bottom:1px solid var(--line)}
 .budrow:last-child{border-bottom:0}
 .budrow > .r{border-bottom:0 !important}
@@ -595,7 +652,7 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
-const APP_VERSION = "2.2.0";
+const APP_VERSION = "2.5.0";
 const APP_BUILD = "2026-10-01";
 
 /* ---------- helpers ---------- */
@@ -691,6 +748,7 @@ const P = {
   pill: '<rect x="4.6" y="9" width="14.8" height="6" rx="3" transform="rotate(-45 12 12)"/><path d="M9.6 9.6 14.4 14.4"/>',
   shirt: '<path d="M8.4 4.4 12 6.4l3.6-2 4.4 2.6-2 3.6-1.6-.8v10.2H7.6V9.8l-1.6.8L4 7z"/>',
   plane: '<path d="M10.4 20.4 12 15.6l7.4-2.2a1.8 1.8 0 0 0 0-3.4L4.6 4.6l1.8 6.2-3 1.6 3 1.6-1.8 6.2z"/>',
+  repeat: '<path d="M4.4 11.2a7.6 7.6 0 0 1 12.6-5.4l2.6 2.4"/><path d="M19.6 4.6v3.8h-3.8"/><path d="M19.6 12.8a7.6 7.6 0 0 1-12.6 5.4l-2.6-2.4"/><path d="M4.4 19.4v-3.8h3.8"/>',
   users: '<circle cx="9" cy="8" r="3.4"/><path d="M3.4 20a5.6 5.6 0 0 1 11.2 0"/><path d="M15.6 5.2a3.4 3.4 0 0 1 0 6.4"/><path d="M17 14.8a5.6 5.6 0 0 1 3.6 5.2"/>',
   copy: '<rect x="8.4" y="8.4" width="11.2" height="11.2" rx="2.6"/><path d="M15.6 8.4V6.8a2.4 2.4 0 0 0-2.4-2.4H6.8a2.4 2.4 0 0 0-2.4 2.4v6.4a2.4 2.4 0 0 0 2.4 2.4h1.6"/>',
   split: '<path d="M4.4 5.6h4l7.2 12.8h4"/><path d="M15.6 5.6h4"/><path d="M4.4 18.4h4l2.6-4.6"/><path d="M17.4 3.4l2.4 2.2-2.4 2.2"/><path d="M17.4 16.2l2.4 2.2-2.4 2.2"/>'
@@ -766,13 +824,15 @@ const DEFAULT_WALLETS = [
 const WALLET_ICONS = ["wallet", "safe", "bank", "card", "coins", "phone", "gift", "home"];
 
 const state = {
-  settings: { name: "", currency: "ج.م", income: 0, savePct: 15, onboarded: false, lastBackup: "" },
+  settings: { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "" },
   wallets: JSON.parse(JSON.stringify(DEFAULT_WALLETS)),
   categories: JSON.parse(JSON.stringify(DEFAULT_CATS)),
   txs: [],
   debts: [],
+  repeats: [],
+  shortcuts: [],
   goals: [],
-  ui: { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", statW: "all", q: "" }
+  ui: { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", statW: "all", sv: "sum", q: "" }
 };
 
 /* ---------- storage ---------- */
@@ -823,11 +883,13 @@ function applyData(d) {
   if (Array.isArray(d.categories) && d.categories.length) state.categories = d.categories;
   if (Array.isArray(d.txs)) state.txs = d.txs;
   if (Array.isArray(d.debts)) state.debts = d.debts;
+  if (Array.isArray(d.repeats)) state.repeats = d.repeats;
+  if (Array.isArray(d.shortcuts)) state.shortcuts = d.shortcuts;
   if (Array.isArray(d.goals)) state.goals = d.goals;
   return true;
 }
 function dataBundle() {
-  return { settings: state.settings, wallets: state.wallets, categories: state.categories, txs: state.txs, debts: state.debts, goals: state.goals };
+  return { settings: state.settings, wallets: state.wallets, categories: state.categories, txs: state.txs, debts: state.debts, goals: state.goals, repeats: state.repeats, shortcuts: state.shortcuts };
 }
 
 /* ---- تشفير محلي: المفتاح مشتق من رمز القفل ---- */
@@ -917,11 +979,13 @@ function writeDoc(k) {
   if (k === "categories") return db.doc("app/categories").set({ list: state.categories });
   if (k === "goals") return db.doc("app/goals").set({ list: state.goals });
   if (k === "debts") return db.doc("app/debts").set({ list: state.debts });
+  if (k === "repeats") return db.doc("app/repeats").set({ list: state.repeats });
+  if (k === "shortcuts") return db.doc("app/shortcuts").set({ list: state.shortcuts });
   if (k.startsWith("m:")) { const mk = k.slice(2); return db.doc("months/" + mk).set({ mk: mk, txs: state.txs.filter(t => mkOf(t.date) === mk) }); }
   return Promise.resolve();
 }
 function saveAll() {
-  save("settings", "wallets", "categories", "goals", "debts");
+  save("settings", "wallets", "categories", "goals", "debts", "repeats", "shortcuts");
   [...new Set(state.txs.map(t => mkOf(t.date)))].forEach(mk => save("m:" + mk));
 }
 function degrade() {
@@ -936,22 +1000,24 @@ async function connect() {
   if (!db) { Store.mode = "local"; renderStorageLine(); return; }
   Store.db = db; Store.mode = "cloud";
   try {
-    const [s, w, c, g, dbt, ms] = await Promise.all([
+    const [s, w, c, g, dbt, rp, scs, ms] = await Promise.all([
       db.doc("app/settings").get(), db.doc("app/wallets").get(), db.doc("app/categories").get(),
-      db.doc("app/goals").get(), db.doc("app/debts").get(), db.collection("months").get()
+      db.doc("app/goals").get(), db.doc("app/debts").get(), db.doc("app/repeats").get(), db.doc("app/shortcuts").get(), db.collection("months").get()
     ]);
     const hasCloud = s.exists || c.exists || (ms && ms.size > 0);
     if (hasCloud) {
       const all = [];
       (ms.docs || []).forEach(d => { const v = d.data(); if (v && Array.isArray(v.txs)) all.push.apply(all, v.txs); });
       const wd = w.exists ? w.data() : null, cd = c.exists ? c.data() : null,
-        gd = g.exists ? g.data() : null, dd = dbt.exists ? dbt.data() : null;
+        gd = g.exists ? g.data() : null, dd = dbt.exists ? dbt.data() : null, rd = rp.exists ? rp.data() : null, sd = scs.exists ? scs.data() : null;
       applyData({
         settings: s.exists ? s.data() : null,
         wallets: wd && Array.isArray(wd.list) ? wd.list : null,
         categories: cd && Array.isArray(cd.list) ? cd.list : null,
         goals: gd && Array.isArray(gd.list) ? gd.list : [],
         debts: dd && Array.isArray(dd.list) ? dd.list : [],
+        repeats: rd && Array.isArray(rd.list) ? rd.list : [],
+        shortcuts: sd && Array.isArray(sd.list) ? sd.list : [],
         txs: all
       });
       writeLocal();
@@ -1145,6 +1211,12 @@ function monthClock(mk) {
 function allowance(mk) {
   const { exp } = totalsOf(mk), ck = monthClock(mk);
   const bt = budgetTotal(), inc = +state.settings.income || 0;
+  const cap = +state.settings.monthCap || 0;
+  if (cap > 0) {
+    const rem = cap - exp;
+    return { basis: "cap", base: cap, rem: rem, perDay: ck.left > 0 ? rem / ck.left : 0, left: ck.left, over: rem < 0,
+      why: "من حد الشهر اللي إنت حاططه (" + nf(cap) + ") ناقص اللي اتصرف" };
+  }
   if (bt > 0) {
     const rem = bt - exp;
     return { basis: "budget", base: bt, rem: rem, perDay: ck.left > 0 ? rem / ck.left : 0, left: ck.left, over: rem < 0,
@@ -1304,6 +1376,31 @@ function insights(mk) {
     const gap = daysBetween(last, todayISO());
     if (gap >= 3) push("warn", "بقالك " + gap + " يوم ما سجلتش حاجة", "الأرقام بتبقى مظبوطة لما تسجل أول بأول. سجّل اللي فات دلوقتي.", "clock");
   }
+
+  // حد الشهر
+  const capI = +state.settings.monthCap || 0;
+  if (capI > 0 && !ck.future) {
+    const over = T.exp - capI;
+    if (over > 0) push("crit", "عديت حد الشهر", "حدك " + money2(capI) + " وصرفت " + money2(T.exp) + " — زيادة " + money2(over) + ".", "alert");
+    else if (!ck.past && ck.day > 3) {
+      const pr = T.exp / ck.day * ck.dim;
+      if (pr > capI * 1.05) push("warn", "بالمعدل ده هتعدّي حد الشهر",
+        "متوقع تقفل على " + money2(pr) + " والحد " + money2(capI) + ". قلّل حوالي " + money2((pr - capI) / Math.max(1, ck.left)) + " في اليوم.", "tUp");
+      else if (ck.left <= 7) push("good", "ماشي كويس على حد الشهر", "فاضل " + money2(capI - T.exp) + " على " + ck.left + " يوم.", "check");
+    }
+  }
+
+  // متكررة متأخرة
+  const pendIns = repsPending();
+  if (pendIns.length) {
+    const worst = pendIns[0], late = daysBetween(worst.date, todayISO());
+    push(late >= 3 ? "crit" : "warn", pendIns.length === 1 ? esc(worst.rp.name) + " مستحقة" : pendIns.length + " مصاريف متكررة مستحقة",
+      (late > 0 ? "معاد " + esc(worst.rp.name) + " عدى من " + late + " يوم" : "معاد " + esc(worst.rp.name) + " النهاردة") +
+      " (" + money2(worst.rp.amount) + "). سجّلها من الشاشة الرئيسية عشان الأرقام تفضل مظبوطة.", "repeat");
+  }
+  const shortIns = repShortfall();
+  if (shortIns) push("crit", esc(shortIns[0].w.name) + " مش هيكفي المصاريف الجاية",
+    "المستحق خلال أسبوعين " + money2(shortIns[0].need) + " والموجود " + money2(shortIns[0].have) + " — حوّل " + money2(shortIns[0].gap) + " من مكان تاني قبل المعاد.", "alert");
 
   // سلف قديمة
   const oldOut = state.debts.filter(d => d.dir === "out" && debtOpen(d) && daysBetween(d.date, todayISO()) >= 30)
@@ -1485,7 +1582,11 @@ async function offerBio() {
 
 /* ================= ui helpers ================= */
 let toastT = null;
-function toast(msg) { const t = el("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2600); }
+function toast(msg) {
+  const t = el("toast");
+  t.textContent = msg; t.classList.remove("hasbtn"); t.classList.add("on");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2600);
+}
 function pill(lv, txt) {
   const map = { crit: ["crit", "alert"], warn: ["warn", "alert"], good: ["good", "check"], info: ["flat", "info"] };
   const m = map[lv] || map.info;
@@ -1614,7 +1715,7 @@ const TABS = [
   { id: "tx", name: "حركات", ic: "tabList" },
   { id: "budget", name: "حدود", ic: "tabShield" },
   { id: "goals", name: "ادخار", ic: "tabTarget" },
-  { id: "stats", name: "مصاريف", ic: "tabChart" },
+  { id: "stats", name: "تحليل", ic: "tabChart" },
   { id: "income", name: "الدخل", ic: "up" },
   { id: "settings", name: "إعدادات", ic: "gear" }
 ];
@@ -1696,18 +1797,68 @@ function viewHome() {
       : (avgDay > 0 ? (tSpent > avgDay * 1.25 ? pill("warn", "فوق متوسطك") : pill("good", "في الطبيعي")) : "")) + "</span></div>" +
     '<div class="track"><i style="width:' + ratio.toFixed(1) + "%;background:" + tone + '"></i></div>' +
     '<div class="foot"><span>متوسطك <b>' + nf(avgDay, 0) + "</b> في اليوم</span>" +
-    "<span>" + (al ? (al.basis === "cash" ? "محسوب من فلوسك المتاحة" : al.basis === "budget" ? "محسوب من حدود الصرف" : "محسوب من دخلك") : "حدّد حدود صرف عشان نحسبلك") + "</span></div></button>";
+    "<span>" + (al ? (al.basis === "cap" ? "محسوب من حد الشهر" : al.basis === "cash" ? "محسوب من فلوسك المتاحة" : al.basis === "budget" ? "محسوب من حدود البنود" : "محسوب من دخلك") : "حدّد حدود صرف عشان نحسبلك") + "</span></div></button>";
+
+  // تسجيل سريع: اختصاراتك الأول
+  const sr = shortRail();
+  if (sr) h += grp("سجّل بضغطة", sr, { act: actBtn("shortcuts", "إدارة") });
+  else {
+    const qc = quickChips();
+    if (qc) h += grp("سجّل بضغطة", qc, { sub: "اتعلمناها من حركاتك", act: actBtn("shortcuts", "اعمل اختصار") });
+    else h += grp("سجّل بضغطة", '<div class="panel">' + rowEl({
+      act: "shortcuts", icon: "bolt", iconBg: "var(--accent-soft)", iconColor: "var(--accent)",
+      name: "اعمل اختصارات للحاجات المتكررة", wrap: true,
+      meta: "مواصلات الشغل بـ 16، مترو بـ 10 — ضغطة واحدة تسجلها."
+    }) + "</div>");
+  }
+
+  // المتكررة المستحقة
+  const pend = repsPending(), upc = repsUpcoming(7);
+  if (pend.length) {
+    h += grp("مستحقة النهاردة", '<div class="panel">' + pend.slice(0, 4).map(({ rp, date }) => {
+      const c = catById(rp.catId);
+      const late = daysBetween(date, todayISO());
+      return '<div class="r" style="flex-wrap:wrap">' +
+        '<span class="ri" style="background:color-mix(in srgb,var(--' + c.color + ') 14%, var(--surface));color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" +
+        '<span class="rt"><span class="rn">' + esc(rp.name) + '</span><span class="rm">' +
+        (late > 0 ? "معادها عدى من " + late + " يوم" : "معادها النهاردة") + " · " + esc(walletById(rp.walletId).name) + "</span></span>" +
+        '<span class="rv">' + nf(rp.amount) + "</span>" +
+        '<span style="display:flex;gap:7px;width:100%;margin-top:9px">' +
+        '<button class="btn pri" style="flex:1;padding:8px;font-size:13px" data-act="repDo" data-id="' + rp.id + '" data-v="' + date + '">' + ico("check") + (rp.type === "income" ? "استلمتها" : "اتدفعت") + "</button>" +
+        '<button class="btn" style="padding:8px 13px;font-size:13px" data-act="repSkip" data-id="' + rp.id + '" data-v="' + date + '">تخطّي</button></span></div>';
+    }).join("") + "</div>",
+      { sub: pend.length > 4 ? "أول 4 من " + pend.length : "", act: actBtn("repeats", "الكل") });
+  } else if (upc.length) {
+    const next = upc[0], inDays = daysBetween(todayISO(), next.date);
+    const short = repShortfall();
+    h += grp("جاي قريب", '<div class="panel">' +
+      upc.slice(0, 3).map(({ rp, date }) => {
+        const c = catById(rp.catId), dd = daysBetween(todayISO(), date);
+        return rowEl({
+          act: "repeats",
+          icon: c.icon, iconBg: "color-mix(in srgb,var(--" + c.color + ") 14%, var(--surface))", iconColor: "var(--" + c.color + ")",
+          name: esc(rp.name), meta: (dd === 1 ? "بكرة" : "بعد " + dd + " يوم") + " · " + esc(walletById(rp.walletId).name),
+          value: nf(rp.amount)
+        });
+      }).join("") +
+      (short ? rowEl({ icon: "alert", iconBg: "color-mix(in srgb,var(--crit) 12%, var(--surface))", iconColor: "var(--crit)",
+        name: esc(short[0].w.name) + " مش هيكفي", wrap: true,
+        meta: "المستحق " + money2(short[0].need) + " والموجود " + money2(short[0].have) + " — ناقص " + money2(short[0].gap) + ".", act: "repeats" }) : "") +
+      "</div>", { act: actBtn("repeats", "الكل") });
+  }
 
   // الشهر
-  const bt = budgetTotal();
+  const bt = budgetTotal(), capH = +state.settings.monthCap || 0;
   const prevExp = totalsOf(mkShift(mk, -1)).exp;
   const dpc = prevExp > 0 ? (T.exp - prevExp) / prevExp * 100 : null;
   h += grp("شهر " + AR_MONTHS[+mk.slice(5, 7) - 1],
     '<div class="bigstat" style="margin-bottom:0"><div class="lab">اتصرف لحد دلوقتي</div>' +
     '<div class="num2">' + nf(T.exp) + '<span class="cu">' + cur + "</span></div>" +
-    (bt > 0 ? '<div class="bar" style="margin-top:12px"><i class="' + progClass(T.exp / bt * 100) + '" style="width:' + clamp(T.exp / bt * 100, 0, 100) + '%"></i></div>' : "") +
+    (capH > 0 ? '<div class="bar" style="margin-top:12px"><i class="' + progClass(T.exp / capH * 100) + '" style="width:' + clamp(T.exp / capH * 100, 0, 100) + '%"></i></div>'
+      : bt > 0 ? '<div class="bar" style="margin-top:12px"><i class="' + progClass(T.exp / bt * 100) + '" style="width:' + clamp(T.exp / bt * 100, 0, 100) + '%"></i></div>' : "") +
     '<div class="meta">' +
-    (bt > 0 ? "<span>من حد <b>" + nf(bt) + "</b></span>" : "") +
+    (capH > 0 ? "<span>من حد الشهر <b>" + nf(capH) + "</b>" + (T.exp > capH ? " · عديته" : " · فاضل <b>" + nf(capH - T.exp) + "</b>") + "</span>"
+      : bt > 0 ? "<span>من حد <b>" + nf(bt) + "</b></span>" : "") +
     (T.inc > 0 ? "<span>دخل <b>" + nf(T.inc) + "</b></span>" : "") +
     (projected(mk) > 0 ? (projected(mk) > 0 ? "<span>متوقع آخر الشهر <b>" + nf(projected(mk), 0) + "</b></span>" : "") : "") +
     (dpc !== null && Math.abs(dpc) >= 3 ? "<span>" + (dpc > 0 ? "أعلى" : "أقل") + " من الشهر اللي فات بـ <b>" + Math.round(Math.abs(dpc)) + "%</b></span>" : "") +
@@ -1831,17 +1982,38 @@ function viewBudget() {
   const open = state.ui.openCat || "";
   let h = "";
 
-  h += '<div class="bigstat"><div class="lab">إجمالي الحدود الشهرية</div>' +
-    '<div class="num2">' + nf(bt) + '<span class="cu">' + cur + "</span></div>" +
-    (bt > 0 ? '<div class="bar" style="margin-top:12px"><i class="' + progClass(T.exp / bt * 100) + '" style="width:' + clamp(T.exp / bt * 100, 0, 100) + '%"></i></div>' : "") +
-    '<div class="meta">' +
-    (bt > 0 ? "<span>اتصرف <b>" + nf(T.exp) + "</b></span><span>فاضل <b>" + nf(Math.max(0, bt - T.exp)) + "</b></span>" +
-      (projected(mk) > 0 ? "<span>متوقع آخر الشهر <b>" + nf(projected(mk), 0) + "</b></span>" : "") : "<span>حدّد حد لكل بند عشان التطبيق ينبهك قبل ما تتعدى</span>") +
-    (inc > 0 && bt > 0 ? "<span>" + (bt > inc ? "أعلى من دخلك" : "يسيب <b>" + nf(inc - bt) + "</b> للادخار") + "</span>" : "") +
-    "</div>" +
-    '<div class="btnrow" style="margin-top:14px">' +
-    (inc > 0 ? '<button class="btn" data-act="suggest">' + ico("spark") + "اقترح حدود من دخلي</button>" : "") +
-    '<button class="btn" data-act="newCat">' + ico("plus") + "بند رئيسي</button></div></div>";
+  const cap = +state.settings.monthCap || 0;
+  const alB = allowance(mk);
+  if (cap > 0) {
+    const pc = T.exp / cap * 100;
+    h += '<div class="bigstat"><div class="lab">حد الشهر</div>' +
+      '<div class="num2">' + nf(T.exp) + '<span class="cu">من ' + nf(cap) + " " + cur + "</span></div>" +
+      '<div class="bar" style="margin-top:12px"><i class="' + progClass(pc) + '" style="width:' + clamp(pc, 0, 100) + '%"></i></div>' +
+      '<div class="meta">' +
+      (T.exp > cap ? '<span>عديت الحد بـ <b style="color:var(--down)">' + nf(T.exp - cap) + "</b></span>"
+        : "<span>فاضل <b>" + nf(cap - T.exp) + "</b></span>") +
+      (alB && alB.left > 0 && !alB.over ? "<span>يبقى <b>" + nf(alB.perDay, 0) + "</b> في اليوم على " + alB.left + " يوم</span>" : "") +
+      (projected(mk) > 0 ? "<span>متوقع آخر الشهر <b>" + nf(projected(mk), 0) + "</b></span>" : "") +
+      (inc > 0 ? "<span>" + (cap > inc ? "أعلى من دخلك" : "يسيب <b>" + nf(inc - cap) + "</b> للادخار") + "</span>" : "") +
+      "</div>" +
+      '<div class="btnrow" style="margin-top:14px"><button class="btn" data-act="setCap">' + ico("edit") + "عدّل حد الشهر</button></div></div>";
+  } else {
+    h += '<div class="bigstat"><div class="lab">اتصرف الشهر ده</div>' +
+      '<div class="num2">' + nf(T.exp) + '<span class="cu">' + cur + "</span></div>" +
+      '<p class="sub" style="margin:11px 0 0">مفيش حد للشهر لسه. حط رقم واحد لكل الشهر، والتطبيق هيقسّمه على الأيام الباقية ويقولك المسموح لك كل يوم.</p>' +
+      '<div class="btnrow" style="margin-top:14px"><button class="btn pri block" data-act="setCap">' + ico("tabShield") + "حدّد حد الشهر</button></div></div>";
+  }
+
+  h += grp("حدود البنود", '<div class="panel pad2">' +
+    '<div class="ftrow"><span>مجموع حدود البنود</span><b style="color:var(--ink);font-family:var(--ff-display);font-size:15px">' + nf(bt) + "</b></div>" +
+    (cap > 0 && bt > 0 ? '<p class="sub" style="margin:9px 0 0">' +
+      (bt > cap ? "مجموع البنود أعلى من حد الشهر بـ <b>" + nf(bt - cap) + "</b> — يعني لو كل بند وصل لحده هتعدّي الحد."
+        : bt < cap ? "فاضل <b>" + nf(cap - bt) + "</b> من حد الشهر لسه مش موزّع على بنود."
+          : "مجموع البنود مساوي لحد الشهر بالظبط.") + "</p>" : "") +
+    (bt === 0 ? '<p class="sub" style="margin:9px 0 0">اختياري — لو عايز تعرف أكتر بند بيعدّي، حط له حد لوحده.</p>' : "") +
+    '<div class="btnrow" style="margin-top:12px">' +
+    (inc > 0 || cap > 0 ? '<button class="btn" data-act="suggest">' + ico("spark") + "اقترح حدود" + (cap > 0 ? " من حد الشهر" : " من دخلي") + "</button>" : "") +
+    '<button class="btn" data-act="newCat">' + ico("plus") + "بند</button></div></div>");
 
   const roots = rootCats().map(c => {
     const sp = catTotal(c.id, r);
@@ -2054,6 +2226,217 @@ function catList(r, wf, parentId) {
     return catRowEl(c, v, total, { meta: meta });
   }).join("") + "</div>";
 }
+/* ---------- محرّك التحليل ---------- */
+/* أيام الفترة اللي عدّت فعلاً (مش الشهر كله لو لسه في نصه) */
+function rangeDays(r) {
+  const t = todayISO();
+  let last = "";
+  for (const x of state.txs) if (inRange(x.date, r) && x.date > last) last = x.date;
+  let end = r.to;
+  if (r.to >= t) end = (last && last > t) ? last : t;
+  if (end > r.to) end = r.to;
+  if (end < r.from) end = r.from;
+  const out = [];
+  let d = r.from, guard = 0;
+  while (d <= end && guard++ < 400) { out.push(d); d = shiftDay(d, 1); }
+  return out.length ? out : [r.from];
+}
+/* كل أرقام الفترة في حتة واحدة */
+function statsPack(r, wf) {
+  const exp = state.txs.filter(t => t.type === "expense" && inRange(t.date, r) && okW(t, wf));
+  const incL = state.txs.filter(t => t.type === "income" && inRange(t.date, r) && okW(t, wf));
+  const total = exp.reduce((s, t) => s + t.amount, 0);
+  const income = incL.reduce((s, t) => s + t.amount, 0);
+
+  const days = rangeDays(r), nd = days.length;
+  const byDay = {};
+  days.forEach(d => byDay[d] = 0);
+  exp.forEach(t => byDay[t.date] = (byDay[t.date] || 0) + t.amount);
+
+  let topDay = { iso: days[0], v: 0 }, zero = 0, over = 0;
+  const avgDay = total / nd;
+  days.forEach(d => {
+    const v = byDay[d] || 0;
+    if (v > topDay.v) topDay = { iso: d, v: v };
+    if (v <= 0.004) zero++; else if (v > avgDay) over++;
+  });
+
+  const sorted = exp.slice().sort((a, b) => b.amount - a.amount);
+  const avgTx = exp.length ? total / exp.length : 0;
+  const med = exp.length ? sorted[Math.floor(exp.length / 2)].amount : 0;
+
+  // أيام الأسبوع
+  const wd = [];
+  for (let i = 0; i < 7; i++) wd.push({ g: i, sum: 0, n: 0 });
+  days.forEach(d => { const g = new Date(d + "T00:00:00").getDay(); wd[g].sum += byDay[d] || 0; wd[g].n++; });
+  wd.forEach(x => x.avg = x.n ? x.sum / x.n : 0);
+
+  // ثابت (متكرر أو اختصار) مقابل متغير
+  let fixed = 0, fixedN = 0;
+  exp.forEach(t => { if (t.repId) { fixed += t.amount; fixedN++; } });
+
+  // شرايح حجم الحركة
+  const small = Math.max(10, Math.round(Math.max(avgTx / 3, 15) / 5) * 5);
+  const cuts = [small, small * 4, small * 20];
+  const buckets = [
+    { lab: "أقل من " + nf(cuts[0], 0), lo: 0, hi: cuts[0], n: 0, v: 0 },
+    { lab: nf(cuts[0], 0) + " – " + nf(cuts[1], 0), lo: cuts[0], hi: cuts[1], n: 0, v: 0 },
+    { lab: nf(cuts[1], 0) + " – " + nf(cuts[2], 0), lo: cuts[1], hi: cuts[2], n: 0, v: 0 },
+    { lab: "أكتر من " + nf(cuts[2], 0), lo: cuts[2], hi: Infinity, n: 0, v: 0 }
+  ];
+  exp.forEach(t => { const b = buckets.find(b => t.amount >= b.lo && t.amount < b.hi) || buckets[3]; b.n++; b.v += t.amount; });
+
+  // المحافظ
+  const byW = {};
+  exp.forEach(t => byW[t.walletId] = (byW[t.walletId] || 0) + t.amount);
+
+  // التوقّع لآخر الفترة
+  let proj = 0;
+  if (r.kind !== "day" && r.to >= todayISO() && nd >= 3) proj = avgDay * r.days;
+
+  return { r: r, wf: wf, exp: exp, incL: incL, total: total, income: income,
+    days: days, nd: nd, byDay: byDay, avgDay: avgDay, topDay: topDay, zero: zero, over: over,
+    sorted: sorted, avgTx: avgTx, med: med, wd: wd, fixed: fixed, fixedN: fixedN,
+    small: small, buckets: buckets, byW: byW, proj: proj };
+}
+/* قراءات مكتوبة من الأرقام نفسها */
+function readings(pk) {
+  const r = pk.r, wf = pk.wf, cur = esc(state.settings.currency), out = [];
+  const N = (v, d) => '<b class="num">' + nf(v, d) + "</b>";
+  const P = (v) => '<b class="num">' + Math.round(v) + "%</b>";
+  const push = (tone, ic, text, act, id, v) => out.push({ tone: tone, ic: ic, text: text, act: act, id: id, v: v });
+  if (!pk.exp.length) {
+    push("info", "info", "ما فيش أي مصروف مسجّل في الفترة دي، فمفيش حاجة أحللها.");
+    return out;
+  }
+  const isThisMonth = r.kind === "month" && r.from.slice(0, 7) === thisMK();
+
+  // 1) المسموح اليومي
+  if (isThisMonth && !wf) {
+    const a = allowance(thisMK());
+    if (a) {
+      if (a.over) push("warn", "alert", "عدّيت " + (a.basis === "cap" ? "حد الشهر" : a.basis === "budget" ? "مجموع حدودك" : "المخطط") +
+        " بـ " + N(Math.abs(a.rem)) + " " + cur + ". باقي " + N(a.left, 0) + " يوم في الشهر.", "tab", null, "budget");
+      else {
+        const d = pk.avgDay - a.perDay;
+        if (a.perDay > 0 && Math.abs(d) / Math.max(1, a.perDay) >= 0.08)
+          push(d > 0 ? "warn" : "good", d > 0 ? "tUp" : "tDown",
+            "متوسط يومك " + N(pk.avgDay, 0) + " والمسموح " + N(a.perDay, 0) + " — إنت " +
+            (d > 0 ? "فوق المعدّل بـ " : "تحت المعدّل بـ ") + N(Math.abs(d), 0) + " في اليوم.", "tab", null, "budget");
+        else push("good", "check", "ماشي على المعدّل: متوسط يومك " + N(pk.avgDay, 0) + " والمسموح " + N(a.perDay, 0) + ".", "tab", null, "budget");
+      }
+    }
+  }
+  // 2) التوقّع
+  if (pk.proj > 0 && r.kind === "month") {
+    const a = isThisMonth && !wf ? allowance(thisMK()) : null;
+    let t = "بالمعدل ده الشهر هيقفل على ~" + N(pk.proj) + " " + cur + ".";
+    let tone = "info";
+    if (a && a.base > 0) {
+      const g = pk.proj - a.base;
+      if (g > a.base * 0.02) { t += " يعني فوق " + (a.basis === "cap" ? "حدك" : "خطتك") + " بـ " + N(g) + "."; tone = "warn"; }
+      else { t += " يعني جوه " + (a.basis === "cap" ? "حدك" : "خطتك") + " بـ " + N(Math.abs(g)) + "."; tone = "good"; }
+    }
+    push(tone, "clock", t);
+  } else if (pk.proj > 0 && r.kind === "year") {
+    push("info", "clock", "بالمعدل ده السنة هتقفل على ~" + N(pk.proj) + " " + cur + ".");
+  }
+  // 3) أكبر بند ونصيبه
+  const cs = spendByRootIn(r, wf);
+  const ce = Object.entries(cs).sort((a, b) => b[1] - a[1]);
+  if (ce.length) {
+    const [id, v] = ce[0], c = catById(id), sh = v / pk.total * 100;
+    push(sh >= 50 ? "warn" : "info", c.icon, "أكبر بند: " + esc(c.name) + " بـ " + N(v) + " — " + P(sh) + " من صرفك" +
+      (ce.length > 1 ? "، وبعده " + esc(catById(ce[1][0]).name) + " بـ " + N(ce[1][1]) : "") + ".", "catDetail", id);
+  }
+  // 4) أكبر فرق عن الفترة اللي فاتت
+  const pr = prevRange(r), ps = spendByRootIn(pr, wf);
+  const ids = [...new Set([...Object.keys(cs), ...Object.keys(ps)])];
+  const mov = ids.map(id => ({ id: id, a: cs[id] || 0, b: ps[id] || 0, d: (cs[id] || 0) - (ps[id] || 0) }))
+    .sort((x, y) => Math.abs(y.d) - Math.abs(x.d));
+  const big = mov.find(m => Math.abs(m.d) >= Math.max(pk.total * 0.06, 1) && m.b > 0 && m.a > 0);
+  if (big) {
+    const c = catById(big.id), pc = Math.abs(big.d) / big.b * 100;
+    push(big.d > 0 ? "warn" : "good", big.d > 0 ? "tUp" : "tDown",
+      esc(c.name) + (big.d > 0 ? " زاد " : " قلّ ") + "عن " + pr.label + " بـ " + N(Math.abs(big.d)) +
+      " (" + P(pc) + ") — من " + N(big.b) + " لـ " + N(big.a) + ".", "catDetail", big.id);
+  }
+  // بنود جديدة أو وقفت
+  const fresh = mov.filter(m => m.b === 0 && m.a >= pk.total * 0.05).sort((x, y) => y.a - x.a)[0];
+  if (fresh) push("info", "spark", "بند جديد الفترة دي: " + esc(catById(fresh.id).name) + " بـ " + N(fresh.a) +
+    " — ما كانش فيه صرف عليه في " + pr.label + ".", "catDetail", fresh.id);
+  const gone = mov.filter(m => m.a === 0 && m.b > 0).sort((x, y) => y.b - x.b)[0];
+  if (gone) push("good", "tDown", "ما صرفتش خالص على " + esc(catById(gone.id).name) + " الفترة دي — كان " + N(gone.b) + " في " + pr.label + ".");
+  // 5) الحركات الصغيرة
+  const sm = pk.buckets[0];
+  if (sm.n >= 5 && sm.v >= pk.total * 0.06)
+    push("info", "coins", N(sm.n, 0) + " حركة صغيرة (أقل من " + nf(pk.small, 0) + " " + cur + ") مجموعها " + N(sm.v) +
+      " — " + P(sm.v / pk.total * 100) + " من صرفك راح حتة حتة.", "sview", null, "txs");
+  // 6) أكبر حركة
+  const t0 = pk.sorted[0];
+  if (t0 && pk.exp.length >= 3 && t0.amount >= pk.total * 0.15)
+    push("info", "alert", "أكبر حركة لوحدها " + N(t0.amount) + " (" + P(t0.amount / pk.total * 100) + " من الفترة): " +
+      esc(catPath(t0.catId)) + (t0.note ? " — " + esc(t0.note) : "") + " يوم " + dayLabel(t0.date) + ".", "pickDay", null, t0.date);
+  // 7) أعلى يوم
+  if (r.kind !== "day" && pk.topDay.v > 0 && pk.nd >= 4 && pk.topDay.v >= pk.avgDay * 1.8)
+    push("warn", "cal", "أعلى يوم: " + dayLabel(pk.topDay.iso) + " بـ " + N(pk.topDay.v) + " — " +
+      '<b class="num">' + (pk.topDay.v / Math.max(1, pk.avgDay)).toFixed(1) + "</b> ضعف متوسطك اليومي.", "pickDay", null, pk.topDay.iso);
+  // 8) أكتر يوم في الأسبوع
+  if (r.kind !== "day" && pk.nd >= 12) {
+    const act = pk.wd.filter(x => x.n >= 2 && x.avg > 0).sort((a, b) => b.avg - a.avg);
+    if (act.length >= 3 && act[0].avg >= pk.avgDay * 1.25)
+      push("info", "cal", "أكتر يوم بتصرف فيه: " + AR_DAYS[act[0].g] + " بمتوسط " + N(act[0].avg, 0) +
+        "، وأقلهم " + AR_DAYS[act[act.length - 1].g] + " بـ " + N(act[act.length - 1].avg, 0) + ".", "sview", null, "time");
+  }
+  // 9) أيام من غير صرف
+  if (r.kind !== "day" && pk.zero >= 2)
+    push("good", "check", "فيه " + N(pk.zero, 0) + " يوم ما صرفتش فيهم ولا جنيه من أصل " + N(pk.nd, 0) + " يوم.", "sview", null, "time");
+  // 10) ثابت ومتغير
+  if (pk.fixed > 0)
+    push("info", "repeat", "المصاريف الثابتة (المتكررة) " + N(pk.fixed) + " — " + P(pk.fixed / pk.total * 100) +
+      " من صرفك، والباقي " + N(pk.total - pk.fixed) + " متغيّر وإنت اللي متحكم فيه.", "tab", null, "budget");
+  // 11) من فين بتصرف
+  const we = Object.entries(pk.byW).sort((a, b) => b[1] - a[1]);
+  if (!wf && we.length > 1 && we[0][1] / pk.total >= 0.55)
+    push("info", walletById(we[0][0]).icon, "أغلب صرفك من " + esc(walletById(we[0][0]).name) + ": " +
+      N(we[0][1]) + " يعني " + P(we[0][1] / pk.total * 100) + ".", "sview", null, "txs");
+  // 12) الدخل مقابل الصرف
+  if (pk.income > 0) {
+    const nt = pk.income - pk.total;
+    push(nt < 0 ? "warn" : "good", nt < 0 ? "tUp" : "coins",
+      nt < 0 ? "صرفت أكتر من دخلك في الفترة دي بـ " + N(Math.abs(nt)) + " — الفرق جه من فلوس قديمة."
+        : "دخلك " + N(pk.income) + " وصرفت " + N(pk.total) + "، فضل " + N(nt) + " يعني " + P(nt / pk.income * 100) + " من دخلك.",
+      "tab", null, "income");
+  }
+  // 13) حدود البنود اللي اتعدّت
+  if (r.kind === "month" && !wf) {
+    const bust = rootCats().map(c => ({ c: c, v: cs[c.id] || 0, l: catLimit(c) }))
+      .filter(x => x.l > 0 && x.v > x.l).sort((a, b) => (b.v - b.l) - (a.v - a.l));
+    if (bust.length) {
+      const b0 = bust[0];
+      push("warn", "tabShield", (bust.length > 1 ? N(bust.length, 0) + " بنود عدّت حدها، أكبرهم " : "عدّيت حد ") +
+        esc(b0.c.name) + " بـ " + N(b0.v - b0.l) + " (" + N(b0.v) + " من " + N(b0.l) + ").", "catDetail", b0.c.id);
+    }
+  }
+  return out;
+}
+function insRow(o) {
+  const tone = o.tone === "warn" ? "var(--down)" : o.tone === "good" ? "var(--up)" : "var(--accent)";
+  const tag = o.act ? "button" : "div";
+  return "<" + tag + ' class="ins"' + (o.act ? ' data-act="' + o.act + '"' : "") +
+    (o.id ? ' data-id="' + o.id + '"' : "") + (o.v ? ' data-v="' + esc(o.v) + '"' : "") + ">" +
+    '<span class="ii" style="background:color-mix(in srgb,' + tone + ' 13%, var(--surface));color:' + tone + '">' + ico(o.ic) + "</span>" +
+    '<span class="it"><p>' + o.text + "</p></span>" +
+    (o.act ? '<span class="rc">' + ico("chevL") + "</span>" : "") + "</" + tag + ">";
+}
+function kTile(o) {
+  const tag = o.act ? "button" : "div";
+  return "<" + tag + ' class="k' + (o.wide ? " wide" : "") + '"' + (o.act ? ' data-act="' + o.act + '"' : "") +
+    (o.id ? ' data-id="' + o.id + '"' : "") + (o.v ? ' data-v="' + esc(o.v) + '"' : "") + ">" +
+    '<span class="kl">' + (o.ic ? ico(o.ic) : "") + o.lab + "</span>" +
+    '<span class="kv"' + (o.color ? ' style="color:' + o.color + '"' : "") + ">" + o.val + "</span>" +
+    (o.sub ? '<span class="ks">' + o.sub + "</span>" : "") + "</" + tag + ">";
+}
 function elapsedDays(r) {
   if (r.kind === "day") return 1;
   const t = todayISO();
@@ -2114,95 +2497,256 @@ function sheetCatDetail(catId) {
     : '<div class="panel"><div class="empty"><p>ما فيش حركات في الفترة دي.</p></div></div>', { sub: String(list.length) });
   openSheet(esc(c.name), h);
 }
+/* ---------- تاب التحليل ---------- */
+const SVIEWS = [["sum", "نظرة عامة"], ["cats", "البنود"], ["time", "الوقت"], ["txs", "الحركات"]];
 function viewStats() {
-  const wf = statWSet();
-  const r = curRange(), pr = prevRange(r), T = totalsIn(r, wf), P = totalsIn(pr, wf);
-  const list = txIn(r, wf).filter(t => t.type === "expense");
-  const cur = esc(state.settings.currency);
-  const elapsed = elapsedDays(r);
-  const diff = P.exp > 0 ? (T.exp - P.exp) / P.exp * 100 : null;
-  let h = periodNav() + walletFilterBar();
-
-  h += '<div class="bigstat"><div class="lab">' +
-    (r.kind === "day" ? "صرفت في اليوم ده" : r.kind === "year" ? "صرفت في السنة دي" : "صرفت في الشهر ده") +
-    (wf ? " · " + esc(statWLabel()) : "") + "</div>" +
-    '<div class="num2">' + nf(T.exp) + '<span class="cu">' + cur + "</span></div>" +
-    '<div class="meta">' +
-    (r.kind !== "day" ? "<span>متوسط اليوم <b>" + nf(T.exp / elapsed, 0) + "</b></span>" : "") +
-    "<span><b>" + list.length + "</b> حركة</span>" +
-    (T.inc > 0 ? "<span>دخل <b>" + nf(T.inc) + "</b></span>" : "") +
-    (diff !== null && Math.abs(diff) >= 1 ? "<span>" + (diff > 0 ? "أعلى" : "أقل") + " من " + pr.label + " بـ <b>" + Math.round(Math.abs(diff)) + "%</b></span>" : "") +
+  const wf = statWSet(), r = curRange(), pk = statsPack(r, wf);
+  const sv = SVIEWS.some(x => x[0] === state.ui.sv) ? state.ui.sv : "sum";
+  let h = periodNav() + walletFilterBar() +
+    '<div class="sview"><div class="segs">' + SVIEWS.map(x =>
+      '<button data-act="sview" data-v="' + x[0] + '" aria-pressed="' + (sv === x[0]) + '">' + x[1] + "</button>").join("") +
     "</div></div>";
+  h += statHead(pk);
+  if (sv === "sum") h += svSum(pk);
+  else if (sv === "cats") h += svCats(pk);
+  else if (sv === "time") h += svTime(pk);
+  else h += svTxs(pk);
+  if (sv === "sum") h += '<div id="aiSlot"></div>';
+  return h;
+}
+/* الرقم الكبير — ثابت فوق كل الأقسام */
+function statHead(pk) {
+  const r = pk.r, cur = esc(state.settings.currency), pr = prevRange(r);
+  const P = totalsIn(pr, pk.wf);
+  const diff = P.exp > 0 ? (pk.total - P.exp) / P.exp * 100 : null;
+  return '<div class="bigstat"><div class="lab">' +
+    (r.kind === "day" ? "صرفت في اليوم ده" : r.kind === "year" ? "صرفت في السنة دي" : "صرفت في الشهر ده") +
+    (pk.wf ? " · " + esc(statWLabel()) : "") + "</div>" +
+    '<div class="num2">' + nf(pk.total) + '<span class="cu">' + cur + "</span></div>" +
+    '<div class="meta">' +
+    (r.kind !== "day" ? "<span>متوسط اليوم <b>" + nf(pk.avgDay, 0) + "</b></span>" : "") +
+    "<span><b>" + pk.exp.length + "</b> حركة</span>" +
+    (pk.income > 0 ? "<span>دخل <b>" + nf(pk.income) + "</b></span>" : "") +
+    (diff !== null && Math.abs(diff) >= 1
+      ? "<span>" + (diff > 0 ? "أعلى" : "أقل") + " من " + pr.label + " بـ <b>" + Math.round(Math.abs(diff)) + "%</b></span>"
+      : P.exp === 0 && pk.total > 0 ? "<span>ما كانش فيه صرف في " + pr.label + "</span>" : "") +
+    "</div></div>";
+}
+/* ===== نظرة عامة ===== */
+function svSum(pk) {
+  const r = pk.r, cur = esc(state.settings.currency);
+  let h = "";
+  if (!pk.exp.length) return '<div class="panel"><div class="empty"><div class="eic">' + ico("pie") +
+    "</div><h4>ما فيش مصاريف في الفترة دي</h4><p>غيّر الفترة من فوق، أو سجّل حركة.</p></div></div>";
 
-  if (r.kind !== "day") h += grp(r.kind === "year" ? "الصرف على الشهور" : "الصرف يوم بيوم",
-    '<div class="panel pad2">' + periodBars(r, wf) + "</div>");
+  // مربعات الأرقام
+  const t0 = pk.sorted[0];
+  const tiles = [];
+  if (r.kind === "day") {
+    const mr = rangeOf("month", r.from.slice(0, 7)), mp = statsPack(mr, pk.wf);
+    const d = pk.total - mp.avgDay;
+    tiles.push({ ic: "scale", lab: "متوسط يومك في الشهر", val: nf(mp.avgDay, 0),
+      sub: Math.abs(d) < 1 ? "زي متوسطك بالظبط" : (d > 0 ? "النهاردة أعلى بـ " : "النهاردة أقل بـ ") + nf(Math.abs(d), 0),
+      color: d > 0 ? "var(--down)" : "var(--up)" });
+    tiles.push({ ic: "tabList", lab: "عدد الحركات", val: nf(pk.exp.length, 0), sub: "متوسط الحركة " + nf(pk.avgTx, 0) });
+    if (t0) tiles.push({ ic: "alert", lab: "أكبر حركة", val: nf(t0.amount), sub: esc(catPath(t0.catId)), act: "catDetail", id: rootIdOf(t0.catId) });
+    const y = shiftDay(r.from, -1), yv = spentOnDay(y, pk.wf);
+    tiles.push({ ic: "cal", lab: "امبارح", val: nf(yv), sub: "دوس تشوف تفاصيله", act: "pickDay", v: y });
+  } else {
+    tiles.push({ ic: "scale", lab: "متوسط اليوم", val: nf(pk.avgDay, 0), sub: "على " + nf(pk.nd, 0) + " يوم عدّوا" });
+    tiles.push({ ic: "tUp", lab: "أعلى يوم", val: nf(pk.topDay.v), sub: dayLabel(pk.topDay.iso), act: "pickDay", v: pk.topDay.iso });
+    tiles.push({ ic: "check", lab: "أيام من غير صرف", val: nf(pk.zero, 0), sub: pk.zero ? "من " + nf(pk.nd, 0) + " يوم" : "صرفت كل يوم", act: "sview", v: "time" });
+    tiles.push({ ic: "tabList", lab: "متوسط الحركة", val: nf(pk.avgTx, 0), sub: nf(pk.exp.length, 0) + " حركة · الوسيط " + nf(pk.med, 0), act: "sview", v: "txs" });
+    if (t0) tiles.push({ ic: "alert", lab: "أكبر حركة", val: nf(t0.amount), sub: esc(catPath(t0.catId)) + " · " + dayLabel(t0.date), act: "pickDay", v: t0.date });
+    if (pk.proj > 0) tiles.push({ ic: "clock", lab: r.kind === "year" ? "متوقّع آخر السنة" : "متوقّع آخر الشهر", val: "~" + nf(pk.proj), sub: "بنفس معدّل الصرف ده" });
+  }
+  h += '<div class="kgrid">' + tiles.map(kTile).join("") + "</div>";
 
+  // القراءات
+  const ins = readings(pk);
+  if (ins.length) h += grp("قراءات في أرقامك", '<div class="panel">' + ins.map(insRow).join("") + "</div>",
+    { sub: nf(ins.length, 0) + " ملاحظة" });
+
+  // أكبر ٣ بنود مختصرة
+  const cl = catListTop(r, pk.wf, 3);
+  if (cl) h += grp("أكتر ٣ بنود", cl, { act: actBtn("sview", "كل البنود", ' data-v="cats"') });
+
+  // مقارنة بالفترة اللي فاتت
+  h += cmpBlock(pk);
+  return h;
+}
+/* ===== البنود ===== */
+function svCats(pk) {
+  const r = pk.r, wf = pk.wf;
+  let h = "";
+  const d = donutRange(r, wf);
+  if (d) h += grp("التوزيع", '<div class="panel pad2">' + d.html + "</div>");
   const cl = catList(r, wf);
   if (cl) h += grp("فلوسك راحت فين", cl, { sub: "دوس على بند تشوف تفاصيله" });
-  else h += grp("فلوسك راحت فين", '<div class="panel"><div class="empty"><div class="eic">' + ico("pie") + "</div><h4>ما فيش مصاريف في الفترة دي</h4><p>غيّر الفترة أو سجّل حركات.</p></div></div>");
+  else h += grp("فلوسك راحت فين", '<div class="panel"><div class="empty"><div class="eic">' + ico("pie") +
+    "</div><h4>ما فيش مصاريف في الفترة دي</h4><p>غيّر الفترة أو سجّل حركات.</p></div></div>");
+
+  // البنود الفرعية كلها مرتبة
+  const leaf = {};
+  pk.exp.forEach(t => { const c = catById(t.catId); if (c.parent) leaf[t.catId] = (leaf[t.catId] || 0) + t.amount; });
+  const le = Object.entries(leaf).sort((a, b) => b[1] - a[1]).slice(0, 12);
+  if (le.length) {
+    const mx = le[0][1];
+    h += grp("البنود الفرعية", '<div class="panel">' + le.map(([id, v]) => {
+      const c = catById(id);
+      return rowEl({ act: "catDetail", id: id, icon: c.icon,
+        iconBg: "color-mix(in srgb,var(--" + c.color + ") 14%, var(--surface))", iconColor: "var(--" + c.color + ")",
+        name: esc(c.name), meta: esc(catById(c.parent).name), value: nf(v),
+        sub: Math.round(v / pk.total * 100) + "%", cls: "rank",
+        fill: (v / mx * 100).toFixed(1), fillColor: "var(--" + c.color + ")" });
+    }).join("") + "</div>", { sub: "الأدق تحت كل بند رئيسي" });
+  }
+  h += cmpBlock(pk);
+  if (r.kind === "month" && !wf) h += limitsBlock(pk);
+  return h;
+}
+/* ===== الوقت ===== */
+function svTime(pk) {
+  const r = pk.r, wf = pk.wf;
+  let h = "";
+  if (r.kind !== "day")
+    h += grp(r.kind === "year" ? "الصرف على الشهور" : "الصرف يوم بيوم", '<div class="panel pad2">' + periodBars(r, wf) + "</div>");
 
   if (r.kind === "day") {
+    const week = [];
+    for (let i = 6; i >= 0; i--) { const iso = shiftDay(r.from, -i); week.push({ iso: iso, v: spentOnDay(iso, wf) }); }
+    const wmax = Math.max(1, ...week.map(x => x.v));
+    h += grp("آخر ٧ أيام", '<div class="panel">' + week.map(x => {
+      const dt = new Date(x.iso + "T00:00:00");
+      const lbl = x.iso === todayISO() ? "النهاردة" : AR_DAYS[dt.getDay()] + " " + dt.getDate();
+      return rowEl({ act: "pickDay", v: x.iso, name: lbl, value: nf(x.v), cls: "rank",
+        fill: (x.v / wmax * 100).toFixed(1), fillColor: x.iso === r.from ? "var(--accent)" : "var(--s1)" });
+    }).join("") + "</div>");
     const dl = txIn(r, wf).sort((a, b) => (b.at || 0) - (a.at || 0));
     h += grp("حركات اليوم", dl.length
       ? '<div class="panel">' + dl.map(t => txRow(t, { date: false })).join("") + "</div>"
       : '<div class="panel"><div class="empty"><p>ما فيش حركات في اليوم ده.</p></div></div>', { sub: String(dl.length) });
-    const week = []; for (let i = 6; i >= 0; i--) { const iso = shiftDay(r.from, -i); week.push({ iso: iso, v: spentOnDay(iso, wf) }); }
-    const wmax = Math.max(1, ...week.map(x => x.v));
-    h += grp("آخر 7 أيام", '<div class="panel">' + week.map(x => {
-      const dt = new Date(x.iso + "T00:00:00");
-      const lbl = x.iso === todayISO() ? "النهاردة" : AR_DAYS[dt.getDay()].replace("الأ", "أ") + " " + dt.getDate();
-      return rowEl({ act: "pickDay", v: x.iso, name: lbl, value: nf(x.v), cls: "rank",
-        fill: (x.v / wmax * 100).toFixed(1), fillColor: x.iso === r.from ? "var(--accent)" : "var(--s1)" });
-    }).join("") + "</div>");
-  } else {
-    const unit = r.kind === "year" ? "month" : "day";
-    const tot = {};
-    list.forEach(t => { const k = unit === "month" ? t.date.slice(0, 7) : t.date; tot[k] = (tot[k] || 0) + t.amount; });
-    const keys = Object.keys(tot).sort((a, b) => b.localeCompare(a));
-    if (keys.length) {
-      const mx = Math.max(1, ...Object.values(tot));
-      h += grp(unit === "month" ? "الشهور" : "الأيام",
-        '<div class="panel">' + keys.map(k => rowEl({
-          act: unit === "month" ? "goMonth" : "pickDay", v: k,
-          name: unit === "month" ? mkLabel(k) : dayLabel(k), value: nf(tot[k]),
-          cls: "rank", fill: (tot[k] / mx * 100).toFixed(1), fillColor: "var(--accent)"
-        })).join("") + "</div>", { sub: "دوس عشان تفتح" });
-    }
+    return h;
   }
 
-  // اتصرف من فين
-  const byW = {};
-  list.forEach(t => byW[t.walletId] = (byW[t.walletId] || 0) + t.amount);
-  const wEnt = Object.entries(byW).sort((a, b) => b[1] - a[1]);
-  if (wEnt.length > 1 && !wf) {
-    h += grp("اتصرف من فين", '<div class="panel">' + wEnt.map(([id, v]) => {
+  // أيام / شهور مرتبة بالأكتر
+  const unit = r.kind === "year" ? "month" : "day";
+  const tot = {};
+  pk.exp.forEach(t => { const k = unit === "month" ? t.date.slice(0, 7) : t.date; tot[k] = (tot[k] || 0) + t.amount; });
+  const keys = Object.keys(tot).sort((a, b) => b.localeCompare(a));
+  if (keys.length) {
+    const mx = Math.max(1, ...Object.values(tot));
+    h += grp(unit === "month" ? "الشهور بالترتيب" : "الأيام بالترتيب",
+      '<div class="panel">' + keys.map(k => rowEl({
+        act: unit === "month" ? "goMonth" : "pickDay", v: k,
+        name: unit === "month" ? mkLabel(k) : dayLabel(k),
+        meta: unit === "day" && tot[k] > pk.avgDay * 1.5 ? "فوق متوسطك" : "",
+        value: nf(tot[k]), cls: "rank", fill: (tot[k] / mx * 100).toFixed(1), fillColor: "var(--accent)"
+      })).join("") + "</div>", { sub: "دوس عشان تفتح" });
+  }
+
+  // أيام الأسبوع
+  if (pk.nd >= 7) {
+    const act = pk.wd.filter(x => x.n > 0);
+    const mx = Math.max(1, ...act.map(x => x.avg));
+    h += grp("أيام الأسبوع", '<div class="panel">' + act.slice().sort((a, b) => b.avg - a.avg).map(x =>
+      rowEl({ name: AR_DAYS[x.g], meta: nf(x.n, 0) + (x.n === 1 ? " مرة" : x.n === 2 ? " مرتين" : " مرات") + " · إجمالي " + nf(x.sum),
+        value: nf(x.avg, 0), sub: "متوسط", cls: "rank", fill: (x.avg / mx * 100).toFixed(1),
+        fillColor: x.avg >= mx ? "var(--down)" : "var(--s1)" })).join("") + "</div>",
+      { sub: "متوسط اليوم الواحد" });
+  }
+  return h;
+}
+/* ===== الحركات ===== */
+function svTxs(pk) {
+  const r = pk.r, wf = pk.wf, cur = esc(state.settings.currency);
+  let h = "";
+  if (!pk.exp.length) return '<div class="panel"><div class="empty"><p>ما فيش حركات في الفترة دي.</p></div></div>';
+
+  // أكبر الحركات
+  const top = pk.sorted.slice(0, 8);
+  h += grp("أكبر الحركات", '<div class="panel">' + top.map(t => txRow(t, { date: r.kind !== "day" })).join("") + "</div>",
+    { sub: "مجموعهم " + nf(top.reduce((s, t) => s + t.amount, 0)) });
+
+  // حجم الحركات
+  const bs = pk.buckets.filter(b => b.n > 0);
+  if (bs.length > 1) {
+    const mx = Math.max(...bs.map(b => b.v));
+    h += grp("حجم الحركات", '<div class="panel">' + bs.map(b => rowEl({
+      name: b.lab + " " + cur, meta: nf(b.n, 0) + " حركة · " + Math.round(b.v / pk.total * 100) + "% من الصرف",
+      value: nf(b.v), cls: "rank", fill: (b.v / mx * 100).toFixed(1), fillColor: "var(--s1)"
+    })).join("") + "</div>", { sub: "فين فلوسك بتروح: شوية كبار ولا كتير صغار" });
+  }
+
+  // ثابت ومتغير
+  if (pk.fixed > 0) {
+    const varv = pk.total - pk.fixed;
+    h += grp("ثابت ومتغيّر", '<div class="panel">' +
+      rowEl({ icon: "repeat", iconBg: "color-mix(in srgb,var(--s7) 14%, var(--surface))", iconColor: "var(--s7)",
+        name: "مصاريف ثابتة", meta: nf(pk.fixedN, 0) + " حركة متكررة", value: nf(pk.fixed),
+        sub: Math.round(pk.fixed / pk.total * 100) + "%", cls: "rank", fill: (pk.fixed / pk.total * 100).toFixed(1), fillColor: "var(--s7)" }) +
+      rowEl({ icon: "spark", iconBg: "color-mix(in srgb,var(--s2) 14%, var(--surface))", iconColor: "var(--s2)",
+        name: "مصاريف متغيّرة", meta: "دي اللي تقدر تقلّلها", value: nf(varv),
+        sub: Math.round(varv / pk.total * 100) + "%", cls: "rank", fill: (varv / pk.total * 100).toFixed(1), fillColor: "var(--s2)" }) +
+      "</div>");
+  }
+
+  // من فين اتصرف
+  const we = Object.entries(pk.byW).sort((a, b) => b[1] - a[1]);
+  if (we.length > 1) {
+    h += grp("اتصرف من فين", '<div class="panel">' + we.map(([id, v]) => {
       const w = walletById(id);
       return rowEl({ icon: w.icon, iconBg: "color-mix(in srgb,var(--" + w.color + ") 14%, var(--surface))", iconColor: "var(--" + w.color + ")",
-        name: esc(w.name), value: nf(v), sub: Math.round(v / T.exp * 100) + "%",
-        cls: "rank", fill: (v / T.exp * 100).toFixed(1), fillColor: "var(--" + w.color + ")" });
+        name: esc(w.name), value: nf(v), sub: Math.round(v / pk.total * 100) + "%",
+        cls: "rank", fill: (v / pk.total * 100).toFixed(1), fillColor: "var(--" + w.color + ")" });
     }).join("") + "</div>");
   }
 
-  // مقارنة
+  // كل الحركات
+  const all = pk.exp.slice().sort((a, b) => b.date.localeCompare(a.date) || (b.at || 0) - (a.at || 0));
+  h += grp("كل الحركات", '<div class="panel">' + all.slice(0, 60).map(t => txRow(t, { date: r.kind !== "day" })).join("") +
+    (all.length > 60 ? '<div class="empty" style="padding:13px"><p>وفيه ' + nf(all.length - 60, 0) + " حركة كمان — افتح تاب الحركات للبحث فيهم كلهم.</p></div>" : "") +
+    "</div>", { sub: nf(all.length, 0) + " حركة" });
+  return h;
+}
+/* أكتر N بند */
+function catListTop(r, wf, n) {
+  const ent = Object.entries(spendByRootIn(r, wf)).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
+  if (!ent.length) return "";
+  const total = ent.reduce((s, e) => s + e[1], 0);
+  return '<div class="panel">' + ent.slice(0, n).map(([id, v]) => catRowEl(catById(id), v, total, {})).join("") + "</div>";
+}
+/* مقارنة بالفترة اللي فاتت */
+function cmpBlock(pk) {
+  const r = pk.r, wf = pk.wf, pr = prevRange(r);
   const cs = spendByRootIn(r, wf), ps = spendByRootIn(pr, wf);
   const ids = [...new Set([...Object.keys(cs), ...Object.keys(ps)])];
   const mov = ids.map(id => ({ c: catById(id), d: (cs[id] || 0) - (ps[id] || 0), a: cs[id] || 0, b: ps[id] || 0 }))
-    .filter(m => Math.abs(m.d) > 0).sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 5);
-  if (mov.length) {
-    h += grp("مقارنة بـ " + pr.label, '<div class="panel">' + mov.map(m => rowEl({
-      act: "catDetail", id: m.c.id,
-      icon: m.c.icon, iconBg: "color-mix(in srgb,var(--" + m.c.color + ") 14%, var(--surface))", iconColor: "var(--" + m.c.color + ")",
-      name: esc(m.c.name), meta: '<span class="num">' + nf(m.b) + " ← " + nf(m.a) + "</span>",
-      value: '<span style="color:' + (m.d > 0 ? "var(--down)" : "var(--up)") + '"><span class="num">' + (m.d > 0 ? "+" : "−") + nf(Math.abs(m.d)) + "</span></span>"
-    })).join("") + "</div>");
-  }
-
-  // الدونت كعرض ثانوي
-  const d = donutRange(r, wf);
-  if (d) h += grp("التوزيع", '<div class="panel pad2">' + d.html + "</div>");
-
-  h += '<div id="aiSlot"></div>';
-  return h;
+    .filter(m => Math.abs(m.d) > 0).sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 6);
+  if (!mov.length) return "";
+  return grp("مقارنة بـ " + pr.label, '<div class="panel">' + mov.map(m => rowEl({
+    act: "catDetail", id: m.c.id, icon: m.c.icon,
+    iconBg: "color-mix(in srgb,var(--" + m.c.color + ") 14%, var(--surface))", iconColor: "var(--" + m.c.color + ")",
+    name: esc(m.c.name), meta: '<span class="num">' + nf(m.b) + " ← " + nf(m.a) + "</span>",
+    value: '<span style="color:' + (m.d > 0 ? "var(--down)" : "var(--up)") + '"><span class="num">' +
+      (m.d > 0 ? "+" : "−") + nf(Math.abs(m.d)) + "</span></span>"
+  })).join("") + "</div>", { sub: "اللي زاد واللي قلّ" });
+}
+/* حالة الحدود */
+function limitsBlock(pk) {
+  const cs = spendByRootIn(pk.r, pk.wf);
+  const rows = rootCats().map(c => ({ c: c, v: cs[c.id] || 0, l: catLimit(c) })).filter(x => x.l > 0);
+  if (!rows.length) return "";
+  rows.sort((a, b) => (b.v / b.l) - (a.v / a.l));
+  return grp("وقفتك من الحدود", '<div class="panel">' + rows.map(x => {
+    const p = x.v / x.l * 100;
+    return rowEl({ act: "catDetail", id: x.c.id, icon: x.c.icon,
+      iconBg: "color-mix(in srgb,var(--" + x.c.color + ") 14%, var(--surface))", iconColor: "var(--" + x.c.color + ")",
+      name: esc(x.c.name), meta: '<span class="num">' + nf(x.v) + " من " + nf(x.l) + "</span>" +
+        (x.v > x.l ? " · عدّيت بـ " + nf(x.v - x.l) : " · فاضل " + nf(x.l - x.v)),
+      value: Math.round(p) + "%", cls: "rank", fill: Math.min(100, p).toFixed(1),
+      fillColor: p >= 100 ? "var(--down)" : p >= 80 ? "var(--s4)" : "var(--up)" });
+  }).join("") + "</div>");
 }
 function viewOnboard() {
   return '<div class="ob"><div class="obhead"><div class="mark">' + ico("coins") + "</div>" +
@@ -2319,9 +2863,12 @@ function openSheet(title, body, onMount) {
 }
 function closeSheet() { el("backdrop").hidden = true; el("sheet").innerHTML = ""; document.body.style.overflow = ""; sheetMount = null; }
 
-function lastUsedWallet() {
-  const last = state.txs.filter(t => t.type !== "transfer").sort((a, b) => (b.at || 0) - (a.at || 0))[0];
-  return last && walletById(last.walletId).id === last.walletId ? last.walletId : (state.wallets[0] || {}).id;
+function lastUsedWallet(catId) {
+  const pool = state.txs.filter(t => t.type !== "transfer" && (!catId || t.catId === catId));
+  const last = pool.sort((a, b) => (b.at || 0) - (a.at || 0))[0];
+  if (last && state.wallets.some(w => w.id === last.walletId)) return last.walletId;
+  if (catId) return lastUsedWallet("");
+  return richestSpendWallet() || (state.wallets[0] || {}).id;
 }
 function sheetTx(id) {
   const t = id ? state.txs.find(x => x.id === id) : null;
@@ -2331,6 +2878,8 @@ function sheetTx(id) {
     '<button data-act="txType" data-v="expense" aria-pressed="' + (type === "expense") + '">مصروف</button>' +
     '<button data-act="txType" data-v="income" aria-pressed="' + (type === "income") + '">دخل</button>' +
     '<button data-act="txType" data-v="transfer" aria-pressed="' + (type === "transfer") + '">تحويل</button></div>' +
+    (!id && state.shortcuts.length ? '<div class="field"><label>اختصاراتك</label>' +
+      '<div class="qrail">' + state.shortcuts.slice().sort((a, b) => (+b.uses || 0) - (+a.uses || 0)).slice(0, 8).map(sc => shortChip(sc, true)).join("") + "</div></div>" : "") +
     '<div class="field"><label for="txAmt">المبلغ</label><input class="inp big" id="txAmt" type="number" inputmode="decimal" step="0.01" value="' + (t ? t.amount : "") + '" placeholder="0"></div>' +
     '<div class="keypad" style="margin:-6px 0 14px">' + [10, 25, 50, 100, 200, 500, 1000, "مسح"].map(v =>
       '<button data-act="quick" data-v="' + v + '">' + (v === "مسح" ? "مسح" : '<span class="num">+' + v + "</span>") + "</button>").join("") + "</div>" +
@@ -2354,7 +2903,9 @@ function sheetTx(id) {
     const sh = el("sheet");
     sh.dataset.type = type;
     sh.dataset.cat = t ? t.catId || "" : "";
-    sh.dataset.wallet = t ? (t.type === "transfer" ? t.fromWallet : t.walletId) || lastUsedWallet() : lastUsedWallet();
+    sh.dataset.txid = id || "";
+    sh.dataset.wtouched = "";
+    sh.dataset.wallet = t ? (t.type === "transfer" ? t.fromWallet : t.walletId) || lastUsedWallet() : lastUsedWallet(sh.dataset.cat);
     sh.dataset.towallet = t && t.type === "transfer" ? t.toWallet : (state.wallets.find(w => w.id !== sh.dataset.wallet) || {}).id || "";
     paintTxForm();
     sh.addEventListener("input", (e) => {
@@ -2924,6 +3475,436 @@ function incomeAdvice(r, T, prevT) {
   return out;
 }
 
+/* ================= تسجيل سريع =================
+   بيطلع أكتر الحركات اللي بتتكرر بنفس البند والمبلغ تقريباً */
+function frequentTxs(limit) {
+  const since = shiftDay(todayISO(), -75);
+  const map = {};
+  for (const t of state.txs) {
+    if (t.type !== "expense" || t.date < since || t.repId) continue;
+    const bucket = t.amount < 100 ? 5 : t.amount < 500 ? 25 : 100;
+    const key = t.catId + "|" + Math.round(t.amount / bucket) * bucket + "|" + (t.note || "").trim();
+    if (!map[key]) map[key] = { catId: t.catId, note: (t.note || "").trim(), amounts: [], walletId: t.walletId, last: t.date, n: 0 };
+    const e = map[key];
+    e.n++; e.amounts.push(t.amount);
+    if (t.date >= e.last) { e.last = t.date; e.walletId = t.walletId; }
+  }
+  return Object.values(map)
+    .filter(e => e.n >= 2)
+    .map(e => {
+      const sorted = e.amounts.slice().sort((a, b) => a - b);
+      e.amount = sorted[Math.floor(sorted.length / 2)];
+      e.score = e.n * 2 + Math.max(0, 30 - daysBetween(e.last, todayISO())) / 10;
+      return e;
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit || 6);
+}
+function quickChips() {
+  const f = frequentTxs(6);
+  if (!f.length) return "";
+  return '<div class="qrail">' + f.map((e, i) => {
+    const c = catById(e.catId);
+    return '<button class="qchip" data-act="quickAdd" data-v="' + i + '">' +
+      '<span class="qi" style="background:color-mix(in srgb,var(--' + c.color + ') 15%, var(--surface));color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" +
+      '<span class="qn">' + esc(e.note || c.name) + "</span>" +
+      '<span class="qa"><span class="num">' + nf(e.amount) + "</span></span></button>";
+  }).join("") +
+    '<button class="qchip add" data-act="newTx" aria-label="حركة جديدة">' + ico("plus") + "</button></div>";
+}
+function quickAdd(i) {
+  const f = frequentTxs(6), e = f[+i];
+  if (!e) return;
+  const date = todayISO();
+  const wid = state.wallets.some(w => w.id === e.walletId) ? e.walletId : richestSpendWallet();
+  const tx = {
+    id: uid("t"), type: "expense", amount: e.amount, catId: e.catId, walletId: wid,
+    fromWallet: "", toWallet: "", date: date, note: e.note, at: Date.now()
+  };
+  state.txs.push(tx);
+  save("m:" + mkOf(date));
+  render();
+  lastAdded = tx.id;
+  toastUndo(esc(e.note || catById(e.catId).name) + " · " + money2(e.amount), "undoTx", tx.id);
+}
+/* تراجع بعد الحذف أو الإضافة السريعة */
+let lastAdded = "", undoBin = null, undoTimer = null;
+function toastUndo(msg, act, id) {
+  const t = el("toast");
+  t.innerHTML = '<span>' + msg + '</span><button class="undo" data-act="' + act + '" data-id="' + id + '">تراجع</button>';
+  t.classList.add("on", "hasbtn");
+  clearTimeout(toastT);
+  toastT = setTimeout(() => { t.classList.remove("on", "hasbtn"); }, 5000);
+}
+function undoAdd(id) {
+  const t = state.txs.find(x => x.id === id); if (!t) return;
+  state.txs = state.txs.filter(x => x.id !== id);
+  save("m:" + mkOf(t.date));
+  el("toast").classList.remove("on", "hasbtn");
+  render(); toast("اترجعت");
+}
+function undoDelete() {
+  if (!undoBin) return;
+  const { tx } = undoBin;
+  state.txs.push(tx);
+  save("m:" + mkOf(tx.date));
+  undoBin = null;
+  el("toast").classList.remove("on", "hasbtn");
+  render(); toast("رجّعنا الحركة");
+}
+/* ================= اختصارات بتعملها بنفسك ================= */
+function shortGroups() {
+  const g = {};
+  state.shortcuts.forEach(sc => {
+    const k = (sc.group || "").trim() || "من غير مجموعة";
+    (g[k] = g[k] || []).push(sc);
+  });
+  return Object.keys(g).map(k => ({ name: k, items: g[k] }));
+}
+function shortcutNames() {
+  return [...new Set(state.shortcuts.map(s => (s.group || "").trim()).filter(Boolean))];
+}
+function addFromShortcut(id) {
+  const sc = state.shortcuts.find(x => x.id === id); if (!sc) return;
+  const amt = +sc.amount || 0;
+  if (!(amt > 0)) { // اختصار من غير مبلغ ثابت: يفتح الفورم جاهز
+    closeSheet();
+    setTimeout(() => {
+      sheetTx();
+      setTimeout(() => {
+        const sh = el("sheet"); if (!sh) return;
+        sh.dataset.cat = sc.catId;
+        sh.dataset.wallet = state.wallets.some(w => w.id === sc.walletId) ? sc.walletId : lastUsedWallet(sc.catId);
+        sh.dataset.wtouched = "1";
+        const n = el("txNote"); if (n) n.value = sc.name;
+        paintTxForm();
+        const a = el("txAmt"); if (a) a.focus();
+      }, 90);
+    }, 160);
+    return;
+  }
+  const date = todayISO();
+  const wid = state.wallets.some(w => w.id === sc.walletId) ? sc.walletId : lastUsedWallet(sc.catId);
+  const tx = {
+    id: uid("t"), type: sc.type || "expense", amount: amt, catId: sc.catId, walletId: wid,
+    fromWallet: "", toWallet: "", date: date, note: sc.name, scId: sc.id, at: Date.now()
+  };
+  state.txs.push(tx);
+  sc.uses = (+sc.uses || 0) + 1; sc.lastUsed = date;
+  save("shortcuts", "m:" + mkOf(date));
+  if (!el("backdrop").hidden) closeSheet();
+  render();
+  toastUndo(esc(sc.name) + " · " + money2(amt), "undoTx", tx.id);
+}
+function shortChip(sc, compact) {
+  const c = catById(sc.catId);
+  return '<button class="qchip' + (compact ? " sm" : "") + '" data-act="useShort" data-id="' + sc.id + '">' +
+    '<span class="qi" style="background:color-mix(in srgb,var(--' + c.color + ') 15%, var(--surface));color:var(--' + c.color + ')">' + ico(sc.icon || c.icon) + "</span>" +
+    '<span class="qn">' + esc(sc.name) + "</span>" +
+    '<span class="qa">' + (+sc.amount > 0 ? '<span class="num">' + nf(sc.amount) + "</span>" : '<span style="font-size:12.5px;color:var(--muted)">اكتب المبلغ</span>') + "</span></button>";
+}
+function shortRail() {
+  if (!state.shortcuts.length) return "";
+  const list = state.shortcuts.slice().sort((a, b) => (+b.uses || 0) - (+a.uses || 0) || (a.order || 0) - (b.order || 0));
+  return '<div class="qrail">' + list.slice(0, 10).map(sc => shortChip(sc)).join("") +
+    '<button class="qchip add" data-act="shortcuts" aria-label="إدارة الاختصارات">' + ico("gear") + "</button></div>";
+}
+function sheetShortcuts() {
+  const groups = shortGroups();
+  let h = '<p class="sub" style="margin:0 0 14px">الحاجات اللي بتدفعها باستمرار بنفس المبلغ — مواصلات الشغل، المترو، القهوة. سجّلها مرة، وبعد كده ضغطة واحدة تسجلها.</p>';
+  h += '<div class="btnrow" style="margin-bottom:16px"><button class="btn pri block" data-act="newShort">' + ico("plus") + "اختصار جديد</button></div>";
+  if (!state.shortcuts.length) {
+    h += '<div class="panel"><div class="empty"><div class="eic">' + ico("bolt") + "</div><h4>ما فيش اختصارات لسه</h4>" +
+      "<p>مثال: « مواصلات الشغل » بـ 16، « مترو » بـ 10. تحطهم في مجموعة « مواصلات » وتلاقيهم مع بعض.</p></div></div>";
+    return openSheet("اختصارات التسجيل", h);
+  }
+  groups.forEach(g => {
+    h += grp(esc(g.name), '<div class="panel">' + g.items.map(sc => {
+      const c = catById(sc.catId);
+      return rowEl({
+        act: "editShort", id: sc.id,
+        icon: sc.icon || c.icon, iconBg: "color-mix(in srgb,var(--" + c.color + ") 14%, var(--surface))", iconColor: "var(--" + c.color + ")",
+        name: esc(sc.name),
+        meta: esc(catPath(sc.catId)) + " · " + esc(walletById(sc.walletId).name) + ((+sc.uses || 0) > 0 ? " · اتسجلت " + sc.uses + " مرة" : ""),
+        value: +sc.amount > 0 ? nf(sc.amount) : "—"
+      });
+    }).join("") + "</div>", { sub: String(g.items.length) });
+  });
+  openSheet("اختصارات التسجيل", h);
+}
+function sheetShort(id) {
+  const sc = id ? state.shortcuts.find(x => x.id === id) : null;
+  const gs = shortcutNames();
+  const body =
+    '<div class="field"><label for="scName">الاسم</label><input class="inp" id="scName" value="' + esc(sc ? sc.name : "") + '" placeholder="مثلاً: مواصلات الشغل"></div>' +
+    '<div class="field"><label for="scAmt">المبلغ</label><input class="inp big" id="scAmt" type="number" inputmode="decimal" value="' + (sc && +sc.amount > 0 ? sc.amount : "") + '" placeholder="0">' +
+    '<p class="sub" style="margin:7px 0 0">سيبه فاضي لو المبلغ بيتغيّر — الاختصار هيفتحلك الفورم جاهز وإنت تكتب المبلغ.</p></div>' +
+    '<div class="field"><label for="scGroup">المجموعة</label><input class="inp" id="scGroup" value="' + esc(sc ? sc.group || "" : "") + '" placeholder="مثلاً: مواصلات" list="scGroups" autocomplete="off">' +
+    (gs.length ? '<datalist id="scGroups">' + gs.map(g => '<option value="' + esc(g) + '"></option>').join("") + "</datalist>" : "") + "</div>" +
+    '<div class="field"><label>البند</label><div class="chips" id="scCats"></div></div>' +
+    '<div class="field" id="scSubsF" hidden></div>' +
+    '<div class="field"><label>تتدفع من فين؟</label><div class="chips" id="scW"></div></div>' +
+    '<div class="btnrow"><button class="btn pri" style="flex:1" data-act="saveShort" data-id="' + (id || "") + '">' + ico("check") + "حفظ</button>" +
+    (id ? '<button class="btn danger" data-act="delShort" data-id="' + id + '">' + ico("trash") + "حذف</button>" : "") + "</div>";
+  openSheet(sc ? "تعديل « " + sc.name + " »" : "اختصار جديد", body, () => {
+    const sh = el("sheet");
+    sh.dataset.cat = sc ? sc.catId : "";
+    sh.dataset.wallet = sc ? sc.walletId : richestSpendWallet();
+    paintShortForm();
+    setTimeout(() => { const n = el("scName"); if (n && !sc) n.focus(); }, 60);
+  });
+}
+function paintShortForm() {
+  const sh = el("sheet");
+  const roots = rootCats();
+  let cur = state.categories.find(c => c.id === sh.dataset.cat);
+  if (!cur) { cur = roots[0]; sh.dataset.cat = cur ? cur.id : ""; }
+  const rootId = cur && cur.parent ? cur.parent : (cur ? cur.id : "");
+  el("scCats").innerHTML = roots.map(c =>
+    '<button class="chip" data-act="scRoot" data-v="' + c.id + '" aria-pressed="' + (c.id === rootId) + '" style="' + (c.id === rootId ? "color:var(--" + c.color + ")" : "") + '">' +
+    '<span style="color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" + esc(c.name) + "</button>").join("");
+  const kids = childCats(rootId), sub = el("scSubsF");
+  sub.hidden = !kids.length;
+  if (kids.length) sub.innerHTML = '<label>تحديد أدق</label><div class="chips">' +
+    '<button class="chip" data-act="scCat" data-v="' + rootId + '" aria-pressed="' + (sh.dataset.cat === rootId) + '">' + esc(catById(rootId).name) + " عام</button>" +
+    kids.map(c => '<button class="chip" data-act="scCat" data-v="' + c.id + '" aria-pressed="' + (c.id === sh.dataset.cat) + '" style="' + (c.id === sh.dataset.cat ? "color:var(--" + c.color + ")" : "") + '">' +
+      '<span style="color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" + esc(c.name) + "</button>").join("") + "</div>";
+  walletChips("scW", sh.dataset.wallet, "scWallet");
+}
+/* ================= المصاريف المتكررة =================
+   every: "month" (يوم محدد في الشهر) | "week" (يوم في الأسبوع)
+   lastDone: آخر تاريخ اتسجلت فيه فعلاً  */
+function repDueDates(rp, fromISO, toISO) {
+  const out = [];
+  if (rp.paused) return out;
+  const start = rp.startedAt && rp.startedAt > fromISO ? rp.startedAt : fromISO;
+  if (start > toISO) return out;
+  if (rp.every === "week") {
+    let d = start;
+    const wd = clamp(+rp.weekday || 0, 0, 6);
+    for (let i = 0; i < 400 && d <= toISO; i++) {
+      if (new Date(d + "T00:00:00").getDay() === wd) out.push(d);
+      d = shiftDay(d, 1);
+    }
+    return out;
+  }
+  const day = clamp(+rp.day || 1, 1, 31);
+  let mk = start.slice(0, 7);
+  const endMk = toISO.slice(0, 7);
+  for (let i = 0; i < 400; i++) {
+    const dim = daysIn(mk);
+    const iso = mk + "-" + String(Math.min(day, dim)).padStart(2, "0");
+    if (iso >= start && iso <= toISO) out.push(iso);
+    if (mk >= endMk) break;
+    mk = mkShift(mk, 1);
+  }
+  return out;
+}
+function repNextDue(rp) {
+  const today = todayISO();
+  const after = rp.lastDone && rp.lastDone >= today ? shiftDay(rp.lastDone, 1) : today;
+  const win = repDueDates(rp, after, shiftDay(today, 70));
+  return win.length ? win[0] : "";
+}
+/* المستحق دلوقتي: كل معاد عدى ولسه ما اتسجلش */
+function repPending(rp) {
+  const today = todayISO();
+  const from = rp.lastDone ? shiftDay(rp.lastDone, 1) : (rp.startedAt || today);
+  return repDueDates(rp, from, today).filter(d => !(rp.skipped || []).includes(d));
+}
+function repsPending() {
+  const out = [];
+  state.repeats.forEach(rp => repPending(rp).forEach(d => out.push({ rp: rp, date: d })));
+  return out.sort((a, b) => a.date.localeCompare(b.date));
+}
+/* الجاي خلال كام يوم */
+function repsUpcoming(days) {
+  const today = todayISO(), to = shiftDay(today, days || 7);
+  const out = [];
+  state.repeats.forEach(rp => {
+    const from = rp.lastDone && rp.lastDone >= today ? shiftDay(rp.lastDone, 1) : shiftDay(today, 1);
+    repDueDates(rp, from, to).forEach(d => { if (!(rp.skipped || []).includes(d)) out.push({ rp: rp, date: d }); });
+  });
+  return out.sort((a, b) => a.date.localeCompare(b.date));
+}
+function repLabel(rp) {
+  if (rp.every === "week") return "كل " + AR_DAYS[clamp(+rp.weekday || 0, 0, 6)];
+  return "يوم " + clamp(+rp.day || 1, 1, 31) + " من كل شهر";
+}
+/* تحذير: المستحق الجاي أكبر من اللي في المحفظة */
+function repShortfall() {
+  const up = repsUpcoming(14).concat(repsPending());
+  if (!up.length) return null;
+  const wb = walletBalances();
+  const need = {};
+  up.forEach(({ rp }) => {
+    if (rp.type !== "expense") return;
+    need[rp.walletId] = (need[rp.walletId] || 0) + (+rp.amount || 0);
+  });
+  const short = [];
+  Object.keys(need).forEach(wid => {
+    const have = wb[wid] || 0;
+    if (need[wid] > have) short.push({ w: walletById(wid), need: need[wid], have: have, gap: need[wid] - have });
+  });
+  return short.length ? short.sort((a, b) => b.gap - a.gap) : null;
+}
+function doRepeat(rpId, dateISO, mode) {
+  const rp = state.repeats.find(x => x.id === rpId); if (!rp) return;
+  if (mode === "skip") {
+    rp.skipped = (rp.skipped || []).concat([dateISO]).slice(-60);
+    if (!rp.lastDone || dateISO > rp.lastDone) rp.lastDone = dateISO;
+    save("repeats"); render(); toast("اتخطّينا " + esc(rp.name) + " المرة دي");
+    return;
+  }
+  const tx = {
+    id: uid("t"), type: rp.type || "expense", amount: +rp.amount || 0,
+    catId: rp.catId, walletId: rp.walletId, fromWallet: "", toWallet: "",
+    date: dateISO, note: rp.note || rp.name, repId: rp.id, at: Date.now()
+  };
+  state.txs.push(tx);
+  rp.lastDone = (!rp.lastDone || dateISO > rp.lastDone) ? dateISO : rp.lastDone;
+  save("repeats", "m:" + mkOf(dateISO));
+  render();
+  toast("اتسجلت " + esc(rp.name) + " · " + money2(tx.amount));
+}
+
+function sheetRepeats() {
+  const pend = repsPending(), up = repsUpcoming(14);
+  let h = "";
+  if (pend.length) {
+    h += grp("مستحقة دلوقتي", '<div class="panel">' + pend.map(({ rp, date }) => {
+      const c = catById(rp.catId);
+      return '<div class="r" style="flex-wrap:wrap">' +
+        '<span class="ri" style="background:color-mix(in srgb,var(--' + c.color + ') 14%, var(--surface));color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" +
+        '<span class="rt"><span class="rn">' + esc(rp.name) + '</span><span class="rm">' + esc(walletById(rp.walletId).name) + " · " + dayLabel(date) + "</span></span>" +
+        '<span class="rv">' + nf(rp.amount) + "</span>" +
+        '<span style="display:flex;gap:7px;width:100%;margin-top:9px">' +
+        '<button class="btn pri" style="flex:1;padding:8px;font-size:13px" data-act="repDo" data-id="' + rp.id + '" data-v="' + date + '">' + ico("check") + "اتدفعت</button>" +
+        '<button class="btn" style="padding:8px 13px;font-size:13px" data-act="repSkip" data-id="' + rp.id + '" data-v="' + date + '">تخطّي</button></span></div>';
+    }).join("") + "</div>", { sub: String(pend.length) });
+  }
+  if (up.length) {
+    h += grp("جاية قريب", '<div class="panel">' + up.slice(0, 8).map(({ rp, date }) => {
+      const c = catById(rp.catId), inDays = daysBetween(todayISO(), date);
+      return rowEl({
+        act: "repEdit", id: rp.id, chev: false,
+        icon: c.icon, iconBg: "color-mix(in srgb,var(--" + c.color + ") 14%, var(--surface))", iconColor: "var(--" + c.color + ")",
+        name: esc(rp.name), meta: (inDays === 1 ? "بكرة" : "بعد " + inDays + " يوم") + " · " + esc(walletById(rp.walletId).name),
+        value: nf(rp.amount)
+      });
+    }).join("") + "</div>");
+  }
+  const all = state.repeats.slice().sort((a, b) => (a.paused ? 1 : 0) - (b.paused ? 1 : 0) || (+a.day || 0) - (+b.day || 0));
+  h += grp("كل المتكررة", all.length
+    ? '<div class="panel">' + all.map(rp => {
+      const c = catById(rp.catId);
+      return rowEl({
+        act: "repEdit", id: rp.id,
+        icon: c.icon, iconBg: "color-mix(in srgb,var(--" + c.color + ") 14%, var(--surface))", iconColor: "var(--" + c.color + ")",
+        name: esc(rp.name) + (rp.paused ? " — موقوفة" : ""),
+        meta: repLabel(rp) + " · " + esc(catPath(rp.catId)) + " · " + esc(walletById(rp.walletId).name),
+        value: (rp.type === "income" ? "+" : "") + nf(rp.amount)
+      });
+    }).join("") + "</div>"
+    : '<div class="panel"><div class="empty"><div class="eic">' + ico("repeat") + "</div><h4>ما فيش حاجة متكررة</h4>" +
+    "<p>الإيجار والنت والموبايل بتتكرر كل شهر. سجّلها مرة، والتطبيق هيفكّرك في معادها ويسجّلها بضغطة.</p></div></div>",
+    { act: actBtn("newRep", "جديدة") });
+
+  const short = repShortfall();
+  if (short) {
+    h += grp("انتبه", '<div class="panel">' + short.map(x => rowEl({
+      icon: "alert", iconBg: "color-mix(in srgb,var(--crit) 12%, var(--surface))", iconColor: "var(--crit)",
+      name: esc(x.w.name) + " مش هيكفي", wrap: true,
+      meta: "المستحق خلال أسبوعين " + money2(x.need) + " والموجود " + money2(x.have) + " — ناقص " + money2(x.gap) + "."
+    })).join("") + "</div>");
+  }
+  openSheet("المصاريف المتكررة", h);
+}
+function sheetRep(id) {
+  const rp = id ? state.repeats.find(x => x.id === id) : null;
+  const type = rp ? rp.type || "expense" : "expense";
+  const body =
+    '<div class="segs" style="margin-bottom:14px">' +
+    '<button data-act="repType" data-v="expense" aria-pressed="' + (type === "expense") + '">مصروف</button>' +
+    '<button data-act="repType" data-v="income" aria-pressed="' + (type === "income") + '">دخل</button></div>' +
+    '<div class="field"><label for="rpName">الاسم</label><input class="inp" id="rpName" value="' + esc(rp ? rp.name : "") + '" placeholder="مثلاً: إيجار الشقة"></div>' +
+    '<div class="field"><label for="rpAmt">المبلغ</label><input class="inp big" id="rpAmt" type="number" inputmode="decimal" value="' + (rp ? rp.amount : "") + '" placeholder="0"></div>' +
+    '<div class="field"><label>كل قد إيه؟</label><div class="segs">' +
+    '<button data-act="repEvery" data-v="month" aria-pressed="' + (!rp || rp.every !== "week") + '">كل شهر</button>' +
+    '<button data-act="repEvery" data-v="week" aria-pressed="' + (!!(rp && rp.every === "week")) + '">كل أسبوع</button></div></div>' +
+    '<div class="field" id="rpDayF"><label for="rpDay">يوم كام في الشهر؟</label>' +
+    '<input class="inp" id="rpDay" type="number" inputmode="numeric" min="1" max="31" value="' + (rp && rp.day ? rp.day : 1) + '">' +
+    '<p class="sub" style="margin:7px 0 0">لو الشهر أقصر من اليوم ده، هيتحسب آخر يوم في الشهر.</p></div>' +
+    '<div class="field" id="rpWdF" hidden><label>يوم إيه؟</label><div class="chips" id="rpWd"></div></div>' +
+    '<div class="field" id="rpCatsF"><label>البند</label><div class="chips" id="rpCats"></div></div>' +
+    '<div class="field" id="rpSubsF" hidden></div>' +
+    '<div class="field"><label id="rpWlbl">تتدفع من فين؟</label><div class="chips" id="rpW"></div></div>' +
+    '<div class="field"><label for="rpNote">ملاحظة (اختياري)</label><input class="inp" id="rpNote" value="' + esc(rp ? rp.note || "" : "") + '"></div>' +
+    (rp ? '<label class="chk"><input type="checkbox" id="rpPause"' + (rp.paused ? " checked" : "") + '><span>أوقفها مؤقتاً</span></label>' : "") +
+    '<div class="card pad" id="rpPrev" style="margin:14px 0"></div>' +
+    '<div class="btnrow"><button class="btn pri" style="flex:1" data-act="saveRep" data-id="' + (id || "") + '">' + ico("check") + "حفظ</button>" +
+    (id ? '<button class="btn danger" data-act="delRep" data-id="' + id + '">' + ico("trash") + "حذف</button>" : "") + "</div>";
+  openSheet(rp ? "تعديل « " + rp.name + " »" : "مصروف متكرر جديد", body, () => {
+    const sh = el("sheet");
+    sh.dataset.rtype = type;
+    sh.dataset.revery = rp ? rp.every || "month" : "month";
+    sh.dataset.rwd = String(rp && rp.weekday != null ? rp.weekday : 0);
+    sh.dataset.cat = rp ? rp.catId : "";
+    sh.dataset.wallet = rp ? rp.walletId : richestSpendWallet();
+    paintRepForm();
+    ["rpAmt", "rpDay"].forEach(k => { const n = el(k); if (n) n.addEventListener("input", repPreview); });
+    setTimeout(() => { const n = el("rpName"); if (n && !rp) n.focus(); }, 60);
+  });
+}
+function paintRepForm() {
+  const sh = el("sheet"), type = sh.dataset.rtype, every = sh.dataset.revery;
+  el("rpDayF").hidden = every !== "month";
+  el("rpWdF").hidden = every !== "week";
+  el("rpWlbl").textContent = type === "income" ? "تدخل فين؟" : "تتدفع من فين؟";
+  if (every === "week") {
+    el("rpWd").innerHTML = AR_DAYS.map((d, i) =>
+      '<button class="chip" data-act="repWd" data-v="' + i + '" aria-pressed="' + (String(i) === sh.dataset.rwd) + '">' + d + "</button>").join("");
+  }
+  // البنود
+  if (type === "income") {
+    if (!INCOME_CATS.some(c => c.id === sh.dataset.cat)) sh.dataset.cat = INCOME_CATS[0].id;
+    el("rpCats").innerHTML = INCOME_CATS.map(c =>
+      '<button class="chip" data-act="repCat" data-v="' + c.id + '" aria-pressed="' + (c.id === sh.dataset.cat) + '" style="' + (c.id === sh.dataset.cat ? "color:var(--" + c.color + ")" : "") + '">' +
+      '<span style="color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" + esc(c.name) + "</button>").join("");
+    el("rpSubsF").hidden = true;
+  } else {
+    const roots = rootCats();
+    let cur = state.categories.find(c => c.id === sh.dataset.cat);
+    if (!cur) { cur = roots[0]; sh.dataset.cat = cur ? cur.id : ""; }
+    const rootId = cur && cur.parent ? cur.parent : (cur ? cur.id : "");
+    el("rpCats").innerHTML = roots.map(c =>
+      '<button class="chip" data-act="repRoot" data-v="' + c.id + '" aria-pressed="' + (c.id === rootId) + '" style="' + (c.id === rootId ? "color:var(--" + c.color + ")" : "") + '">' +
+      '<span style="color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" + esc(c.name) + "</button>").join("");
+    const kids = childCats(rootId), sub = el("rpSubsF");
+    sub.hidden = !kids.length;
+    if (kids.length) sub.innerHTML = '<label>تحديد أدق</label><div class="chips">' +
+      '<button class="chip" data-act="repCat" data-v="' + rootId + '" aria-pressed="' + (sh.dataset.cat === rootId) + '">' + esc(catById(rootId).name) + " عام</button>" +
+      kids.map(c => '<button class="chip" data-act="repCat" data-v="' + c.id + '" aria-pressed="' + (c.id === sh.dataset.cat) + '" style="' + (c.id === sh.dataset.cat ? "color:var(--" + c.color + ")" : "") + '">' +
+        '<span style="color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" + esc(c.name) + "</button>").join("") + "</div>";
+  }
+  walletChips("rpW", sh.dataset.wallet, "repWallet");
+  repPreview();
+}
+function repPreview() {
+  const box = el("rpPrev"); if (!box) return;
+  const sh = el("sheet");
+  const draft = {
+    every: sh.dataset.revery, day: parseInt(el("rpDay").value, 10) || 1,
+    weekday: +sh.dataset.rwd, startedAt: todayISO(), lastDone: ""
+  };
+  const amt = parseFloat(el("rpAmt").value) || 0;
+  const next = repNextDue(draft);
+  const perYear = draft.every === "week" ? 52 : 12;
+  box.innerHTML = '<div class="ftrow" style="padding:3px 0;border-bottom:1px solid var(--line)"><span>المعاد الجاي</span>' +
+    '<b style="color:var(--ink);font-family:var(--ff-display)">' + (next ? fmtDate(next) : "—") + "</b></div>" +
+    '<div class="ftrow" style="padding:6px 0 0"><span>في السنة</span><b style="color:var(--ink);font-family:var(--ff-display)">' +
+    (amt > 0 ? nf(amt * perYear) + " " + esc(state.settings.currency) : "—") + "</b></div>";
+}
 function viewIncome() {
   const wf = statWSet();
   const r = curRange(), pr = prevRange(r);
@@ -3030,6 +4011,15 @@ function viewSettings() {
   let h = '<h2 class="sec" style="margin-top:6px">حسابك</h2><div class="card">' +
     srow("stProfile", "wallet", "بياناتك الأساسية", (s.name ? esc(s.name) + " · " : "") + "دخل " + nf(s.income) + " · ادخار " + nf(s.savePct) + "%") +
     srow("wallets", "coins", "أماكن الفلوس", state.wallets.length + " مكان · إجمالي " + nf(B.total) + " " + esc(s.currency)) +
+    srow("shortcuts", "bolt", "اختصارات التسجيل",
+      state.shortcuts.length ? state.shortcuts.length + " اختصار" : "الحاجات اللي بتدفعها باستمرار — ضغطة واحدة",
+      state.shortcuts.length ? "" : pill("flat", "فاضية")) +
+    srow("setCap", "tabShield", "حد الشهر",
+      (+state.settings.monthCap || 0) > 0 ? nf(state.settings.monthCap) + " " + esc(state.settings.currency) + " لكل الشهر" : "رقم واحد للشهر كله — منه بيتحسب المسموح اليومي",
+      (+state.settings.monthCap || 0) > 0 ? pill("good", "شغال") : pill("flat", "مش محدد")) +
+    srow("repeats", "repeat", "مصاريف متكررة",
+      state.repeats.length ? state.repeats.length + " مسجلة" + (repsPending().length ? " · " + repsPending().length + " مستحقة دلوقتي" : "") : "الإيجار والنت والاشتراكات — سجّلها مرة",
+      repsPending().length ? pill("warn", "مستحقة") : "") +
     srow("debts", "handOut", "سلف وديون", B.debts.owedToMe || B.debts.iOwe
       ? "ليك " + nf(B.debts.owedToMe) + " · عليك " + nf(B.debts.iOwe)
       : "ما فيش سلف مفتوحة") +
@@ -3173,14 +4163,26 @@ function addTxFromSheet(id) {
   if (mkOf(date) <= thisMK()) { state.ui.mk = mkOf(date); state.ui.day = date; state.ui.year = date.slice(0, 4); }
   closeSheet(); render();
 }
+function capPrev() {
+  const box = el("capPrev"); if (!box) return;
+  const v = parseFloat(el("capAmt").value) || 0;
+  const mk = thisMK(), ck = monthClock(mk), T = totalsOf(mk);
+  if (!(v > 0)) { box.innerHTML = '<p class="sub" style="margin:0">اكتب رقم وهنوريك هيطلع كام في اليوم.</p>'; return; }
+  const rem = v - T.exp;
+  box.innerHTML =
+    '<div class="ftrow" style="padding:3px 0;border-bottom:1px solid var(--line)"><span>اتصرف الشهر ده</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(T.exp) + "</b></div>" +
+    '<div class="ftrow" style="padding:6px 0;border-bottom:1px solid var(--line)"><span>' + (rem < 0 ? "زيادة عن الحد" : "فاضل") + '</span><b style="color:' + (rem < 0 ? "var(--down)" : "var(--ink)") + ';font-family:var(--ff-display)">' + nf(Math.abs(rem)) + "</b></div>" +
+    '<div class="ftrow" style="padding:6px 0 3px"><span>يبقى في اليوم على ' + ck.left + ' يوم</span><b style="color:var(--accent);font-family:var(--ff-display);font-size:16px">' +
+    (ck.left > 0 && rem > 0 ? nf(rem / ck.left, 0) : "0") + "</b></div>";
+}
 function suggestLimits() {
-  const inc = +state.settings.income || 0;
-  if (!(inc > 0)) return toast("حدّد دخلك الشهري في الإعدادات الأول");
-  const avail = inc * (1 - (+state.settings.savePct || 0) / 100);
+  const cap = +state.settings.monthCap || 0, inc = +state.settings.income || 0;
+  const avail = cap > 0 ? cap : inc * (1 - (+state.settings.savePct || 0) / 100);
+  if (!(avail > 0)) return toast("حدّد حد الشهر أو دخلك الأول");
   const totalPct = state.categories.reduce((s, c) => s + (+c.pct || 0), 0) || 100;
   state.categories.forEach(c => { c.limit = Math.round(avail * (+c.pct || 0) / totalPct / 5) * 5; });
   save("categories"); render();
-  toast("اتحطت حدود مقترحة — عدّلها زي ما تحب");
+  toast("اتوزّع " + money2(avail) + " على البنود — عدّلها زي ما تحب");
 }
 /* ---------- backup & restore ---------- */
 async function saveFile(name, text, mime) {
@@ -3290,6 +4292,8 @@ function sheetRestore(fileName) {
     row("البنود", nf((d.categories || []).length)) +
     row("أهداف الادخار", nf((d.goals || []).length)) +
     row("سلف وديون", nf((d.debts || []).length)) +
+    row("مصاريف متكررة", nf((d.repeats || []).length)) +
+    row("اختصارات", nf((d.shortcuts || []).length)) +
     (savedAt && !isNaN(savedAt) ? row("تاريخ النسخة", fmtDate(savedAt.toISOString().slice(0, 10))) : "") +
     '<div class="ftrow" style="padding:6px 0"><span>حركات جديدة مش عندك</span><span style="color:var(--ink);font-weight:600">' + nf(fresh) + "</span></div></div>" +
     '<div class="btnrow" style="flex-direction:column;align-items:stretch">' +
@@ -3312,6 +4316,8 @@ function applyRestore(mode) {
     (d.categories || []).forEach(c => { if (c && c.id && !state.categories.some(x => x.id === c.id)) state.categories.push(c); });
     (d.goals || []).forEach(g => { if (g && g.id && !state.goals.some(x => x.id === g.id)) state.goals.push(g); });
     (d.debts || []).forEach(x => { if (x && x.id && !state.debts.some(y => y.id === x.id)) state.debts.push(x); });
+    (d.repeats || []).forEach(x => { if (x && x.id && !state.repeats.some(y => y.id === x.id)) state.repeats.push(x); });
+    (d.shortcuts || []).forEach(x => { if (x && x.id && !state.shortcuts.some(y => y.id === x.id)) state.shortcuts.push(x); });
   }
   state.txs.forEach(t => touched.add(mkOf(t.date)));
   save("settings", "wallets", "categories", "goals", "debts");
@@ -3651,15 +4657,18 @@ document.addEventListener("click", (ev) => {
     case "newTx": sheetTx(); break;
     case "editTx": sheetTx(id); break;
     case "txType": sh.dataset.type = v; sh.querySelectorAll('[data-act="txType"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); paintTxForm(); break;
-    case "pickCat": sh.dataset.cat = v; paintTxForm(); break;
-    case "pickRoot": {
-      const kids = childCats(v);
+    case "pickCat":
       sh.dataset.cat = v;
+      if (!sh.dataset.txid && !sh.dataset.wtouched) sh.dataset.wallet = lastUsedWallet(v);
       paintTxForm();
       break;
-    }
+    case "pickRoot":
+      sh.dataset.cat = v;
+      if (!sh.dataset.txid && !sh.dataset.wtouched) sh.dataset.wallet = lastUsedWallet(v);
+      paintTxForm();
+      break;
     case "newSub": { const pid = v; closeSheet(); setTimeout(() => { sheetCat(null, pid); const t = el("sheet"); if (t) t.dataset.backTx = "1"; }, 180); break; }
-    case "pickWallet": sh.dataset.wallet = v; paintTxForm(); break;
+    case "pickWallet": sh.dataset.wallet = v; sh.dataset.wtouched = "1"; paintTxForm(); break;
     case "pickTo": sh.dataset.towallet = v; paintTxForm(); break;
     case "splitToggle": {
       const box = el("splitBox"), on = box.hidden;
@@ -3689,9 +4698,41 @@ document.addEventListener("click", (ev) => {
     case "saveTx": addTxFromSheet(id); break;
     case "delTx": {
       const t = state.txs.find(x => x.id === id); if (!t) break;
-      state.txs = state.txs.filter(x => x.id !== id); save("m:" + mkOf(t.date)); closeSheet(); render(); toast("اتمسحت");
+      undoBin = { tx: JSON.parse(JSON.stringify(t)) };
+      state.txs = state.txs.filter(x => x.id !== id); save("m:" + mkOf(t.date)); closeSheet(); render();
+      toastUndo("اتمسحت الحركة", "undoDel", "");
       break;
     }
+    case "quickAdd": quickAdd(v); break;
+    case "shortcuts": closeSheet(); setTimeout(sheetShortcuts, 160); break;
+    case "newShort": closeSheet(); setTimeout(() => sheetShort(), 180); break;
+    case "editShort": closeSheet(); setTimeout(() => sheetShort(id), 180); break;
+    case "useShort": addFromShortcut(id); break;
+    case "scRoot": case "scCat": sh.dataset.cat = v; paintShortForm(); break;
+    case "scWallet": sh.dataset.wallet = v; paintShortForm(); break;
+    case "saveShort": {
+      const name = el("scName").value.trim().slice(0, 40);
+      if (!name) return toast("اكتب اسم الاختصار");
+      const amt = Math.max(0, Math.round((parseFloat(el("scAmt").value) || 0) * 100) / 100);
+      if (!sh.dataset.cat) return toast("اختار البند");
+      const data = {
+        name: name, amount: amt, catId: sh.dataset.cat, walletId: sh.dataset.wallet,
+        group: el("scGroup").value.trim().slice(0, 30), type: "expense",
+        icon: catById(sh.dataset.cat).icon
+      };
+      if (id) { const sc = state.shortcuts.find(x => x.id === id); Object.assign(sc, data); }
+      else state.shortcuts.push(Object.assign({ id: uid("sc"), uses: 0, lastUsed: "", order: state.shortcuts.length, at: Date.now() }, data));
+      save("shortcuts"); closeSheet(); render();
+      toast(id ? "اتحفظ" : "اتضاف — هتلاقيه على الشاشة الرئيسية");
+      break;
+    }
+    case "delShort": {
+      state.shortcuts = state.shortcuts.filter(x => x.id !== id);
+      save("shortcuts"); closeSheet(); render(); toast("اتمسح");
+      break;
+    }
+    case "undoTx": undoAdd(id); break;
+    case "undoDel": undoDelete(); break;
     case "newCat": sheetCat(); break;
     case "newSubCat": sheetCat(null, id); break;
     case "toggleCat": state.ui.openCat = state.ui.openCat === id ? "" : id; render(); break;
@@ -3722,6 +4763,33 @@ document.addEventListener("click", (ev) => {
       break;
     }
     case "suggest": suggestLimits(); break;
+    case "setCap": {
+      const cur0 = +state.settings.monthCap || 0;
+      const inc0 = +state.settings.income || 0;
+      const last = totalsOf(mkShift(thisMK(), -1)).exp;
+      openSheet("حد الشهر",
+        '<p class="sub" style="margin:0 0 14px">رقم واحد لكل الشهر مش موزّع على بنود. التطبيق هيقسّمه على الأيام الباقية ويقولك المسموح لك كل يوم.</p>' +
+        '<div class="field"><label for="capAmt">الحد الشهري</label><input class="inp big" id="capAmt" type="number" inputmode="decimal" value="' + (cur0 || "") + '" placeholder="0"></div>' +
+        (last > 0 || inc0 > 0 ? '<div class="chips" style="margin:-4px 0 14px">' +
+          (last > 0 ? '<button class="chip" data-act="capSet" data-v="' + Math.round(last / 50) * 50 + '">زي الشهر اللي فات <span class="num">' + nf(Math.round(last / 50) * 50) + "</span></button>" : "") +
+          (last > 0 ? '<button class="chip" data-act="capSet" data-v="' + Math.round(last * 0.9 / 50) * 50 + '">أقل 10%</button>' : "") +
+          (inc0 > 0 ? '<button class="chip" data-act="capSet" data-v="' + Math.round(inc0 * (1 - (+state.settings.savePct || 0) / 100) / 50) * 50 + '">دخلي ناقص الادخار</button>' : "") +
+          "</div>" : "") +
+        '<div class="card pad" id="capPrev" style="margin-bottom:14px"></div>' +
+        '<button class="btn pri block" data-act="saveCap">' + ico("check") + "حفظ</button>" +
+        (cur0 > 0 ? '<button class="btn ghost block" style="margin-top:9px" data-act="clearCap">شيل حد الشهر</button>' : ""),
+        () => { capPrev(); const n = el("capAmt"); if (n) { n.addEventListener("input", capPrev); setTimeout(() => { n.focus(); n.select(); }, 60); } });
+      break;
+    }
+    case "capSet": { const n = el("capAmt"); if (n) { n.value = v; capPrev(); } break; }
+    case "saveCap": {
+      const v2 = Math.max(0, parseFloat(el("capAmt").value) || 0);
+      state.settings.monthCap = v2;
+      save("settings"); closeSheet(); render();
+      toast(v2 > 0 ? "حد الشهر بقى " + money2(v2) : "اتشال حد الشهر");
+      break;
+    }
+    case "clearCap": state.settings.monthCap = 0; save("settings"); closeSheet(); render(); toast("اتشال حد الشهر"); break;
     case "newGoal": sheetGoal(); break;
     case "editGoal": sheetGoal(id); break;
     case "goalMode": sh.dataset.gmode = v; paintGoalMode(); break;
@@ -3868,18 +4936,19 @@ document.addEventListener("click", (ev) => {
       openSheet("الرقم ده جاي منين؟",
         (al2 ? '<div class="card pad" style="margin-bottom:14px">' +
           '<div class="ftrow" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>الأساس</span><b style="color:var(--ink)">' +
-          (al2.basis === "budget" ? "حدود الصرف" : al2.basis === "income" ? "دخلك الشهري" : "فلوسك المتاحة") + "</b></div>" +
+          (al2.basis === "cap" ? "حد الشهر" : al2.basis === "budget" ? "حدود البنود" : al2.basis === "income" ? "دخلك الشهري" : "فلوسك المتاحة") + "</b></div>" +
           '<div class="ftrow" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>المتاح</span><b style="color:var(--ink);font-family:var(--ff-display)">' + nf(al2.rem) + "</b></div>" +
           '<div class="ftrow" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>أيام فاضلة في الشهر</span><b style="color:var(--ink);font-family:var(--ff-display)">' + al2.left + "</b></div>" +
           '<div class="ftrow" style="padding:4px 0"><span>يبقى في اليوم</span><b style="color:var(--accent);font-family:var(--ff-display);font-size:16px">' + nf(al2.perDay, 0) + "</b></div></div>" +
           '<p class="sub" style="margin:0 0 14px">' + esc(al2.why) + ".</p>" : "") +
         '<hr class="sep"><h4 style="margin:0 0 7px;font-family:var(--ff-display);font-size:14.5px">والمتوسط؟</h4>' +
         '<p class="sub" style="margin:0 0 14px">متوسط اليوم = اللي صرفته الشهر ده (' + nf(T2.exp) + ") مقسوم على عدد الأيام اللي عدت (" + ck3.day + ") = <b>" + nf(ck3.day > 0 ? T2.exp / ck3.day : 0, 0) + "</b> في اليوم. ده رقم فعلي من حركاتك مش تقدير.</p>" +
-        (al2 && al2.basis === "cash" ? '<div class="card pad" style="background:var(--accent-soft);border-color:var(--accent-line)"><p class="sub" style="margin:0;color:var(--ink-2)">إنت مش كاتب دخل شهري ولا حدود صرف، فالتطبيق بيحسب من فلوسك اللي فعلاً متاحة. لو حطيت <b>حدود صرف</b> للبنود من تبويب الحدود، هيبقى الحساب أدق ويقدر ينبهك قبل ما تتعدى.</p></div>' : ""));
+        (al2 && (al2.basis === "cash" || al2.basis === "income") ? '<div class="card pad" style="background:var(--accent-soft);border-color:var(--accent-line)"><p class="sub" style="margin:0;color:var(--ink-2)">إنت مش كاتب دخل شهري ولا حدود صرف، فالتطبيق بيحسب من فلوسك اللي فعلاً متاحة. لو حطيت <b>حدود صرف</b> للبنود من تبويب الحدود، هيبقى الحساب أدق ويقدر ينبهك قبل ما تتعدى.</p></div>' : ""));
       break;
     }
     case "goDay": state.ui.tab = "stats"; state.ui.period = "day"; state.ui.day = todayISO(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "period": state.ui.period = v; render(); break;
+    case "sview": closeSheet(); state.ui.tab = "stats"; state.ui.sv = v; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "statW": {
       const u = state.ui;
       if (v === "all") u.statW = "all";
@@ -3894,6 +4963,45 @@ document.addEventListener("click", (ev) => {
     case "pickDay": closeSheet(); state.ui.tab = "stats"; state.ui.period = "day"; state.ui.day = v; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "goMonth": closeSheet(); state.ui.tab = "stats"; state.ui.period = "month"; state.ui.mk = v; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "catDetail": sheetCatDetail(id); break;
+    case "repeats": sheetRepeats(); break;
+    case "newRep": closeSheet(); setTimeout(() => sheetRep(), 180); break;
+    case "repEdit": closeSheet(); setTimeout(() => sheetRep(id), 180); break;
+    case "repDo": doRepeat(id, v, "do"); closeSheet(); break;
+    case "repSkip": doRepeat(id, v, "skip"); closeSheet(); break;
+    case "repType": sh.dataset.rtype = v; sh.querySelectorAll('[data-act="repType"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); sh.dataset.cat = ""; paintRepForm(); break;
+    case "repEvery": sh.dataset.revery = v; sh.querySelectorAll('[data-act="repEvery"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); paintRepForm(); break;
+    case "repWd": sh.dataset.rwd = v; paintRepForm(); break;
+    case "repCat": sh.dataset.cat = v; paintRepForm(); break;
+    case "repRoot": sh.dataset.cat = v; paintRepForm(); break;
+    case "repWallet": sh.dataset.wallet = v; paintRepForm(); break;
+    case "saveRep": {
+      const name = el("rpName").value.trim().slice(0, 40);
+      if (!name) return toast("اكتب اسم المصروف");
+      const amt = Math.round((parseFloat(el("rpAmt").value) || 0) * 100) / 100;
+      if (!(amt > 0)) return toast("اكتب المبلغ");
+      if (!sh.dataset.cat) return toast("اختار البند");
+      if (!sh.dataset.wallet) return toast("اختار المكان");
+      const data = {
+        name: name, type: sh.dataset.rtype, amount: amt, catId: sh.dataset.cat, walletId: sh.dataset.wallet,
+        every: sh.dataset.revery, day: clamp(parseInt(el("rpDay").value, 10) || 1, 1, 31),
+        weekday: +sh.dataset.rwd, note: el("rpNote").value.trim().slice(0, 120)
+      };
+      const pz = el("rpPause");
+      if (id) {
+        const rp = state.repeats.find(x => x.id === id);
+        Object.assign(rp, data, { paused: !!(pz && pz.checked) });
+      } else {
+        state.repeats.push(Object.assign({ id: uid("rp"), startedAt: todayISO(), lastDone: "", skipped: [], paused: false, at: Date.now() }, data));
+      }
+      save("repeats"); closeSheet(); render();
+      toast(id ? "اتحفظت" : "اتضافت — هنفكّرك في معادها");
+      break;
+    }
+    case "delRep": {
+      state.repeats = state.repeats.filter(x => x.id !== id);
+      save("repeats"); closeSheet(); render(); toast("اتمسحت");
+      break;
+    }
     case "incSrc": sheetIncomeSrc(id); break;
     case "goIncome": state.ui.tab = "income"; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "pprev": {
@@ -4027,11 +5135,11 @@ window.addEventListener("scroll", () => { el("topbar").classList.toggle("scrolle
 
 async function doReset() {
   const mks = [...new Set(state.txs.map(t => mkOf(t.date)))];
-  state.settings = { name: "", currency: "ج.م", income: 0, savePct: 15, onboarded: false, lastBackup: "" };
+  state.settings = { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "" };
   state.categories = JSON.parse(JSON.stringify(DEFAULT_CATS));
   state.wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
-  state.txs = []; state.goals = []; state.debts = [];
-  state.ui = { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", statW: "all", q: "" };
+  state.txs = []; state.goals = []; state.debts = []; state.repeats = []; state.shortcuts = [];
+  state.ui = { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", statW: "all", sv: "sum", q: "" };
   writeLocal();
   if (Store.db) {
     try {
@@ -4040,6 +5148,8 @@ async function doReset() {
       await Store.db.doc("app/categories").set({ list: state.categories });
       await Store.db.doc("app/goals").set({ list: [] });
       await Store.db.doc("app/debts").set({ list: [] });
+      await Store.db.doc("app/repeats").set({ list: [] });
+      await Store.db.doc("app/shortcuts").set({ list: [] });
       for (const mk of mks) await Store.db.doc("months/" + mk).delete();
     } catch (_) { }
   }
