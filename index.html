@@ -529,6 +529,13 @@ button.ins:active{background:var(--surface-2)}
 .crumb{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); margin-bottom:11px}
 .crumb svg{width:12px;height:12px}
 .crumb b{color:var(--ink)}
+.scr{align-items:center}
+.scb{display:flex; gap:2px; flex:none; margin-inline-start:4px}
+.scb button{width:30px; height:30px; border:0; background:transparent; color:var(--muted);
+  border-radius:9px; display:grid; place-items:center}
+.scb button svg{width:15px; height:15px}
+.scb button:hover{background:var(--surface-3); color:var(--ink)}
+.scb button[disabled]{opacity:.22; pointer-events:none}
 /* سجّل بضغطة */
 .qrail{display:flex; gap:9px; overflow-x:auto; padding-bottom:3px; scrollbar-width:none}
 .qrail::-webkit-scrollbar{display:none}
@@ -652,7 +659,7 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
-const APP_VERSION = "2.5.0";
+const APP_VERSION = "2.5.1";
 const APP_BUILD = "2026-10-01";
 
 /* ---------- helpers ---------- */
@@ -700,6 +707,8 @@ const P = {
   gear: '<circle cx="12" cy="12" r="3.1"/><path d="M12 2.6l1.4 2.2 2.6-.4.6 2.6 2.4 1-.9 2.5 1.7 2-1.7 2 .9 2.5-2.4 1-.6 2.6-2.6-.4L12 21.4l-1.4-2.2-2.6.4-.6-2.6-2.4-1 .9-2.5-1.7-2 1.7-2-.9-2.5 2.4-1 .6-2.6 2.6.4z"/>',
   chevR: '<path d="M9.5 5 16 12l-6.5 7"/>',
   chevL: '<path d="M14.5 5 8 12l6.5 7"/>',
+  cUp: '<path d="M5 15.5 12 8.5l7 7"/>',
+  cDown: '<path d="M5 8.5 12 15.5l7-7"/>',
   tabHome: '<path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M9.5 20v-5.2h5V20"/>',
   tabList: '<circle cx="4.6" cy="6.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.6" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.6" cy="17.5" r="1.3" fill="currentColor" stroke="none"/><path d="M8.6 6.5H20"/><path d="M8.6 12H20"/><path d="M8.6 17.5H20"/>',
   tabShield: '<path d="M12 3.2 19 6v6c0 4.4-3 7.7-7 8.9-4-1.2-7-4.5-7-8.9V6z"/><path d="M9.3 12.1l1.9 1.9 3.5-3.7"/>',
@@ -1799,18 +1808,14 @@ function viewHome() {
     '<div class="foot"><span>متوسطك <b>' + nf(avgDay, 0) + "</b> في اليوم</span>" +
     "<span>" + (al ? (al.basis === "cap" ? "محسوب من حد الشهر" : al.basis === "cash" ? "محسوب من فلوسك المتاحة" : al.basis === "budget" ? "محسوب من حدود البنود" : "محسوب من دخلك") : "حدّد حدود صرف عشان نحسبلك") + "</span></div></button>";
 
-  // تسجيل سريع: اختصاراتك الأول
+  // تسجيل سريع: اختصاراتك إنت بس — مفيش حاجة بتتحط هنا من غير ما تكتبها
   const sr = shortRail();
-  if (sr) h += grp("سجّل بضغطة", sr, { act: actBtn("shortcuts", "إدارة") });
-  else {
-    const qc = quickChips();
-    if (qc) h += grp("سجّل بضغطة", qc, { sub: "اتعلمناها من حركاتك", act: actBtn("shortcuts", "اعمل اختصار") });
-    else h += grp("سجّل بضغطة", '<div class="panel">' + rowEl({
-      act: "shortcuts", icon: "bolt", iconBg: "var(--accent-soft)", iconColor: "var(--accent)",
-      name: "اعمل اختصارات للحاجات المتكررة", wrap: true,
-      meta: "مواصلات الشغل بـ 16، مترو بـ 10 — ضغطة واحدة تسجلها."
-    }) + "</div>");
-  }
+  if (sr) h += grp("سجّل بضغطة", sr, { sub: nf(state.shortcuts.length, 0) + " اختصار", act: actBtn("shortcuts", "إدارة") });
+  else h += grp("سجّل بضغطة", '<div class="panel">' + rowEl({
+    act: "newShort", icon: "bolt", iconBg: "var(--accent-soft)", iconColor: "var(--accent)",
+    name: "اعمل اختصار لحاجة بتدفعها باستمرار", wrap: true,
+    meta: "إنت اللي تكتبها: مواصلات الشغل بـ 16، مترو بـ 10، قهوة الصبح بـ 25 — وبعدين ضغطة واحدة تسجلها."
+  }) + "</div>");
 
   // المتكررة المستحقة
   const pend = repsPending(), upc = repsUpcoming(7);
@@ -2879,7 +2884,7 @@ function sheetTx(id) {
     '<button data-act="txType" data-v="income" aria-pressed="' + (type === "income") + '">دخل</button>' +
     '<button data-act="txType" data-v="transfer" aria-pressed="' + (type === "transfer") + '">تحويل</button></div>' +
     (!id && state.shortcuts.length ? '<div class="field"><label>اختصاراتك</label>' +
-      '<div class="qrail">' + state.shortcuts.slice().sort((a, b) => (+b.uses || 0) - (+a.uses || 0)).slice(0, 8).map(sc => shortChip(sc, true)).join("") + "</div></div>" : "") +
+      '<div class="qrail">' + shortsOrdered().map(sc => shortChip(sc, true)).join("") + "</div></div>" : "") +
     '<div class="field"><label for="txAmt">المبلغ</label><input class="inp big" id="txAmt" type="number" inputmode="decimal" step="0.01" value="' + (t ? t.amount : "") + '" placeholder="0"></div>' +
     '<div class="keypad" style="margin:-6px 0 14px">' + [10, 25, 50, 100, 200, 500, 1000, "مسح"].map(v =>
       '<button data-act="quick" data-v="' + v + '">' + (v === "مسح" ? "مسح" : '<span class="num">+' + v + "</span>") + "</button>").join("") + "</div>" +
@@ -3475,58 +3480,6 @@ function incomeAdvice(r, T, prevT) {
   return out;
 }
 
-/* ================= تسجيل سريع =================
-   بيطلع أكتر الحركات اللي بتتكرر بنفس البند والمبلغ تقريباً */
-function frequentTxs(limit) {
-  const since = shiftDay(todayISO(), -75);
-  const map = {};
-  for (const t of state.txs) {
-    if (t.type !== "expense" || t.date < since || t.repId) continue;
-    const bucket = t.amount < 100 ? 5 : t.amount < 500 ? 25 : 100;
-    const key = t.catId + "|" + Math.round(t.amount / bucket) * bucket + "|" + (t.note || "").trim();
-    if (!map[key]) map[key] = { catId: t.catId, note: (t.note || "").trim(), amounts: [], walletId: t.walletId, last: t.date, n: 0 };
-    const e = map[key];
-    e.n++; e.amounts.push(t.amount);
-    if (t.date >= e.last) { e.last = t.date; e.walletId = t.walletId; }
-  }
-  return Object.values(map)
-    .filter(e => e.n >= 2)
-    .map(e => {
-      const sorted = e.amounts.slice().sort((a, b) => a - b);
-      e.amount = sorted[Math.floor(sorted.length / 2)];
-      e.score = e.n * 2 + Math.max(0, 30 - daysBetween(e.last, todayISO())) / 10;
-      return e;
-    })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit || 6);
-}
-function quickChips() {
-  const f = frequentTxs(6);
-  if (!f.length) return "";
-  return '<div class="qrail">' + f.map((e, i) => {
-    const c = catById(e.catId);
-    return '<button class="qchip" data-act="quickAdd" data-v="' + i + '">' +
-      '<span class="qi" style="background:color-mix(in srgb,var(--' + c.color + ') 15%, var(--surface));color:var(--' + c.color + ')">' + ico(c.icon) + "</span>" +
-      '<span class="qn">' + esc(e.note || c.name) + "</span>" +
-      '<span class="qa"><span class="num">' + nf(e.amount) + "</span></span></button>";
-  }).join("") +
-    '<button class="qchip add" data-act="newTx" aria-label="حركة جديدة">' + ico("plus") + "</button></div>";
-}
-function quickAdd(i) {
-  const f = frequentTxs(6), e = f[+i];
-  if (!e) return;
-  const date = todayISO();
-  const wid = state.wallets.some(w => w.id === e.walletId) ? e.walletId : richestSpendWallet();
-  const tx = {
-    id: uid("t"), type: "expense", amount: e.amount, catId: e.catId, walletId: wid,
-    fromWallet: "", toWallet: "", date: date, note: e.note, at: Date.now()
-  };
-  state.txs.push(tx);
-  save("m:" + mkOf(date));
-  render();
-  lastAdded = tx.id;
-  toastUndo(esc(e.note || catById(e.catId).name) + " · " + money2(e.amount), "undoTx", tx.id);
-}
 /* تراجع بعد الحذف أو الإضافة السريعة */
 let lastAdded = "", undoBin = null, undoTimer = null;
 function toastUndo(msg, act, id) {
@@ -3554,12 +3507,13 @@ function undoDelete() {
 }
 /* ================= اختصارات بتعملها بنفسك ================= */
 function shortGroups() {
-  const g = {};
-  state.shortcuts.forEach(sc => {
+  const g = {}, ord = {};
+  shortsOrdered().forEach((sc, i) => {
     const k = (sc.group || "").trim() || "من غير مجموعة";
+    if (!(k in ord)) ord[k] = i;
     (g[k] = g[k] || []).push(sc);
   });
-  return Object.keys(g).map(k => ({ name: k, items: g[k] }));
+  return Object.keys(g).sort((a, b) => ord[a] - ord[b]).map(k => ({ name: k, items: g[k] }));
 }
 function shortcutNames() {
   return [...new Set(state.shortcuts.map(s => (s.group || "").trim()).filter(Boolean))];
@@ -3603,33 +3557,60 @@ function shortChip(sc, compact) {
     '<span class="qn">' + esc(sc.name) + "</span>" +
     '<span class="qa">' + (+sc.amount > 0 ? '<span class="num">' + nf(sc.amount) + "</span>" : '<span style="font-size:12.5px;color:var(--muted)">اكتب المبلغ</span>') + "</span></button>";
 }
+/* الترتيب اللي إنت حاططه إنت — مش اللي التطبيق بيستنتجه */
+function shortsOrdered() {
+  return state.shortcuts.slice().sort((a, b) => (+a.order || 0) - (+b.order || 0));
+}
+function reindexShorts() { shortsOrdered().forEach((sc, i) => sc.order = i); }
+function moveShort(id, dir) {
+  reindexShorts();
+  const list = shortsOrdered();
+  const i = list.findIndex(x => x.id === id);
+  if (i < 0) return false;
+  const g = (list[i].group || "").trim();
+  let j = -1;
+  for (let k = i + dir; k >= 0 && k < list.length; k += dir) {
+    if (((list[k].group || "").trim()) === g) { j = k; break; }
+  }
+  if (j < 0) return false;
+  const a = list[i].order; list[i].order = list[j].order; list[j].order = a;
+  save("shortcuts");
+  return true;
+}
 function shortRail() {
   if (!state.shortcuts.length) return "";
-  const list = state.shortcuts.slice().sort((a, b) => (+b.uses || 0) - (+a.uses || 0) || (a.order || 0) - (b.order || 0));
-  return '<div class="qrail">' + list.slice(0, 10).map(sc => shortChip(sc)).join("") +
-    '<button class="qchip add" data-act="shortcuts" aria-label="إدارة الاختصارات">' + ico("gear") + "</button></div>";
+  return '<div class="qrail">' + shortsOrdered().map(sc => shortChip(sc)).join("") +
+    '<button class="qchip add" data-act="newShort" aria-label="اختصار جديد">' + ico("plus") + "</button></div>";
 }
 function sheetShortcuts() {
   const groups = shortGroups();
-  let h = '<p class="sub" style="margin:0 0 14px">الحاجات اللي بتدفعها باستمرار بنفس المبلغ — مواصلات الشغل، المترو، القهوة. سجّلها مرة، وبعد كده ضغطة واحدة تسجلها.</p>';
+  let h = '<p class="sub" style="margin:0 0 14px">إنت اللي بتكتب اللي هنا. أي حاجة بتدفعها باستمرار — مواصلات الشغل، المترو، القهوة — ضيفها مرة، وبعد كده ضغطة واحدة على الشاشة الرئيسية تسجّلها.</p>';
   h += '<div class="btnrow" style="margin-bottom:16px"><button class="btn pri block" data-act="newShort">' + ico("plus") + "اختصار جديد</button></div>";
   if (!state.shortcuts.length) {
     h += '<div class="panel"><div class="empty"><div class="eic">' + ico("bolt") + "</div><h4>ما فيش اختصارات لسه</h4>" +
       "<p>مثال: « مواصلات الشغل » بـ 16، « مترو » بـ 10. تحطهم في مجموعة « مواصلات » وتلاقيهم مع بعض.</p></div></div>";
     return openSheet("اختصارات التسجيل", h);
   }
+  const all = shortsOrdered();
   groups.forEach(g => {
-    h += grp(esc(g.name), '<div class="panel">' + g.items.map(sc => {
+    h += grp(esc(g.name), '<div class="panel">' + g.items.map((sc, i) => {
       const c = catById(sc.catId);
-      return rowEl({
-        act: "editShort", id: sc.id,
-        icon: sc.icon || c.icon, iconBg: "color-mix(in srgb,var(--" + c.color + ") 14%, var(--surface))", iconColor: "var(--" + c.color + ")",
-        name: esc(sc.name),
-        meta: esc(catPath(sc.catId)) + " · " + esc(walletById(sc.walletId).name) + ((+sc.uses || 0) > 0 ? " · اتسجلت " + sc.uses + " مرة" : ""),
-        value: +sc.amount > 0 ? nf(sc.amount) : "—"
-      });
+      const first = i === 0, last = i === g.items.length - 1;
+      return '<div class="r scr">' +
+        '<span class="ri" style="background:color-mix(in srgb,var(--' + c.color + ') 14%, var(--surface));color:var(--' + c.color + ')">' +
+        ico(sc.icon || c.icon) + "</span>" +
+        '<span class="rt"><span class="rn">' + esc(sc.name) + "</span>" +
+        '<span class="rm wrap">' + esc(catPath(sc.catId)) + " · " + esc(walletById(sc.walletId).name) +
+        ((+sc.uses || 0) > 0 ? " · اتسجلت " + sc.uses + " مرة" : "") + "</span></span>" +
+        '<span class="rv">' + (+sc.amount > 0 ? nf(sc.amount) : "—") + "</span>" +
+        '<span class="scb">' +
+        '<button data-act="scUp" data-id="' + sc.id + '" aria-label="فوق"' + (first ? " disabled" : "") + ">" + ico("cUp") + "</button>" +
+        '<button data-act="scDown" data-id="' + sc.id + '" aria-label="تحت"' + (last ? " disabled" : "") + ">" + ico("cDown") + "</button>" +
+        '<button data-act="editShort" data-id="' + sc.id + '" aria-label="تعديل">' + ico("edit") + "</button>" +
+        "</span></div>";
     }).join("") + "</div>", { sub: String(g.items.length) });
   });
+  h += '<p class="sub" style="margin:4px 2px 0">الترتيب اللي هنا هو نفسه اللي بيظهر على الشاشة الرئيسية — رتّبهم زي ما يريحك بالسهمين.</p>';
   openSheet("اختصارات التسجيل", h);
 }
 function sheetShort(id) {
@@ -3649,7 +3630,8 @@ function sheetShort(id) {
   openSheet(sc ? "تعديل « " + sc.name + " »" : "اختصار جديد", body, () => {
     const sh = el("sheet");
     sh.dataset.cat = sc ? sc.catId : "";
-    sh.dataset.wallet = sc ? sc.walletId : richestSpendWallet();
+    sh.dataset.wallet = sc ? sc.walletId : lastUsedWallet("");
+    sh.dataset.wtouched = sc ? "1" : "";
     paintShortForm();
     setTimeout(() => { const n = el("scName"); if (n && !sc) n.focus(); }, 60);
   });
@@ -4703,13 +4685,22 @@ document.addEventListener("click", (ev) => {
       toastUndo("اتمسحت الحركة", "undoDel", "");
       break;
     }
-    case "quickAdd": quickAdd(v); break;
     case "shortcuts": closeSheet(); setTimeout(sheetShortcuts, 160); break;
     case "newShort": closeSheet(); setTimeout(() => sheetShort(), 180); break;
     case "editShort": closeSheet(); setTimeout(() => sheetShort(id), 180); break;
     case "useShort": addFromShortcut(id); break;
-    case "scRoot": case "scCat": sh.dataset.cat = v; paintShortForm(); break;
-    case "scWallet": sh.dataset.wallet = v; paintShortForm(); break;
+    case "scUp": case "scDown": {
+      if (!moveShort(id, a === "scUp" ? -1 : 1)) break;
+      const sc0 = el("sheet").scrollTop;
+      sheetShortcuts(); render();
+      el("sheet").scrollTop = sc0;
+      break;
+    }
+    case "scRoot": case "scCat":
+      sh.dataset.cat = v;
+      if (!sh.dataset.wtouched) sh.dataset.wallet = lastUsedWallet(v);
+      paintShortForm(); break;
+    case "scWallet": sh.dataset.wallet = v; sh.dataset.wtouched = "1"; paintShortForm(); break;
     case "saveShort": {
       const name = el("scName").value.trim().slice(0, 40);
       if (!name) return toast("اكتب اسم الاختصار");
@@ -4722,13 +4713,15 @@ document.addEventListener("click", (ev) => {
       };
       if (id) { const sc = state.shortcuts.find(x => x.id === id); Object.assign(sc, data); }
       else state.shortcuts.push(Object.assign({ id: uid("sc"), uses: 0, lastUsed: "", order: state.shortcuts.length, at: Date.now() }, data));
-      save("shortcuts"); closeSheet(); render();
+      reindexShorts(); save("shortcuts"); render();
       toast(id ? "اتحفظ" : "اتضاف — هتلاقيه على الشاشة الرئيسية");
+      sheetShortcuts();
       break;
     }
     case "delShort": {
       state.shortcuts = state.shortcuts.filter(x => x.id !== id);
-      save("shortcuts"); closeSheet(); render(); toast("اتمسح");
+      reindexShorts(); save("shortcuts"); render(); toast("اتمسح");
+      if (state.shortcuts.length) sheetShortcuts(); else closeSheet();
       break;
     }
     case "undoTx": undoAdd(id); break;
