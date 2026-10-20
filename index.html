@@ -529,6 +529,11 @@ button.ins:active{background:var(--surface-2)}
 .crumb{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); margin-bottom:11px}
 .crumb svg{width:12px;height:12px}
 .crumb b{color:var(--ink)}
+.r.ctr{align-items:center; flex-wrap:wrap}
+.r.ctr .cin{flex:none; width:104px; text-align:center; padding:9px 8px; font-weight:600;
+  font-family:var(--ff-display); font-variant-numeric:tabular-nums; direction:ltr}
+.r.ctr .ctag{flex-basis:100%; padding-inline-start:44px; margin-top:-2px}
+.r.ctr .ctag:empty{display:none}
 .scr{align-items:center}
 .scb{display:flex; gap:2px; flex:none; margin-inline-start:4px}
 .scb button{width:30px; height:30px; border:0; background:transparent; color:var(--muted);
@@ -659,8 +664,8 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
-const APP_VERSION = "2.5.1";
-const APP_BUILD = "2026-10-01";
+const APP_VERSION = "2.7.0";
+const APP_BUILD = "2026-10-20";
 
 /* ---------- helpers ---------- */
 const $ = (s, r) => (r || document).querySelector(s);
@@ -812,7 +817,8 @@ const DEFAULT_CATS = [
   { id: "c_edu_fees", name: "مصاريف دراسة", icon: "book", color: "s6", parent: "c_edu", limit: 0 },
   { id: "c_edu_course", name: "كورسات وكتب", icon: "book", color: "s6", parent: "c_edu", limit: 0 },
 
-  { id: "c_other", name: "حاجات تانية", icon: "dots", color: "s9", pct: 5, limit: 0, parent: "" }
+  { id: "c_other", name: "حاجات تانية", icon: "dots", color: "s9", pct: 5, limit: 0, parent: "" },
+  { id: "c_unlog", name: "مصاريف ناسيها", icon: "scale", color: "s9", pct: 0, limit: 0, parent: "" }
 ];
 const INCOME_CATS = [
   { id: "i_salary", name: "مرتب", icon: "wallet", color: "s6" },
@@ -833,7 +839,7 @@ const DEFAULT_WALLETS = [
 const WALLET_ICONS = ["wallet", "safe", "bank", "card", "coins", "phone", "gift", "home"];
 
 const state = {
-  settings: { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "" },
+  settings: { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "", lastCount: "" },
   wallets: JSON.parse(JSON.stringify(DEFAULT_WALLETS)),
   categories: JSON.parse(JSON.stringify(DEFAULT_CATS)),
   txs: [],
@@ -896,6 +902,15 @@ function applyData(d) {
   if (Array.isArray(d.shortcuts)) state.shortcuts = d.shortcuts;
   if (Array.isArray(d.goals)) state.goals = d.goals;
   return true;
+}
+/* بند فرق الجرد لازم يكون موجود حتى للناس اللي عندهم نسخة قديمة */
+function unlogCat() {
+  let c = state.categories.find(x => x.id === "c_unlog");
+  if (!c) {
+    c = { id: "c_unlog", name: "مصاريف ناسيها", icon: "scale", color: "s9", pct: 0, limit: 0, parent: "" };
+    state.categories.push(c);
+  }
+  return c;
 }
 function dataBundle() {
   return { settings: state.settings, wallets: state.wallets, categories: state.categories, txs: state.txs, debts: state.debts, goals: state.goals, repeats: state.repeats, shortcuts: state.shortcuts };
@@ -964,6 +979,7 @@ let saveTimer = null, writing = Promise.resolve();
 function save() {
   for (const k of arguments) dirty.add(k);
   writeLocal();
+  try { AutoBk.schedule(); Snaps.schedule(); } catch (_) { }
   if (!Store.db) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(flush, 450);
@@ -1429,9 +1445,23 @@ function insights(mk) {
 
   // 10. backup reminder
   const bAge = backupAgeDays();
-  if (state.txs.length >= 8 && (bAge === null || bAge >= 21))
-    push("warn", bAge === null ? "ما خدتش نسخة احتياطية لسه" : "آخر نسخة احتياطية من " + bAge + " يوم",
-      "عندك " + nf(state.txs.length) + " حركة مسجلة. نزّل نسخة من « الإعدادات ← نسخة احتياطية » عشان لو حصل حاجة للجهاز ترجّعها في ثانية.", "down");
+  if (AutoBk.on()) {
+    // النسخ التلقائي شغال — مفيش داعي ننبه
+  } else if (state.txs.length >= 8 && (bAge === null || bAge >= 14)) {
+    push(bAge === null || bAge >= 30 ? "crit" : "warn",
+      bAge === null ? "ما خدتش نسخة احتياطية لسه" : "آخر نسخة احتياطية من " + bAge + " يوم",
+      "عندك " + nf(state.txs.length) + " حركة مسجلة. " +
+      (AutoBk.sup
+        ? "من « الإعدادات ← نسخة تلقائية » اختار فولدر مرة واحدة والتطبيق ينسخ لوحده بعد كل حركة."
+        : "نزّل نسخة من « الإعدادات ← نسخة احتياطية » — ثانية واحدة وتبقى مطمّن."), AutoBk.sup ? "repeat" : "down");
+  }
+
+  // 10ب. الجرد: لو بقاله كتير من غير عدّ
+  const cDays = countDays();
+  if (state.txs.length >= 10 && (cDays === null || cDays >= 14))
+    push(cDays === null ? "info" : cDays >= 30 ? "warn" : "info",
+      cDays === null ? "جرّب تعدّ فلوسك" : "آخر جرد من " + arDays(cDays),
+      "عدّ اللي معاك فعلاً واكتبه، والتطبيق يظبط الفرق ويسجّله. ده بيخلّي أرقامك مطابقة للواقع حتى لو نسيت تسجّل حاجة.", "scale");
 
   // 11. no budgets yet
   if (bt === 0) push("info", "ما فيش حدود صرف لسه", "حدّد حد شهري لكل بند من تبويب « الحدود » عشان التطبيق يقدر ينبهك قبل ما تتعدى.", "tabShield");
@@ -1573,7 +1603,7 @@ async function pinPush(dig) {
       }
     } else {
       const ok = await tryPin(pin);
-      if (ok) { LockUI.entry = ""; render(); connect(); }
+      if (ok) { LockUI.entry = ""; render(); connect(); bootBackup(); }
       else { paintDots(true); lockErr("الرمز غلط"); setTimeout(() => { LockUI.entry = ""; paintDots(); }, 550); }
     }
   } catch (e) { lockErr("حصلت مشكلة — جرّب تاني"); LockUI.entry = ""; paintDots(); }
@@ -1807,6 +1837,20 @@ function viewHome() {
     '<div class="track"><i style="width:' + ratio.toFixed(1) + "%;background:" + tone + '"></i></div>' +
     '<div class="foot"><span>متوسطك <b>' + nf(avgDay, 0) + "</b> في اليوم</span>" +
     "<span>" + (al ? (al.basis === "cap" ? "محسوب من حد الشهر" : al.basis === "cash" ? "محسوب من فلوسك المتاحة" : al.basis === "budget" ? "محسوب من حدود البنود" : "محسوب من دخلك") : "حدّد حدود صرف عشان نحسبلك") + "</span></div></button>";
+
+  // أيام فاتت من غير تسجيل، وجرد لو الأرقام بعدت عن الواقع
+  const gapN = missedDays(5);
+  const cDays0 = countDays();
+  const nudges = [];
+  if (gapN.length)
+    nudges.push(rowEl({ act: "fillDay", v: gapN[0], icon: "cal", iconBg: "var(--accent-soft)", iconColor: "var(--accent)",
+      name: gapN.length === 1 ? "ما سجلتش حاجة " + relDay(gapN[0]) : "فيه " + arDays(gapN.length) + " من غير تسجيل",
+      wrap: true, meta: gapN.length === 1 ? "لو صرفت حاجة، سجّلها دلوقتي وهي هتتحط بتاريخها" : "آخرهم " + relDay(gapN[0]) + " — دوس تسجّل فيه" }));
+  if (state.txs.length >= 10 && (cDays0 === null || cDays0 >= 14))
+    nudges.push(rowEl({ act: "count", icon: "scale", iconBg: "var(--surface-2)", iconColor: "var(--muted)",
+      name: "الرقم مش مطابق للي معاك؟", wrap: true,
+      meta: "عدّ فلوسك واكتب الفعلي، والتطبيق يظبط الفرق ويسجّله" }));
+  if (nudges.length) h += grp("ظبّط نفسك", '<div class="panel">' + nudges.join("") + "</div>");
 
   // تسجيل سريع: اختصاراتك إنت بس — مفيش حاجة بتتحط هنا من غير ما تكتبها
   const sr = shortRail();
@@ -2900,7 +2944,13 @@ function sheetTx(id) {
       '<div id="splitRows"></div>' +
       '<button class="btn ghost block" data-act="spAdd" style="margin-top:8px">' + ico("plus") + "ضيف حد</button>" +
       '<div id="spSum" class="spsum"></div></div></div>') +
-    '<div class="field"><label for="txDate">التاريخ</label><input class="inp" id="txDate" type="date" value="' + (t ? t.date : todayISO()) + '" max="' + todayISO() + '"></div>' +
+    '<div class="field"><label for="txDate">التاريخ</label>' +
+    '<div class="chips" id="txDays" style="margin-bottom:8px">' +
+    [[0, "النهاردة"], [1, "إمبارح"], [2, "أول إمبارح"], [3, "من 3 أيام"]].map(x => {
+      const iso = shiftDay(todayISO(), -x[0]);
+      return '<button class="chip" data-act="txDay" data-v="' + iso + '" aria-pressed="' + ((t ? t.date : todayISO()) === iso) + '">' + x[1] + "</button>";
+    }).join("") + "</div>" +
+    '<input class="inp" id="txDate" type="date" value="' + (t ? t.date : todayISO()) + '" max="' + todayISO() + '"></div>' +
     '<div class="field"><label for="txNote">ملاحظة (اختياري)</label><input class="inp" id="txNote" value="' + esc(t ? t.note || "" : "") + '" placeholder="مثلاً: أكل الشغل"></div>' +
     '<div class="btnrow" style="margin-top:6px"><button class="btn pri" style="flex:1" data-act="saveTx" data-id="' + (id || "") + '">' + ico("check") + (t ? "حفظ التعديل" : "سجّل الحركة") + "</button>" +
     (t ? '<button class="btn danger" data-act="delTx" data-id="' + id + '">' + ico("trash") + "حذف</button>" : "") + "</div>";
@@ -3252,7 +3302,8 @@ function paintWKind() {
 function sheetBalance() {
   const B = balanceNow();
   openSheet("فلوسك فين؟",
-    '<p class="sub" style="margin:0 0 14px">رصيدك الكلي مجموع الأماكن دي. دوس على أي مكان تظبط رقمه.</p>' +
+    '<p class="sub" style="margin:0 0 14px">رصيدك الكلي مجموع الأماكن دي. دوس على أي مكان تظبط رقمه، أو اعمل جرد لو الرقم مش مطابق للي معاك.</p>' +
+    '<button class="btn ghost block" data-act="count" style="margin-bottom:14px">' + ico("scale") + "عدّ فلوسك وظبّط الفرق</button>" +
     '<div class="card">' + state.wallets.map(w =>
       '<button class="item" data-act="editWallet" data-id="' + w.id + '">' +
       '<span class="ic" style="background:color-mix(in srgb,var(--' + w.color + ') 15%, var(--surface));color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" +
@@ -4015,6 +4066,11 @@ function viewSettings() {
   h += '<h2 class="sec">بياناتك</h2><div class="card">' +
     srow("stBackup", "down", "نسخة احتياطية", a === null ? "لسه ما خدتش نسخة" : a === 0 ? "آخر نسخة النهاردة" : "آخر نسخة من " + a + " يوم",
       a === null || a > 21 ? pill("warn", "خد نسخة") : pill("good", "تمام")) +
+    srow("count", "scale", "عدّ فلوسك", (function () {
+      const cd = countDays();
+      return cd === null ? "ظبّط التطبيق على اللي معاك فعلاً" : cd === 0 ? "آخر جرد النهاردة" : "آخر جرد من " + arDays(cd);
+    })(), (function () { const cd = countDays(); return cd === null || cd >= 14 ? pill("warn", "اعمل جرد") : pill("good", "تمام"); })()) +
+    srow("stAuto", "repeat", "نسخة تلقائية", autoBkLine(), autoBkPill()) +
     srow("importPick", "up", "استرجاع نسخة", "رجّع بياناتك من ملف احتياطي") +
     srow("exportCSV", "tabList", "تصدير الحركات CSV", "جدول تفتحه في Excel") +
     "</div>";
@@ -4075,6 +4131,247 @@ function sheetProfile() {
 }
 function sheetLock() {
   openSheet("قفل التطبيق", lockSectionHTML());
+}
+/* ---------- واجهة النسخ التلقائي ---------- */
+function autoBkPill() {
+  if (AutoBk.on()) return pill("good", "شغال");
+  if (AutoBk.st === "need") return pill("warn", "محتاج إذن");
+  if (AutoBk.st === "error") return pill("crit", "وقف");
+  return pill("flat", "مطفي");
+}
+function autoBkLine() {
+  if (AutoBk.on()) return "بينسخ في « " + esc(AutoBk.dir.name) + " » بعد كل حركة";
+  if (AutoBk.st === "need") return "الفولدر متسجّل بس المتصفح عايز إذن تاني";
+  if (AutoBk.st === "error") return AutoBk.err || "فيه مشكلة في الكتابة";
+  if (AutoBk.sup) return "اختار فولدر مرة واحدة والباقي عليه";
+  return "الجهاز ده ما بيسمحش بالفولدر — بنحفظ نسخ جوه التطبيق";
+}
+function autoBkBody() {
+  const ago = (iso) => {
+    if (!iso) return "—";
+    const d = new Date(iso); if (isNaN(d)) return "—";
+    const m = Math.round((Date.now() - d.getTime()) / 60000);
+    if (m < 1) return "دلوقتي";
+    if (m < 60) return "من " + m + " دقيقة";
+    const h = Math.round(m / 60);
+    if (h < 24) return "من " + h + " ساعة";
+    return "من " + Math.round(h / 24) + " يوم";
+  };
+  let h = "";
+  if (AutoBk.sup) {
+    if (AutoBk.on()) {
+      h += '<div class="card pad" style="margin-bottom:14px">' +
+        '<div class="ftrow" style="padding:6px 0;border-bottom:1px solid var(--line)"><span>الفولدر</span>' +
+        '<span style="color:var(--ink);font-weight:600">' + esc(AutoBk.dir.name) + "</span></div>" +
+        '<div class="ftrow" style="padding:6px 0;border-bottom:1px solid var(--line)"><span>آخر نسخة</span>' +
+        '<span style="color:var(--ink);font-weight:600">' + ago(AutoBk.last) + "</span></div>" +
+        '<div class="ftrow" style="padding:6px 0"><span>الملفات</span>' +
+        '<span style="color:var(--ink);font-weight:600">masroufy-backup.json + نسخة لكل يوم</span></div></div>' +
+        '<div class="btnrow" style="flex-direction:column;align-items:stretch">' +
+        '<button class="btn pri block" data-act="abkNow">' + ico("check") + "اعمل نسخة دلوقتي</button>" +
+        '<button class="btn ghost block" data-act="abkPick">' + ico("box") + "غيّر الفولدر</button>" +
+        '<button class="btn ghost block" data-act="abkOff">' + ico("x") + "وقّف النسخ التلقائي</button></div>" +
+        '<p class="sub" style="margin:12px 0 0">كل تعديل بيتكتب في <b style="color:var(--ink)">masroufy-backup.json</b> جوه الفولدر، وجوه <b style="color:var(--ink)">masroufy-history</b> بنسيب نسخة لكل يوم (آخر 30 يوم). حط الفولدر ده جوه Google Drive أو OneDrive وهيترفع لوحده.</p>';
+    } else if (AutoBk.st === "need" || AutoBk.st === "error") {
+      h += '<div class="card pad" style="margin-bottom:14px"><p style="margin:0;font-size:13.5px;line-height:1.7">' +
+        (AutoBk.st === "error" ? "النسخ وقف: " + esc(AutoBk.err || "") : "المتصفح نسي الإذن — دي حاجة طبيعية بتحصل بعد ما تقفل المتصفح.") +
+        "</p></div>" +
+        '<div class="btnrow" style="flex-direction:column;align-items:stretch">' +
+        (AutoBk.st === "need" ? '<button class="btn pri block" data-act="abkGrant">' + ico("check") + "اسمح وكمّل</button>" : "") +
+        '<button class="btn ' + (AutoBk.st === "error" ? "pri" : "ghost") + ' block" data-act="abkPick">' + ico("box") + "اختار الفولدر من جديد</button>" +
+        '<button class="btn ghost block" data-act="abkOff">' + ico("x") + "وقّف</button></div>";
+    } else {
+      h += '<p class="sub" style="margin:0 0 14px">اختار فولدر مرة واحدة، وبعد كده كل حركة بتسجلها بتتكتب فيه على طول من غير ما تعمل حاجة. لو حطيت الفولدر جوه Google Drive أو OneDrive، بياناتك هتبقى على السحابة كمان.</p>' +
+        '<button class="btn pri block" data-act="abkPick">' + ico("box") + "اختار فولدر النسخ</button>";
+    }
+  } else {
+    h += '<div class="card pad" style="margin-bottom:14px">' +
+      '<p style="margin:0 0 9px;font-size:13.5px;line-height:1.7"><b>الجهاز ده ما ينفعش فيه الفولدر التلقائي.</b> متصفحات الموبايل بتمنع أي صفحة ويب إنها تكتب في فولدر على التليفون لوحدها — ده قيد في المتصفح نفسه مش في التطبيق.</p>' +
+      '<p class="sub" style="margin:0">اللي بيحصل بدلها: التطبيق بيحفظ نسخة كاملة جوه نفسه بعد كل حركة، وتقدر ترجّع لأي نسخة منها تحت. وعشان دي بتروح لو مسحت التطبيق، فكّرناك تنزّل ملف كل فترة.</p></div>' +
+      '<div class="btnrow" style="flex-direction:column;align-items:stretch">' +
+      '<button class="btn pri block" data-act="stBackup">' + ico("down") + "نزّل ملف نسخة دلوقتي</button>" +
+      '<p class="sub" style="margin:10px 0 0">عايز الفولدر التلقائي؟ افتح التطبيق من كروم أو Edge على كمبيوتر بنفس اللينك.</p></div>';
+  }
+  h += '<div id="snapList" style="margin-top:20px"><p class="sub">بنحمّل النسخ…</p></div>';
+  return h;
+}
+function sheetAuto() {
+  openSheet("نسخة تلقائية", '<div id="abkBody">' + autoBkBody() + "</div>", () => paintSnapList());
+}
+function paintAutoBk() {
+  const box = el("abkBody");
+  if (box) box.innerHTML = autoBkBody();
+  if (el("snapList")) paintSnapList();
+}
+async function paintSnapList() {
+  const box = el("snapList"); if (!box) return;
+  const all = await Snaps.list();
+  if (!el("snapList")) return;
+  if (!all.length) {
+    box.innerHTML = grp("نسخ جوه التطبيق", '<div class="panel"><div class="empty"><p>لسه ما فيش نسخ داخلية — بتتاخد لوحدها بعد أول حركة تسجلها.</p></div></div>');
+    return;
+  }
+  const KIND = { auto: "تلقائية", manual: "يدوية", restore: "قبل استرجاع", reset: "قبل تصفير" };
+  box.innerHTML = grp("نسخ جوه التطبيق", '<div class="panel">' + all.slice(0, 20).map(x => {
+    const d = new Date(x.at);
+    const when = isNaN(d) ? esc(x.at) : fmtDate(x.at.slice(0, 10)) + ' · <span class="num">' +
+      String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + "</span>";
+    return rowEl({ act: "snapOpen", id: x.id,
+      icon: x.kind === "auto" ? "repeat" : "safe",
+      iconBg: "var(--surface-2)", iconColor: "var(--muted)",
+      name: when,
+      meta: nf(x.n, 0) + " حركة · " + (KIND[x.kind] || x.kind) });
+  }).join("") + "</div>", { sub: nf(all.length, 0) + " نسخة",
+    act: actBtn("snapNow", "خد نسخة دلوقتي") }) +
+    '<p class="sub" style="margin:9px 2px 0">دي محفوظة جوه التطبيق على الجهاز ده. بتنفعك لو غلطت أو مسحت حاجة بالغلط — بس بتروح لو مسحت التطبيق نفسه، عشان كده الملف برّه مهم.</p>';
+}
+async function openSnap(id) {
+  const rec = await Snaps.get(id);
+  if (!rec) return toast("مالقيناش النسخة دي");
+  let d; try { d = JSON.parse(rec.data); } catch (_) { return toast("النسخة دي تالفة"); }
+  pendingRestore = d;
+  const dt = new Date(rec.at);
+  sheetRestore("نسخة داخلية · " + (isNaN(dt) ? rec.at : fmtDate(rec.at.slice(0, 10)) + " " +
+    String(dt.getHours()).padStart(2, "0") + ":" + String(dt.getMinutes()).padStart(2, "0")));
+}
+/* ================= الجرد: ظبّط التطبيق على اللي معاك فعلاً =================
+   لما تنسى تسجّل، الرقم في التطبيق بيبقى أعلى من اللي في جيبك.
+   هنا بتعدّ اللي معاك فعلاً، والفرق بيتسجّل حركة حقيقية — مش بيتشال من الحسابات. */
+/* جمع عربي سليم: يوم / يومين / 3 أيام / 11 يوم */
+function arDays(n) {
+  n = Math.round(n);
+  if (n === 1) return "يوم";
+  if (n === 2) return "يومين";
+  if (n >= 3 && n <= 10) return nf(n, 0) + " أيام";
+  return nf(n, 0) + " يوم";
+}
+/* أيام قريبة ما فيهاش ولا حركة — بس بعد ما تبقى بتسجّل فعلاً */
+function missedDays(back) {
+  const days = new Set();
+  for (const t of state.txs) days.add(t.date);
+  if (days.size < 3) return [];
+  const t0 = todayISO();
+  const out = [];
+  for (let i = 1; i <= (back || 5); i++) {
+    const d = shiftDay(t0, -i);
+    if (!days.has(d)) out.push(d);
+  }
+  // لو مفيش ولا يوم مسجّل في الفترة دي، يبقى المستخدم مش بيستخدم التطبيق — ما ننقّش عليهوش
+  if (out.length >= (back || 5)) return [];
+  return out;
+}
+function relDay(iso) {
+  const n = daysBetween(iso, todayISO());
+  if (n === 0) return "النهاردة";
+  if (n === 1) return "إمبارح";
+  if (n === 2) return "أول إمبارح";
+  return "يوم " + fmtDate(iso);
+}
+function countDays() {
+  const last = state.settings.lastCount;
+  if (!last) return null;
+  const d = new Date(last);
+  if (isNaN(d)) return null;
+  return Math.floor((Date.now() - d.getTime()) / 86400000);
+}
+function sheetCount() {
+  const wb = walletBalances();
+  const cur = esc(state.settings.currency);
+  const cd = countDays();
+  const list = state.wallets;
+  let h = '<p class="sub" style="margin:0 0 4px">عدّ اللي معاك فعلاً دلوقتي في كل مكان واكتبه. اللي تسيبه فاضي معناه إنه مظبوط ومش محتاج تغيير.</p>' +
+    '<p class="sub" style="margin:0 0 14px">' +
+    (cd === null ? "دي أول مرة تعمل جرد." : cd === 0 ? "آخر جرد النهاردة." : "آخر جرد من " + arDays(cd) + ".") + "</p>";
+
+  h += '<div class="panel" style="margin-bottom:14px">' + list.map(w =>
+    '<div class="r ctr" data-w="' + w.id + '">' +
+    '<span class="ri" style="background:color-mix(in srgb,var(--' + w.color + ') 14%, var(--surface));color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" +
+    '<span class="rt"><span class="rn">' + esc(w.name) + "</span>" +
+    '<span class="rm">في التطبيق <b class="num">' + nf(wb[w.id] || 0) + "</b></span></span>" +
+    '<input class="inp cin" type="number" inputmode="decimal" data-act="cntIn" data-id="' + w.id + '" placeholder="' + nf(wb[w.id] || 0, 0) + '" aria-label="الفعلي في ' + esc(w.name) + '">' +
+    "</div>").join("") + "</div>";
+
+  h += '<div id="cntSum"></div>';
+  h += '<div class="field" style="margin-top:14px"><label for="cntNote">ملاحظة (اختياري)</label>' +
+    '<input class="inp" id="cntNote" placeholder="مثلاً: مصاريف الأسبوع اللي فات"></div>';
+  h += '<div class="btnrow" style="flex-direction:column;align-items:stretch">' +
+    '<button class="btn pri block" data-act="cntApply" data-v="log">' + ico("check") + "ظبّط وسجّل الفرق</button>" +
+    '<button class="btn ghost block" data-act="cntApply" data-v="quiet">' + ico("scale") + "ظبّط الرصيد بس من غير حركة</button></div>";
+  h += '<p class="sub" style="margin:12px 0 0">« سجّل الفرق » بيحط اللي ناقص كمصروف في بند <b style="color:var(--ink)">مصاريف ناسيها</b>، فيفضل يبان في التحليل — ده الصح عشان أرقامك تفضل حقيقية. « من غير حركة » بيظبّط الرقم وبس، واستخدمه لو الفرق كان غلطة في الرصيد الأساسي مش صرف.</p>';
+  openSheet("عدّ فلوسك", h, () => {
+    paintCount();
+    const sh = el("sheet");
+    sh.addEventListener("input", (e) => { if (e.target && e.target.classList.contains("cin")) paintCount(); });
+    const f = sh.querySelector(".cin"); if (f) setTimeout(() => f.focus(), 80);
+  });
+}
+function countRows() {
+  const wb = walletBalances(), out = [];
+  document.querySelectorAll('[data-act="cntIn"]').forEach(inp => {
+    const id = inp.dataset.id, raw = inp.value.trim();
+    if (raw === "") return;
+    const v = parseFloat(raw);
+    if (!isFinite(v)) return;
+    const app = wb[id] || 0, d = Math.round((v - app) * 100) / 100;
+    if (Math.abs(d) < 0.005) return;
+    out.push({ id: id, app: app, real: v, d: d });
+  });
+  return out;
+}
+function paintCount() {
+  const box = el("cntSum"); if (!box) return;
+  const rows = countRows(), cur = esc(state.settings.currency);
+  document.querySelectorAll(".r.ctr").forEach(r => {
+    const hit = rows.find(x => x.id === r.dataset.w);
+    let tag = r.querySelector(".ctag");
+    if (!tag) { tag = document.createElement("span"); tag.className = "ctag"; r.appendChild(tag); }
+    tag.innerHTML = hit ? pill(hit.d < 0 ? "warn" : "good", (hit.d < 0 ? "ناقص " : "زيادة ") + nf(Math.abs(hit.d))) : "";
+  });
+  if (!rows.length) {
+    box.innerHTML = '<div class="panel"><div class="empty" style="padding:16px"><p>اكتب اللي معاك فعلاً فوق، وهنوريك الفرق هنا.</p></div></div>';
+    return;
+  }
+  const less = rows.filter(x => x.d < 0), more = rows.filter(x => x.d > 0);
+  const lossT = less.reduce((s, x) => s + Math.abs(x.d), 0);
+  const gainT = more.reduce((s, x) => s + x.d, 0);
+  box.innerHTML = '<div class="card pad">' +
+    (lossT > 0 ? '<div class="ftrow" style="padding:6px 0' + (gainT > 0 ? ";border-bottom:1px solid var(--line)" : "") + '">' +
+      "<span>ناقص — هيتسجّل مصروف</span><b style=\"color:var(--down);font-family:var(--ff-display)\"><span class=\"num\">" + nf(lossT) + "</span></b></div>" : "") +
+    (gainT > 0 ? '<div class="ftrow" style="padding:6px 0"><span>زيادة — هيتسجّل دخل</span>' +
+      "<b style=\"color:var(--up);font-family:var(--ff-display)\"><span class=\"num\">" + nf(gainT) + "</span></b></div>" : "") +
+    "</div>" +
+    '<p class="sub" style="margin:9px 2px 0">' +
+    (lossT > 0 && gainT > 0 ? "هنسجّل حركتين: مصروف بـ " + nf(lossT) + " ودخل بـ " + nf(gainT) + "."
+      : lossT > 0 ? "يعني صرفت " + nf(lossT) + " " + cur + " ما سجلتهمش. هنسجّلهم في « مصاريف ناسيها »."
+        : "يعني معاك " + nf(gainT) + " " + cur + " زيادة. هنسجّلهم دخل في « دخل تاني ».") + "</p>";
+}
+function applyCount(mode) {
+  const rows = countRows();
+  if (!rows.length) return toast("اكتب اللي معاك فعلاً الأول");
+  const note = (el("cntNote") ? el("cntNote").value.trim().slice(0, 120) : "") || "فرق جرد " + fmtDate(todayISO());
+  const date = todayISO(), stamp = Date.now();
+  if (mode === "quiet") {
+    rows.forEach(r => { const w = state.wallets.find(x => x.id === r.id); if (w) w.opening = (+w.opening || 0) + r.d; });
+    state.settings.lastCount = new Date().toISOString();
+    save("wallets", "settings"); closeSheet(); render();
+    return toast("ظبّطنا الأرصدة من غير ما نسجّل حركة");
+  }
+  unlogCat();
+  let made = 0;
+  rows.forEach(r => {
+    const amt = Math.abs(r.d);
+    state.txs.push({
+      id: uid("t"), type: r.d < 0 ? "expense" : "income", amount: amt,
+      catId: r.d < 0 ? "c_unlog" : "i_other", walletId: r.id,
+      fromWallet: "", toWallet: "", date: date, note: note, at: stamp + made, adj: 1
+    });
+    made++;
+  });
+  state.settings.lastCount = new Date().toISOString();
+  save("categories", "settings", "m:" + mkOf(date));
+  closeSheet(); render();
+  const tot = rows.reduce((s, x) => s + Math.abs(x.d), 0);
+  toast("ظبّطنا — سجّلنا فرق " + nf(tot) + " " + esc(state.settings.currency));
 }
 function sheetBackup() {
   openSheet("نسخة احتياطية",
@@ -4229,8 +4526,9 @@ async function exportCSV() {
   else if (r !== "cancelled") toast("مقدرناش نحفظ الملف");
 }
 function backupAgeDays() {
-  if (!state.settings.lastBackup) return null;
-  const d = new Date(state.settings.lastBackup);
+  const src = lastBackupAny();
+  if (!src) return null;
+  const d = new Date(src);
   if (isNaN(d)) return null;
   return Math.floor((Date.now() - d.getTime()) / 86400000);
 }
@@ -4243,6 +4541,188 @@ function backupStatusHTML() {
   return pill("crit", "آخر نسخة: من " + a + " يوم");
 }
 
+/* ================= النسخ التلقائي =================
+   على الكمبيوتر: تختار فولدر مرة واحدة، والتطبيق يكتب فيه نسخة بعد كل حركة.
+   على الموبايل: المتصفح ما بيسمحش لصفحة ويب تكتب في فولدر لوحدها،
+   فبنحتفظ بنسخ جوه التطبيق نفسه وبنفكّرك تنزّل ملف. */
+const LS_ABK = "masroufy.autobk.last";
+let idbP = null;
+function idb() {
+  if (idbP) return idbP;
+  idbP = new Promise((res, rej) => {
+    if (!window.indexedDB) return rej(new Error("no-idb"));
+    const r = indexedDB.open("masroufy-bk", 1);
+    r.onupgradeneeded = () => {
+      const db = r.result;
+      if (!db.objectStoreNames.contains("kv")) db.createObjectStore("kv");
+      if (!db.objectStoreNames.contains("snaps")) db.createObjectStore("snaps", { keyPath: "id" });
+    };
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+  idbP.catch(() => { idbP = null; });
+  return idbP;
+}
+function idbDo(store, mode, fn) {
+  return idb().then(db => new Promise((res, rej) => {
+    const tx = db.transaction(store, mode), rq = fn(tx.objectStore(store));
+    tx.oncomplete = () => res(rq ? rq.result : undefined);
+    tx.onerror = () => rej(tx.error);
+    tx.onabort = () => rej(tx.error);
+  }));
+}
+const kvGet = (k) => idbDo("kv", "readonly", s => s.get(k));
+const kvSet = (k, v) => idbDo("kv", "readwrite", s => s.put(v, k));
+const kvDel = (k) => idbDo("kv", "readwrite", s => s.delete(k));
+
+async function writeInto(dir, name, text) {
+  const fh = await dir.getFileHandle(name, { create: true });
+  const w = await fh.createWritable();
+  await w.write(new Blob([text], { type: "application/json;charset=utf-8" }));
+  await w.close();
+}
+async function pruneHistory(dir, keep) {
+  const names = [];
+  try { for await (const n of dir.keys()) if (/^masroufy-\d{4}-\d{2}-\d{2}\.json$/.test(n)) names.push(n); }
+  catch (_) { return; }
+  names.sort();
+  for (const n of names.slice(0, Math.max(0, names.length - keep))) { try { await dir.removeEntry(n); } catch (_) { } }
+}
+
+const AutoBk = {
+  sup: false, dir: null, st: "off", last: "", err: "", busy: false, pend: false, timer: null, writes: 0,
+  on() { return this.st === "ready"; },
+  async init() {
+    this.sup = typeof window.showDirectoryPicker === "function" && !!window.isSecureContext && !window.claude;
+    this.last = (function () { try { return localStorage.getItem(LS_ABK) || ""; } catch (_) { return ""; } })();
+    if (!this.sup) return;
+    let h = null;
+    try { h = await kvGet("dir"); } catch (_) { return; }
+    if (!h) return;
+    this.dir = h;
+    try { this.st = (await h.queryPermission({ mode: "readwrite" })) === "granted" ? "ready" : "need"; }
+    catch (_) { this.st = "need"; }
+    paintAutoBk();
+    if (this.st === "ready") this.schedule(1500);
+  },
+  async pick() {
+    if (!this.sup) return toast("المتصفح ده ما بيسمحش بالنسخ التلقائي لفولدر");
+    let h;
+    try { h = await window.showDirectoryPicker({ id: "masroufyBk", mode: "readwrite", startIn: "documents" }); }
+    catch (e) { if (e && e.name === "AbortError") return; return toast("مقدرناش نفتح الفولدر"); }
+    try { if ((await h.requestPermission({ mode: "readwrite" })) !== "granted") return toast("محتاجين إذن الكتابة في الفولدر"); }
+    catch (_) { }
+    this.dir = h; this.st = "ready"; this.err = "";
+    try { await kvSet("dir", h); } catch (_) { }
+    const okw = await this.write();
+    paintAutoBk(); render();
+    toast(okw ? "تمام — هننسخ في « " + h.name + " » بعد كل حركة" : "اخترنا الفولدر بس الكتابة فشلت");
+  },
+  async grant() {
+    if (!this.dir) return;
+    try {
+      if ((await this.dir.requestPermission({ mode: "readwrite" })) === "granted") {
+        this.st = "ready"; this.err = ""; await this.write(); paintAutoBk(); render(); return toast("رجع يشتغل");
+      }
+    } catch (_) { }
+    toast("لازم تسمح بالكتابة عشان النسخ التلقائي يشتغل");
+  },
+  async off() {
+    this.dir = null; this.st = "off"; this.err = "";
+    try { await kvDel("dir"); } catch (_) { }
+    paintAutoBk(); render(); toast("وقّفنا النسخ التلقائي للفولدر");
+  },
+  schedule(ms) {
+    if (this.st !== "ready") return;
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.write(), ms || 2500);
+  },
+  async write() {
+    if (this.st !== "ready" || !this.dir) return false;
+    if (this.busy) { this.pend = true; return false; }
+    this.busy = true;
+    try {
+      let p = "granted";
+      try { p = await this.dir.queryPermission({ mode: "readwrite" }); } catch (_) { }
+      if (p !== "granted") { this.st = "need"; paintAutoBk(); return false; }
+      const txt = JSON.stringify(backupPayload(), null, 2);
+      await writeInto(this.dir, "masroufy-backup.json", txt);
+      try {
+        const hd = await this.dir.getDirectoryHandle("masroufy-history", { create: true });
+        await writeInto(hd, "masroufy-" + todayISO() + ".json", txt);
+        await pruneHistory(hd, 30);
+      } catch (_) { }
+      this.last = new Date().toISOString(); this.writes++; this.err = "";
+      try { localStorage.setItem(LS_ABK, this.last); } catch (_) { }
+      paintAutoBk();
+      return true;
+    } catch (e) {
+      this.err = (e && (e.name === "NotFoundError" ? "الفولدر مش موجود — يمكن اتنقل أو اتمسح" : e.message)) || "خطأ";
+      this.st = "error"; paintAutoBk(); render();
+      return false;
+    } finally {
+      this.busy = false;
+      if (this.pend) { this.pend = false; this.schedule(1500); }
+    }
+  }
+};
+
+/* نسخ محفوظة جوه التطبيق — بتنفع لو غلطت أو البيانات باظت،
+   بس بتروح لو مسحت التطبيق أو نضّفت بيانات المتصفح. */
+const Snaps = {
+  timer: null, lastAt: 0, pending: false,
+  schedule(ms) {
+    this.pending = true;
+    // لو بقالنا كتير من غير نسخة، ما نستناش التهدئة — خد واحدة دلوقتي
+    if (Date.now() - this.lastAt > 120000) { this.take("auto"); return; }
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.take("auto"), ms || 5000);
+  },
+  flush() { if (this.pending) { clearTimeout(this.timer); this.take("auto"); } },
+  async take(kind) {
+    this.pending = false; this.lastAt = Date.now();
+    try {
+      const txt = JSON.stringify(backupPayload());
+      const rec = { id: "s" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        at: new Date().toISOString(), kind: kind || "auto", n: state.txs.length, size: txt.length, data: txt };
+      await idbDo("snaps", "readwrite", s => s.put(rec));
+      await this.prune();
+      return rec;
+    } catch (_) { return null; }
+  },
+  async list() {
+    try { const all = await idbDo("snaps", "readonly", s => s.getAll()); return (all || []).sort((a, b) => b.at.localeCompare(a.at)); }
+    catch (_) { return []; }
+  },
+  async prune() {
+    const all = await this.list();
+    if (all.length <= 6) return;
+    const keep = new Set();
+    all.slice(0, 5).forEach(x => keep.add(x.id));                      // آخر 5 مهما كانت
+    all.filter(x => x.kind !== "auto").slice(0, 8).forEach(x => keep.add(x.id)); // قبل الاسترجاع واليدوي
+    const days = {};
+    all.forEach(x => { const d = x.at.slice(0, 10); if (!days[d]) days[d] = x.id; });
+    Object.values(days).slice(0, 14).forEach(id => keep.add(id));      // أحدث نسخة في كل يوم، آخر 14 يوم
+    // سقف للحجم: لو النسخ كبرت، شيل الأقدم (غير آخر 3 ونسخ الأمان)
+    let tot = 0;
+    for (const x of all) if (keep.has(x.id)) tot += (x.size || 0);
+    if (tot > 12e6) {
+      const safe = new Set(all.slice(0, 3).map(x => x.id));
+      for (let i = all.length - 1; i >= 0 && tot > 12e6; i--) {
+        const x = all[i];
+        if (!keep.has(x.id) || safe.has(x.id) || x.kind === "restore") continue;
+        keep.delete(x.id); tot -= (x.size || 0);
+      }
+    }
+    for (const x of all) if (!keep.has(x.id)) { try { await idbDo("snaps", "readwrite", s => s.delete(x.id)); } catch (_) { } }
+  },
+  get(id) { return idbDo("snaps", "readonly", s => s.get(id)); },
+  del(id) { return idbDo("snaps", "readwrite", s => s.delete(id)); }
+};
+function lastBackupAny() {
+  const a = state.settings.lastBackup || "", b = AutoBk.last || "";
+  return a > b ? a : b;
+}
 let pendingRestore = null;
 function importFile(e) {
   const f = e.target.files && e.target.files[0];
@@ -4286,6 +4766,7 @@ function sheetRestore(fileName) {
 }
 function applyRestore(mode) {
   const d = pendingRestore; if (!d) return;
+  Snaps.take("restore");
   const touched = new Set(state.txs.map(t => mkOf(t.date)));
   migrate(d);
   if (mode === "replace") {
@@ -5109,6 +5590,25 @@ document.addEventListener("click", (ev) => {
     case "exportBackup": exportBackup(); break;
     case "exportCSV": exportCSV(); break;
     case "importPick": el("impFile").click(); break;
+    case "fillDay": {
+      sheetTx();
+      setTimeout(() => {
+        const d = el("txDate"); if (d) d.value = v;
+        document.querySelectorAll('[data-act="txDay"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v)));
+      }, 120);
+      break;
+    }
+    case "txDay": { const d = el("txDate"); if (d) { d.value = v; sh.querySelectorAll('[data-act="txDay"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); } break; }
+    case "count": closeSheet(); setTimeout(sheetCount, 160); break;
+    case "cntIn": break;
+    case "cntApply": applyCount(v); break;
+    case "stAuto": sheetAuto(); break;
+    case "abkPick": AutoBk.pick(); break;
+    case "abkGrant": AutoBk.grant(); break;
+    case "abkOff": AutoBk.off(); break;
+    case "abkNow": AutoBk.write().then(okw => toast(okw ? "اتكتبت نسخة في الفولدر" : "مقدرناش نكتب — راجع الفولدر")); break;
+    case "snapNow": Snaps.take("manual").then(r => { toast(r ? "خدنا نسخة داخلية" : "مقدرناش ناخد نسخة"); paintSnapList(); }); break;
+    case "snapOpen": openSnap(id); break;
     case "restoreMerge": applyRestore("merge"); break;
     case "restoreReplace": applyRestore("replace"); break;
     case "resetAsk":
@@ -5117,7 +5617,7 @@ document.addEventListener("click", (ev) => {
         '<button class="btn block" data-act="exportBackup" style="margin-bottom:10px">' + ico("down") + "نزّل نسخة احتياطية الأول</button>" +
         '<div class="btnrow"><button class="btn" style="flex:1" data-act="closeSheet">لأ، رجعني</button><button class="btn danger" data-act="resetDo">' + ico("trash") + "امسح كل حاجة</button></div>");
       break;
-    case "resetDo": doReset(); break;
+    case "resetDo": Snaps.take("reset"); setTimeout(doReset, 250); break;
     case "runAI": runAI(); break;
   }
 });
@@ -5128,7 +5628,7 @@ window.addEventListener("scroll", () => { el("topbar").classList.toggle("scrolle
 
 async function doReset() {
   const mks = [...new Set(state.txs.map(t => mkOf(t.date)))];
-  state.settings = { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "" };
+  state.settings = { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "", lastCount: "" };
   state.categories = JSON.parse(JSON.stringify(DEFAULT_CATS));
   state.wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
   state.txs = []; state.goals = []; state.debts = []; state.repeats = []; state.shortcuts = [];
@@ -5167,7 +5667,21 @@ el("fab").innerHTML = ico("plus");
   readLocal();
   render();
   connect();
+  bootBackup();
 })();
+
+function bootBackup() {
+  try {
+    AutoBk.init().then(() => render()).catch(() => { });
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState !== "hidden") return;
+      try { Snaps.flush(); clearTimeout(AutoBk.timer); AutoBk.write(); } catch (_) { }
+    });
+    window.addEventListener("pagehide", () => { try { Snaps.flush(); } catch (_) { } });
+    // أول نسخة داخلية بعد ما البيانات تتقري
+    setTimeout(() => { if (state.txs.length) Snaps.take("auto"); }, 2500);
+  } catch (_) { }
+}
 
 let bioTried = false;
 async function tryBio(auto) {
@@ -5175,7 +5689,7 @@ async function tryBio(auto) {
   bioTried = true;
   try {
     const ok = await unlockWithBio();
-    if (ok) { LockUI.entry = ""; render(); connect(); }
+    if (ok) { LockUI.entry = ""; render(); connect(); bootBackup(); }
     else if (!auto) lockErr("مقدرناش نتأكد من البصمة");
   } catch (e) { if (!auto) lockErr("البصمة مش شغالة دلوقتي — استخدم الرمز"); }
 }
