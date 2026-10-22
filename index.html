@@ -258,11 +258,12 @@ textarea.inp{resize:vertical; min-height:62px}
 /* tabbar + fab */
 .dock{position:fixed; bottom:0; left:50%; transform:translateX(-50%);
   width:min(620px,100%); pointer-events:none; z-index:40}
-.tabbar{pointer-events:auto; display:flex; gap:2px; margin:0 12px;
+.tabbar{pointer-events:auto; display:flex; gap:2px; margin:0 12px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
   background:color-mix(in srgb,var(--surface) 92%, transparent); backdrop-filter:blur(12px) saturate(1.5);
   border:1px solid var(--line); border-radius:18px; padding:6px;
   margin-bottom:calc(10px + env(safe-area-inset-bottom,0px)); box-shadow:var(--shadow)}
-.tabbar button{flex:1; min-width:0; border:0; background:transparent; border-radius:12px;
+.tabbar::-webkit-scrollbar{display:none}
+.tabbar button{flex:1 0 54px; min-width:54px; border:0; background:transparent; border-radius:12px;
   display:flex; flex-direction:column; align-items:center; gap:3px; padding:7px 1px 6px; color:var(--muted); font-size:9.5px; font-weight:600}
 .tabbar button span{max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .tabbar button svg{width:19px;height:19px}
@@ -664,8 +665,8 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
-const APP_VERSION = "2.7.0";
-const APP_BUILD = "2026-10-20";
+const APP_VERSION = "2.8.0";
+const APP_BUILD = "2026-10-22";
 
 /* ---------- helpers ---------- */
 const $ = (s, r) => (r || document).querySelector(s);
@@ -1752,10 +1753,12 @@ function ring(pct, color) {
 const TABS = [
   { id: "home", name: "الرئيسية", ic: "tabHome" },
   { id: "tx", name: "حركات", ic: "tabList" },
-  { id: "budget", name: "حدود", ic: "tabShield" },
-  { id: "goals", name: "ادخار", ic: "tabTarget" },
   { id: "stats", name: "تحليل", ic: "tabChart" },
   { id: "income", name: "الدخل", ic: "up" },
+  { id: "commit", name: "التزامات", ic: "bill" },
+  { id: "save", name: "توفير", ic: "tDown" },
+  { id: "budget", name: "حدود", ic: "tabShield" },
+  { id: "goals", name: "ادخار", ic: "tabTarget" },
   { id: "settings", name: "إعدادات", ic: "gear" }
 ];
 function monthBar() {
@@ -2816,7 +2819,11 @@ function viewOnboard() {
 
 /* ---------- render ---------- */
 function renderTabs() {
-  el("tabbar").innerHTML = TABS.map(t => '<button role="tab" data-act="tab" data-v="' + t.id + '" aria-current="' + (state.ui.tab === t.id) + '">' + ico(t.ic) + "<span>" + t.name + "</span></button>").join("");
+  const bar = el("tabbar");
+  bar.innerHTML = TABS.map(t => '<button role="tab" data-act="tab" data-v="' + t.id + '" aria-current="' + (state.ui.tab === t.id) + '">' + ico(t.ic) + "<span>" + t.name + "</span></button>").join("");
+  // التاب الحالي لازم يبان حتى لو الشريط أطول من الشاشة
+  const act = bar.querySelector('[aria-current="true"]');
+  if (act) requestAnimationFrame(() => { try { act.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); } catch (_) { } });
 }
 function renderStorageLine() {
   const s = el("storLine"); if (!s) return;
@@ -2839,8 +2846,9 @@ function render() {
   b.style.color = alerts ? "var(--crit)" : "";
   const t = state.ui.tab;
   const body = t === "home" ? viewHome() : t === "tx" ? viewTx() : t === "budget" ? viewBudget()
-    : t === "goals" ? viewGoals() : t === "settings" ? viewSettings() : t === "income" ? viewIncome() : viewStats();
-  v.innerHTML = (t === "stats" || t === "settings" || t === "income" ? "" : monthBar()) + body;
+    : t === "goals" ? viewGoals() : t === "settings" ? viewSettings() : t === "income" ? viewIncome()
+      : t === "commit" ? viewCommit() : t === "save" ? viewSave() : viewStats();
+  v.innerHTML = (t === "stats" || t === "settings" || t === "income" || t === "commit" || t === "save" ? "" : monthBar()) + body;
   renderStorageLine();
   if (t === "settings") { const f = el("impFile"); if (f) f.addEventListener("change", importFile); }
   if (t === "stats") { wireCharts(); mountAI(); }
@@ -3742,7 +3750,10 @@ function repNextDue(rp) {
 /* المستحق دلوقتي: كل معاد عدى ولسه ما اتسجلش */
 function repPending(rp) {
   const today = todayISO();
-  const from = rp.lastDone ? shiftDay(rp.lastDone, 1) : (rp.startedAt || today);
+  let from = rp.lastDone ? shiftDay(rp.lastDone, 1) : (rp.startedAt || today);
+  // ما نرجعش لورا أكتر من شهرين: التزام متسجّل بتاريخ بدء قديم ما يطلعش 50 مستحق
+  const floor = shiftDay(today, -62);
+  if (from < floor) from = floor;
   return repDueDates(rp, from, today).filter(d => !(rp.skipped || []).includes(d));
 }
 function repsPending() {
@@ -3872,6 +3883,10 @@ function sheetRep(id) {
     '<div class="field" id="rpCatsF"><label>البند</label><div class="chips" id="rpCats"></div></div>' +
     '<div class="field" id="rpSubsF" hidden></div>' +
     '<div class="field"><label id="rpWlbl">تتدفع من فين؟</label><div class="chips" id="rpW"></div></div>' +
+    '<div class="field" id="rpNeedF"><label>ده أساسي ولا ممكن تستغنى عنه؟</label><div class="segs">' +
+    '<button data-act="repNeed" data-v="must" aria-pressed="' + (repNeed(rp || {}) === "must") + '">أساسي</button>' +
+    '<button data-act="repNeed" data-v="cut" aria-pressed="' + (repNeed(rp || {}) === "cut") + '">ممكن أستغنى عنه</button></div>' +
+    '<p class="sub" style="margin:7px 0 0">تاب التوفير بيستخدم ده عشان يقولك تقدر توفر كام من غير ما يلمس الأساسيات.</p></div>' +
     '<div class="field"><label for="rpNote">ملاحظة (اختياري)</label><input class="inp" id="rpNote" value="' + esc(rp ? rp.note || "" : "") + '"></div>' +
     (rp ? '<label class="chk"><input type="checkbox" id="rpPause"' + (rp.paused ? " checked" : "") + '><span>أوقفها مؤقتاً</span></label>' : "") +
     '<div class="card pad" id="rpPrev" style="margin:14px 0"></div>' +
@@ -3882,6 +3897,7 @@ function sheetRep(id) {
     sh.dataset.rtype = type;
     sh.dataset.revery = rp ? rp.every || "month" : "month";
     sh.dataset.rwd = String(rp && rp.weekday != null ? rp.weekday : 0);
+    sh.dataset.rneed = repNeed(rp || {});
     sh.dataset.cat = rp ? rp.catId : "";
     sh.dataset.wallet = rp ? rp.walletId : richestSpendWallet();
     paintRepForm();
@@ -3894,6 +3910,11 @@ function paintRepForm() {
   el("rpDayF").hidden = every !== "month";
   el("rpWdF").hidden = every !== "week";
   el("rpWlbl").textContent = type === "income" ? "تدخل فين؟" : "تتدفع من فين؟";
+  const nf2 = el("rpNeedF");
+  if (nf2) {
+    nf2.hidden = type === "income";
+    nf2.querySelectorAll('[data-act="repNeed"]').forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === sh.dataset.rneed)));
+  }
   if (every === "week") {
     el("rpWd").innerHTML = AR_DAYS.map((d, i) =>
       '<button class="chip" data-act="repWd" data-v="' + i + '" aria-pressed="' + (String(i) === sh.dataset.rwd) + '">' + d + "</button>").join("");
@@ -3937,6 +3958,355 @@ function repPreview() {
     '<b style="color:var(--ink);font-family:var(--ff-display)">' + (next ? fmtDate(next) : "—") + "</b></div>" +
     '<div class="ftrow" style="padding:6px 0 0"><span>في السنة</span><b style="color:var(--ink);font-family:var(--ff-display)">' +
     (amt > 0 ? nf(amt * perYear) + " " + esc(state.settings.currency) : "—") + "</b></div>";
+}
+/* ================= الالتزامات الشهرية والتوفير ================= */
+/* عدّاد عربي: 1 حاجة / حاجتين / 3-10 حاجات / 11+ حاجة */
+function arCount(n, one, two, few, many) {
+  n = Math.round(n);
+  if (n === 1) return one;
+  if (n === 2) return two;
+  if (n >= 3 && n <= 10) return nf(n, 0) + " " + few;
+  return nf(n, 0) + " " + many;
+}
+const arCommit = (n) => arCount(n, "التزام واحد", "التزامين", "التزامات", "التزام");
+/* التكلفة الشهرية الموحّدة: الأسبوعي بيتحوّل لشهري بـ 52/12 */
+function repMonthly(rp) {
+  const a = +rp.amount || 0;
+  return rp.every === "week" ? a * 52 / 12 : a;
+}
+const repNeed = (rp) => rp.need === "cut" ? "cut" : rp.need === "must" ? "must" : "";
+function commitTotals() {
+  const all = state.repeats.filter(r => (r.type || "expense") === "expense");
+  const live = all.filter(r => !r.paused);
+  const must = live.filter(r => repNeed(r) === "must");
+  const cut = live.filter(r => repNeed(r) === "cut");
+  const un = live.filter(r => !repNeed(r));
+  const sum = (a) => a.reduce((x, r) => x + repMonthly(r), 0);
+  const incR = state.repeats.filter(r => r.type === "income" && !r.paused);
+  return {
+    all: all, live: live, must: must, cut: cut, un: un, paused: all.filter(r => r.paused),
+    monthly: sum(live), mustM: sum(must), cutM: sum(cut), unM: sum(un),
+    incomeM: incR.reduce((x, r) => x + repMonthly(r), 0), incR: incR
+  };
+}
+/* دخل شهري للمقارنة: المسجّل فعلاً، وإلا اللي مكتوب في الإعدادات */
+function monthlyIncome() {
+  const mk = [];
+  for (let i = 1; i <= 3; i++) { const m = mkShift(thisMK(), -i); if (totalsOf(m).inc > 0) mk.push(m); }
+  if (mk.length) return mk.reduce((s, m) => s + totalsOf(m).inc, 0) / mk.length;
+  const t = totalsOf(thisMK()).inc;
+  if (t > 0) return t;
+  return +state.settings.income || 0;
+}
+/* هل الالتزام ده اتدفع الشهر ده؟ */
+function repPaidThisMonth(rp) {
+  const r = rangeOf("month", thisMK());
+  return state.txs.some(t => t.repId === rp.id && inRange(t.date, r));
+}
+function commitRow(rp, opts) {
+  opts = opts || {};
+  const c = catById(rp.catId), m = repMonthly(rp);
+  const need = repNeed(rp);
+  const paid = !rp.paused && repPaidThisMonth(rp);
+  const bits = [repLabel(rp)];
+  if (rp.every === "week") bits.push("≈ " + nf(m, 0) + " في الشهر");
+  bits.push("في السنة " + nf(m * 12, 0));
+  return rowEl({
+    act: "repEdit", id: rp.id,
+    icon: c.icon, iconBg: "color-mix(in srgb,var(--" + c.color + ") 14%, var(--surface))", iconColor: "var(--" + c.color + ")",
+    name: esc(rp.name), wrap: true, meta: bits.join(" · "),
+    badge: rp.paused ? pill("flat", "موقوفة") : paid ? pill("good", "اتدفعت") : need === "cut" ? pill("warn", "اختياري") : "",
+    value: nf(rp.amount), sub: opts.sub || ""
+  });
+}
+/* ---------- تاب الالتزامات ---------- */
+function viewCommit() {
+  const C = commitTotals(), inc = monthlyIncome(), cur = esc(state.settings.currency);
+  const left = inc - C.monthly;
+  const pct = inc > 0 ? C.monthly / inc * 100 : 0;
+  let h = "";
+
+  h += '<div class="bigstat"><div class="lab">التزاماتك الثابتة كل شهر</div>' +
+    '<div class="num2">' + nf(C.monthly) + '<span class="cu">' + cur + "</span></div>" +
+    '<div class="meta">' +
+    "<span>في السنة <b>" + nf(C.monthly * 12, 0) + "</b></span>" +
+    "<span>" + arCommit(C.live.length) + "</span>" +
+    (inc > 0 ? "<span><b>" + Math.round(pct) + "%</b> من دخلك</span>" : "") +
+    "</div></div>";
+
+  if (inc > 0) {
+    const w1 = clamp(C.monthly / inc * 100, 0, 100);
+    h += grp("دخلك بيتقسم إزاي", '<div class="panel pad2">' +
+      '<div class="bar" style="height:14px"><i style="width:' + w1.toFixed(1) + '%;background:var(--s7)"></i></div>' +
+      '<div class="ftrow" style="padding:11px 0 5px;border-bottom:1px solid var(--line)"><span>الدخل الشهري</span>' +
+      '<b style="font-family:var(--ff-display)"><span class="num">' + nf(inc) + "</span></b></div>" +
+      '<div class="ftrow" style="padding:5px 0;border-bottom:1px solid var(--line)"><span>− الالتزامات الثابتة</span>' +
+      '<b style="color:var(--s7);font-family:var(--ff-display)"><span class="num">' + nf(C.monthly) + "</span></b></div>" +
+      '<div class="ftrow" style="padding:5px 0 0"><span>= فاضل للصرف والادخار</span>' +
+      '<b style="color:' + (left < 0 ? "var(--down)" : "var(--up)") + ';font-family:var(--ff-display)"><span class="num">' + nf(left) + "</span></b></div>" +
+      "</div>") +
+      '<p class="sub" style="margin:-10px 2px 18px">' +
+      (left < 0 ? "التزاماتك لوحدها أكبر من دخلك — دي أول حتة لازم تتظبط."
+        : pct > 50 ? "أكتر من نص دخلك مربوط قبل ما تصرف جنيه. المريح إنها تبقى تحت 50%."
+          : "يعني بيفضل معاك " + nf(left) + " " + cur + " بعد الثابت.") + "</p>";
+  }
+
+  if (!C.all.length) {
+    h += grp("التزاماتك", '<div class="panel"><div class="empty"><div class="eic">' + ico("bill") + "</div>" +
+      "<h4>ما فيش التزامات مسجلة</h4><p>الإيجار، النت، الموبايل، الاشتراكات — سجّلها مرة وتعرف إجمالي اللي مربوط عليك كل شهر.</p></div></div>");
+    h += '<button class="btn pri block" data-act="newRep">' + ico("plus") + "ضيف التزام</button>";
+    return h;
+  }
+
+  if (C.un.length)
+    h += grp("صنّفها الأول", '<div class="panel">' +
+      rowEl({ icon: "info", iconBg: "var(--accent-soft)", iconColor: "var(--accent)", wrap: true,
+        name: arCommit(C.un.length) + " لسه مش مصنّف", meta: "افتح كل واحد وقول أساسي ولا ممكن تستغنى عنه — ده اللي بيخلّي تاب التوفير يعرف يقترح عليك." }) +
+      C.un.map(rp => commitRow(rp)).join("") + "</div>", { sub: nf(C.unM, 0) + " " + cur });
+
+  if (C.must.length)
+    h += grp("أساسية", '<div class="panel">' + C.must.map(rp => commitRow(rp)).join("") + "</div>",
+      { sub: nf(C.mustM) + " في الشهر" });
+
+  if (C.cut.length)
+    h += grp("ممكن تستغنى عنها", '<div class="panel">' + C.cut.map(rp => commitRow(rp)).join("") +
+      rowEl({ name: "لو وقفتهم كلهم", meta: "توفير " + nf(C.cutM * 12) + " في السنة", value: nf(C.cutM), sub: "في الشهر", cls: "tot2" }) +
+      "</div>", { sub: nf(C.cutM) + " في الشهر" });
+
+  if (C.paused.length)
+    h += grp("موقوفة", '<div class="panel">' + C.paused.map(rp => commitRow(rp)).join("") + "</div>",
+      { sub: "مش بتتحسب" });
+
+  if (C.incR.length)
+    h += grp("دخل متكرر", '<div class="panel">' + C.incR.map(rp => commitRow(rp)).join("") + "</div>",
+      { sub: nf(C.incomeM) + " في الشهر" });
+
+  // أغلى الالتزامات في السنة
+  const top = C.live.slice().sort((a, b) => repMonthly(b) - repMonthly(a)).slice(0, 5);
+  if (top.length > 1) {
+    const mx = repMonthly(top[0]);
+    h += grp("الأغلى في السنة", '<div class="panel">' + top.map(rp => {
+      const c = catById(rp.catId), m = repMonthly(rp);
+      return rowEl({ act: "repEdit", id: rp.id, name: esc(rp.name), meta: nf(m, 0) + " في الشهر",
+        value: nf(m * 12, 0), sub: "في السنة", cls: "rank",
+        fill: (m / mx * 100).toFixed(1), fillColor: "var(--" + c.color + ")" });
+    }).join("") + "</div>");
+  }
+
+  const pend = repsPending(), upc = repsUpcoming(10);
+  if (pend.length)
+    h += grp("مستحقة دلوقتي", '<div class="panel">' + pend.slice(0, 6).map(({ rp, date }) =>
+      rowEl({ act: "repDo", id: rp.id, v: date, icon: "alert", iconBg: "color-mix(in srgb,var(--crit) 12%, var(--surface))",
+        iconColor: "var(--down)", name: esc(rp.name), meta: "كان المفروض " + fmtDate(date) + " — دوس تسجّلها",
+        value: nf(rp.amount), wrap: true })).join("") + "</div>", { sub: String(pend.length) });
+  if (upc.length)
+    h += grp("جاية قريب", '<div class="panel">' + upc.slice(0, 6).map(({ rp, date }) =>
+      rowEl({ act: "repEdit", id: rp.id, icon: "clock", name: esc(rp.name),
+        meta: fmtDate(date) + " · بعد " + arDays(Math.max(0, daysBetween(todayISO(), date))),
+        value: nf(rp.amount) })).join("") + "</div>");
+
+  h += '<button class="btn pri block" data-act="newRep">' + ico("plus") + "ضيف التزام</button>";
+  return h;
+}
+/* ---------- محرّك التوفير ---------- */
+/* بنشتغل على متوسط آخر الشهور المكتملة اللي فيها صرف — مش شهر واحد ممكن يكون شاذ */
+function savePlan() {
+  const cur = thisMK(), mks = [];
+  for (let i = 1; i <= 3; i++) { const m = mkShift(cur, -i); if (totalsOf(m).exp > 0) mks.push(m); }
+  const useM = mks.length ? mks : [cur];
+  const avgExp = useM.reduce((s, m) => s + totalsOf(m).exp, 0) / useM.length;
+  const inc = monthlyIncome();
+  const C = commitTotals();
+  const savePct = clamp(+state.settings.savePct || 0, 0, 90);
+  const wantSave = inc * savePct / 100;
+  const gap = avgExp - inc;                       // موجب = بيصرف أكتر من دخله
+  const target = Math.max(0, gap) + Math.max(0, wantSave);
+
+  // متوسط الصرف لكل بند رئيسي
+  const byCat = {};
+  useM.forEach(m => {
+    const mm = spendByRootIn(rangeOf("month", m), null);
+    Object.keys(mm).forEach(k => byCat[k] = (byCat[k] || 0) + mm[k] / useM.length);
+  });
+  // الجزء الثابت من كل بند (الالتزامات)
+  const fixedByCat = {};
+  C.live.forEach(r => { const k = rootIdOf(r.catId); fixedByCat[k] = (fixedByCat[k] || 0) + repMonthly(r); });
+
+  const rows = Object.keys(byCat).map(id => {
+    const tot = byCat[id], fix = Math.min(fixedByCat[id] || 0, tot);
+    return { id: id, c: catById(id), total: tot, fixed: fix, flex: Math.max(0, tot - fix) };
+  }).filter(r => r.flex >= 30).sort((a, b) => b.flex - a.flex);
+
+  const flexTotal = rows.reduce((s, r) => s + r.flex, 0);
+  const CAP = 0.30;                               // أقصى تقليل معقول من أي بند متغيّر
+  const maxCut = flexTotal * CAP;
+  let cuts = [];
+  if (target > 0 && flexTotal > 0) {
+    const ratio = Math.min(1, target / maxCut);
+    cuts = rows.map(r => {
+      const cut = Math.round(r.flex * CAP * ratio);
+      return cut >= 20 ? { id: r.id, c: r.c, total: Math.round(r.total), cut: cut, to: Math.round(r.total - cut) } : null;
+    }).filter(Boolean);
+  }
+  const planSaves = cuts.reduce((s, x) => s + x.cut, 0);
+  return { months: useM.length, inc: inc, avgExp: avgExp, gap: gap, wantSave: wantSave, target: target,
+    commit: C, rows: rows, flexTotal: flexTotal, maxCut: maxCut, cuts: cuts, planSaves: planSaves,
+    enough: target <= 0 || planSaves >= target - 1, capped: target > maxCut + 1 };
+}
+/* حاجات صغيرة بتتكرر كتير — مجموعها بيفاجئ */
+function dripSpends(limit) {
+  const since = shiftDay(todayISO(), -60);
+  const map = {};
+  for (const t of state.txs) {
+    if (t.type !== "expense" || t.date < since || t.repId || t.catId === "c_unlog") continue;
+    const k = t.catId + "|" + (t.note || "").trim();
+    if (!map[k]) map[k] = { catId: t.catId, note: (t.note || "").trim(), n: 0, sum: 0 };
+    map[k].n++; map[k].sum += t.amount;
+  }
+  return Object.values(map).filter(e => e.n >= 6 && e.sum >= 150)
+    .map(e => { e.perMonth = e.sum / 2; e.avg = e.sum / e.n; return e; })
+    .sort((a, b) => b.perMonth - a.perMonth).slice(0, limit || 4);
+}
+/* ---------- تاب التوفير ---------- */
+function viewSave() {
+  const P = savePlan(), cur = esc(state.settings.currency);
+  let h = "";
+
+  if (P.inc <= 0) {
+    return '<div class="panel"><div class="empty"><div class="eic">' + ico("up") + "</div>" +
+      "<h4>محتاجين نعرف دخلك الأول</h4><p>اكتب دخلك الشهري من الإعدادات، أو سجّل مرتبك كدخل، وساعتها نقدر نحسبلك إنت محتاج تقلل أد إيه بالظبط.</p></div>" +
+      '<div style="padding:0 14px 14px"><button class="btn pri block" data-act="stProfile">' + ico("edit") + "اكتب دخلك</button></div></div>";
+  }
+
+  // 1) الفجوة
+  const over = P.gap > 0;
+  h += '<div class="bigstat"><div class="lab">' + (over ? "بتصرف أكتر من دخلك بـ" : "بيفضل معاك كل شهر") + "</div>" +
+    '<div class="num2" style="color:' + (over ? "var(--down)" : "var(--up)") + '">' + nf(Math.abs(P.gap)) +
+    '<span class="cu">' + cur + "</span></div>" +
+    '<div class="meta">' +
+    "<span>دخلك <b>" + nf(P.inc, 0) + "</b></span>" +
+    "<span>بتصرف <b>" + nf(P.avgExp, 0) + "</b></span>" +
+    "<span>متوسط <b>" + nf(P.months, 0) + "</b> " + (P.months === 1 ? "شهر" : "شهور") + "</span>" +
+    "</div></div>";
+
+  if (P.target > 0) {
+    h += grp("هدفك", '<div class="panel pad2">' +
+      (over ? '<div class="ftrow" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>عشان تتعادل بس</span>' +
+        '<b style="color:var(--down);font-family:var(--ff-display)"><span class="num">' + nf(P.gap) + "</span></b></div>" : "") +
+      (P.wantSave > 0 ? '<div class="ftrow" style="padding:5px 0;border-bottom:1px solid var(--line)"><span>+ عشان تحوّش ' +
+        nf(+state.settings.savePct || 0, 0) + '%</span><b style="font-family:var(--ff-display)"><span class="num">' + nf(P.wantSave) + "</span></b></div>" : "") +
+      '<div class="ftrow" style="padding:5px 0 0"><span>= لازم تقلل في الشهر</span>' +
+      '<b style="color:var(--accent);font-size:17px;font-family:var(--ff-display)"><span class="num">' + nf(P.target) + "</span></b></div>" +
+      "</div>");
+  } else {
+    h += grp("وقفتك", '<div class="panel">' + rowEl({ icon: "check", iconBg: "color-mix(in srgb,var(--good) 13%, var(--surface))",
+      iconColor: "var(--up)", name: "ماشي كويس", wrap: true,
+      meta: "دخلك أكبر من صرفك وبتوصل لنسبة الادخار اللي حاططها. تحت هتلاقي فرص لو عايز توفر أكتر." }) + "</div>");
+  }
+
+  // 2) الخطة
+  if (P.cuts.length) {
+    const mx = Math.max(...P.cuts.map(x => x.cut));
+    h += grp("خطة التقليل", '<div class="panel">' +
+      P.cuts.map(x => rowEl({
+        act: "catDetail", id: x.id, icon: x.c.icon,
+        iconBg: "color-mix(in srgb,var(--" + x.c.color + ") 14%, var(--surface))", iconColor: "var(--" + x.c.color + ")",
+        name: esc(x.c.name), wrap: true,
+        meta: 'بتصرف <span class="num">' + nf(x.total, 0) + '</span> → خليها <b style="color:var(--ink)"><span class="num">' + nf(x.to, 0) + "</span></b>",
+        value: '<span style="color:var(--up)"><span class="num">' + nf(x.cut, 0) + "</span></span>", sub: "توفير",
+        cls: "rank", fill: (x.cut / mx * 100).toFixed(1), fillColor: "var(--" + x.c.color + ")"
+      })).join("") +
+      rowEl({ name: "الإجمالي", meta: "في السنة " + nf(P.planSaves * 12, 0), value: nf(P.planSaves, 0), sub: "في الشهر", cls: "tot2" }) +
+      "</div>", { sub: "أقصى تقليل 30% من كل بند" });
+
+    h += '<button class="btn pri block" data-act="applyPlan" style="margin:-6px 0 8px">' + ico("check") +
+      "طبّق الخطة — حط الحدود دي</button>" +
+      '<p class="sub" style="margin:0 2px 18px">هيحط حد شهري لكل بند بالرقم ده، ويحط حد للشهر كله بـ ' +
+      nf(Math.max(0, P.avgExp - P.planSaves), 0) + " " + cur + ". تقدر تغيّرهم بعدين من تاب الحدود.</p>";
+
+    if (P.capped)
+      h += grp("كلمة صريحة", '<div class="panel">' + rowEl({
+        icon: "alert", iconBg: "color-mix(in srgb,var(--crit) 12%, var(--surface))", iconColor: "var(--down)",
+        name: "الخطة دي مش كفاية لوحدها", wrap: true,
+        meta: "أقصى اللي ينفع نقلله من البنود المتغيّرة " + nf(P.maxCut, 0) + " في الشهر، وإنت محتاج " + nf(P.target, 0) +
+          ". الباقي (" + nf(P.target - P.maxCut, 0) + ") لازم يجي من الالتزامات الثابتة أو من زيادة الدخل."
+      }) + "</div>");
+  }
+
+  // 3) فرص محددة
+  const opp = [];
+  const C = P.commit;
+  if (C.cutM > 0)
+    opp.push({ ic: "bill", t: "التزامات اختيارية", v: C.cutM,
+      x: arCommit(C.cut.length) + " بـ " + nf(C.cutM, 0) + " في الشهر — يعني " + nf(C.cutM * 12, 0) + " في السنة. دي أسهل فلوس توفرها لأنها مرة واحدة وخلاص.",
+      act: "tab", v2: "commit" });
+  if (C.un.length)
+    opp.push({ ic: "info", t: "فيه " + arCommit(C.un.length) + " لسه مش مصنّف", v: 0,
+      x: "مجموعهم " + nf(C.unM, 0) + " في الشهر. صنّفهم أساسي ولا لأ، وساعتها نعرف نحسبلك توفير حقيقي.", act: "tab", v2: "commit" });
+
+  dripSpends(3).forEach(d => {
+    const c = catById(d.catId);
+    opp.push({ ic: c.icon, t: esc(d.note || c.name), v: d.perMonth / 2,
+      x: nf(d.n, 0) + " مرة في شهرين بمتوسط " + nf(d.avg, 0) + " — يعني " + nf(d.perMonth, 0) +
+        " في الشهر. لو نزّلتها للنص توفر " + nf(d.perMonth / 2, 0) + " في الشهر (" + nf(d.perMonth * 6, 0) + " في السنة)." });
+  });
+
+  // بند زاد عن متوسطه
+  const curM = spendByRootIn(rangeOf("month", thisMK()), null);
+  P.rows.slice(0, 6).forEach(r => {
+    const now = curM[r.id] || 0;
+    const ck = monthClock(thisMK());
+    const pace = ck.day > 3 ? now / ck.day * ck.dim : 0;
+    if (pace > r.total * 1.25 && pace - r.total >= 50)
+      opp.push({ ic: r.c.icon, t: esc(r.c.name) + " ماشي فوق عادته", v: pace - r.total,
+        x: "بالمعدل ده هيقفل الشهر على " + nf(pace, 0) + " بدل " + nf(r.total, 0) + " المعتاد — زيادة " + nf(pace - r.total, 0) + ".",
+        act: "catDetail", id: r.id });
+  });
+
+  if (opp.length) {
+    opp.sort((a, b) => b.v - a.v);
+    h += grp("فرص التوفير", '<div class="panel">' + opp.slice(0, 6).map(o =>
+      rowEl({ act: o.act, id: o.id, v: o.v2, icon: o.ic, iconBg: "var(--surface-2)", iconColor: "var(--muted)",
+        name: o.t, meta: o.x, wrap: true,
+        value: o.v > 0 ? '<span style="color:var(--up)"><span class="num">' + nf(o.v, 0) + "</span></span>" : "",
+        sub: o.v > 0 ? "في الشهر" : "" })).join("") + "</div>",
+      { sub: "مرتبة بالأكبر" });
+  }
+
+  // 4) لو مشيت عليها
+  const tot = P.planSaves + (C.cutM || 0);
+  if (tot > 0) {
+    h += grp("لو مشيت على ده", '<div class="panel pad2">' +
+      '<div class="ftrow" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>توفير في الشهر</span>' +
+      '<b style="color:var(--up);font-family:var(--ff-display)"><span class="num">' + nf(tot, 0) + "</span></b></div>" +
+      '<div class="ftrow" style="padding:5px 0' + (state.goals.length ? ";border-bottom:1px solid var(--line)" : "") + '"><span>في السنة</span>' +
+      '<b style="color:var(--up);font-size:17px;font-family:var(--ff-display)"><span class="num">' + nf(tot * 12, 0) + "</span></b></div>" +
+      (state.goals.length ? (function () {
+        const g = state.goals.slice().sort((a, b) => (+a.target || 0) - (+b.target || 0))[0];
+        const need = Math.max(0, (+g.target || 0) - goalSaved(g));
+        const mo = tot > 0 ? Math.ceil(need / tot) : 0;
+        return '<div class="ftrow" style="padding:5px 0 0"><span>هدف « ' + esc(g.name) + ' » يخلص في</span>' +
+          '<b style="font-family:var(--ff-display)">' + (mo > 0 ? arMonths(mo) : "خلص") + "</b></div>";
+      })() : "") + "</div>");
+  }
+  return h;
+}
+function arMonths(n) {
+  n = Math.round(n);
+  if (n === 1) return "شهر";
+  if (n === 2) return "شهرين";
+  if (n >= 3 && n <= 10) return nf(n, 0) + " شهور";
+  return nf(n, 0) + " شهر";
+}
+function applySavePlan() {
+  const P = savePlan();
+  if (!P.cuts.length) return toast("مفيش خطة نطبقها دلوقتي");
+  P.cuts.forEach(x => { const c = state.categories.find(k => k.id === x.id); if (c) c.limit = x.to; });
+  state.settings.monthCap = Math.max(0, Math.round(P.avgExp - P.planSaves));
+  save("categories", "settings");
+  state.ui.tab = "budget"; render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  toast("حطينا الحدود — حد الشهر " + nf(state.settings.monthCap, 0));
 }
 function viewIncome() {
   const wf = statWSet();
@@ -5443,6 +5813,8 @@ document.addEventListener("click", (ev) => {
     case "repDo": doRepeat(id, v, "do"); closeSheet(); break;
     case "repSkip": doRepeat(id, v, "skip"); closeSheet(); break;
     case "repType": sh.dataset.rtype = v; sh.querySelectorAll('[data-act="repType"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); sh.dataset.cat = ""; paintRepForm(); break;
+    case "repNeed": sh.dataset.rneed = sh.dataset.rneed === v ? "" : v; paintRepForm(); break;
+    case "applyPlan": applySavePlan(); break;
     case "repEvery": sh.dataset.revery = v; sh.querySelectorAll('[data-act="repEvery"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); paintRepForm(); break;
     case "repWd": sh.dataset.rwd = v; paintRepForm(); break;
     case "repCat": sh.dataset.cat = v; paintRepForm(); break;
@@ -5458,7 +5830,8 @@ document.addEventListener("click", (ev) => {
       const data = {
         name: name, type: sh.dataset.rtype, amount: amt, catId: sh.dataset.cat, walletId: sh.dataset.wallet,
         every: sh.dataset.revery, day: clamp(parseInt(el("rpDay").value, 10) || 1, 1, 31),
-        weekday: +sh.dataset.rwd, note: el("rpNote").value.trim().slice(0, 120)
+        weekday: +sh.dataset.rwd, note: el("rpNote").value.trim().slice(0, 120),
+        need: sh.dataset.rtype === "income" ? "" : (sh.dataset.rneed || "")
       };
       const pz = el("rpPause");
       if (id) {
