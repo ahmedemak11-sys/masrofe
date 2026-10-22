@@ -263,7 +263,7 @@ textarea.inp{resize:vertical; min-height:62px}
   border:1px solid var(--line); border-radius:18px; padding:6px;
   margin-bottom:calc(10px + env(safe-area-inset-bottom,0px)); box-shadow:var(--shadow)}
 .tabbar::-webkit-scrollbar{display:none}
-.tabbar button{flex:1 0 54px; min-width:54px; border:0; background:transparent; border-radius:12px;
+.tabbar button{flex:1 1 0; min-width:0; border:0; background:transparent; border-radius:12px;
   display:flex; flex-direction:column; align-items:center; gap:3px; padding:7px 1px 6px; color:var(--muted); font-size:9.5px; font-weight:600}
 .tabbar button span{max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .tabbar button svg{width:19px;height:19px}
@@ -452,7 +452,9 @@ button.r:hover{background:var(--surface-2)}
 .r .rn{font-size:14.5px; font-weight:500; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .r .rm{font-size:12px; color:var(--muted); display:block; margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .r .rm.wrap{white-space:normal; overflow:visible; line-height:1.5; margin-top:3px}
+.r:has(.rm.wrap) .rn{white-space:normal; overflow:visible; line-height:1.4}
 .r:has(.rm.wrap){align-items:flex-start}
+.r .rbg{flex:none; align-self:center}
 .r:has(.rm.wrap) .ri{margin-top:1px}
 .r .rv{font-family:var(--ff-display); font-weight:600; font-size:15px; white-space:nowrap; font-variant-numeric:tabular-nums; text-align:left}
 .r .rv small{display:block; font-size:11.5px; font-weight:400; color:var(--muted); margin-top:1px}
@@ -530,6 +532,9 @@ button.ins:active{background:var(--surface-2)}
 .crumb{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); margin-bottom:11px}
 .crumb svg{width:12px;height:12px}
 .crumb b{color:var(--ink)}
+.incrow{display:flex; gap:9px; align-items:stretch}
+.incrow .inp{flex:1; min-width:0}
+.incrow .btn{flex:none; padding-inline:16px}
 .r.ctr{align-items:center; flex-wrap:wrap}
 .r.ctr .cin{flex:none; width:104px; text-align:center; padding:9px 8px; font-weight:600;
   font-family:var(--ff-display); font-variant-numeric:tabular-nums; direction:ltr}
@@ -665,7 +670,7 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
-const APP_VERSION = "2.8.0";
+const APP_VERSION = "2.8.1";
 const APP_BUILD = "2026-10-22";
 
 /* ---------- helpers ---------- */
@@ -840,7 +845,7 @@ const DEFAULT_WALLETS = [
 const WALLET_ICONS = ["wallet", "safe", "bank", "card", "coins", "phone", "gift", "home"];
 
 const state = {
-  settings: { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "", lastCount: "" },
+  settings: { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "", lastCount: "", incomeMode: "fixed" },
   wallets: JSON.parse(JSON.stringify(DEFAULT_WALLETS)),
   categories: JSON.parse(JSON.stringify(DEFAULT_CATS)),
   txs: [],
@@ -848,7 +853,7 @@ const state = {
   repeats: [],
   shortcuts: [],
   goals: [],
-  ui: { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", statW: "all", sv: "sum", q: "" }
+  ui: { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", statW: "all", sv: "sum", vv: "plan", q: "" }
 };
 
 /* ---------- storage ---------- */
@@ -1754,13 +1759,13 @@ const TABS = [
   { id: "home", name: "الرئيسية", ic: "tabHome" },
   { id: "tx", name: "حركات", ic: "tabList" },
   { id: "stats", name: "تحليل", ic: "tabChart" },
-  { id: "income", name: "الدخل", ic: "up" },
   { id: "commit", name: "التزامات", ic: "bill" },
   { id: "save", name: "توفير", ic: "tDown" },
-  { id: "budget", name: "حدود", ic: "tabShield" },
   { id: "goals", name: "ادخار", ic: "tabTarget" },
   { id: "settings", name: "إعدادات", ic: "gear" }
 ];
+/* تابات قديمة بقت أقسام جوه تابات تانية */
+const TAB_MOVED = { income: ["stats", "inc"], budget: ["save", "limits"] };
 function monthBar() {
   const fwd = state.ui.mk >= thisMK();
   return '<div class="monthbar"><button class="mnav" data-act="mprev" aria-label="الشهر اللي فات">' + ico("chevR") + "</button>" +
@@ -1785,7 +1790,7 @@ function rowEl(o) {
     (o.fill ? '<i class="fill" style="width:' + o.fill + "%;background:" + (o.fillColor || "var(--accent)") + '"></i>' : "") +
     (o.icon ? '<span class="ri" style="background:' + (o.iconBg || "var(--surface-2)") + ";color:" + (o.iconColor || "var(--muted)") + '">' + ico(o.icon) + "</span>" : "") +
     '<span class="rt"><span class="rn">' + o.name + "</span>" + (o.meta ? '<span class="rm' + (o.wrap ? ' wrap' : '') + '">' + o.meta + "</span>" : "") + "</span>" +
-    (o.badge || "") +
+    (o.badge ? '<span class="rbg">' + o.badge + "</span>" : "") +
     (o.value != null ? '<span class="rv">' + o.value + (o.sub ? "<small>" + o.sub + "</small>" : "") + "</span>" : "") +
     (o.act && o.chev !== false ? '<span class="rc">' + ico("chevL") + "</span>" : "") +
     "</" + tag + ">";
@@ -2550,7 +2555,7 @@ function sheetCatDetail(catId) {
   openSheet(esc(c.name), h);
 }
 /* ---------- تاب التحليل ---------- */
-const SVIEWS = [["sum", "نظرة عامة"], ["cats", "البنود"], ["time", "الوقت"], ["txs", "الحركات"]];
+const SVIEWS = [["sum", "نظرة عامة"], ["cats", "البنود"], ["time", "الوقت"], ["txs", "الحركات"], ["inc", "الدخل"]];
 function viewStats() {
   const wf = statWSet(), r = curRange(), pk = statsPack(r, wf);
   const sv = SVIEWS.some(x => x[0] === state.ui.sv) ? state.ui.sv : "sum";
@@ -2558,6 +2563,7 @@ function viewStats() {
     '<div class="sview"><div class="segs">' + SVIEWS.map(x =>
       '<button data-act="sview" data-v="' + x[0] + '" aria-pressed="' + (sv === x[0]) + '">' + x[1] + "</button>").join("") +
     "</div></div>";
+  if (sv === "inc") return h + viewIncome();
   h += statHead(pk);
   if (sv === "sum") h += svSum(pk);
   else if (sv === "cats") h += svCats(pk);
@@ -2832,6 +2838,8 @@ function renderStorageLine() {
 }
 function render() {
   const v = el("view");
+  if (TAB_MOVED[state.ui.tab]) { const mv = TAB_MOVED[state.ui.tab]; state.ui.tab = mv[0];
+    if (mv[0] === "stats") state.ui.sv = mv[1]; else state.ui.vv = mv[1]; }
   if (Lock.on && !Lock.unlocked) {
     el("dock").hidden = true; el("btnAnalyzeTop").hidden = true; updBanner(false);
     v.innerHTML = viewLock();
@@ -2845,14 +2853,13 @@ function render() {
   b.hidden = alerts === 0; b.innerHTML = ico("alert"); b.dataset.act = "allTips";
   b.style.color = alerts ? "var(--crit)" : "";
   const t = state.ui.tab;
-  const body = t === "home" ? viewHome() : t === "tx" ? viewTx() : t === "budget" ? viewBudget()
-    : t === "goals" ? viewGoals() : t === "settings" ? viewSettings() : t === "income" ? viewIncome()
+  const body = t === "home" ? viewHome() : t === "tx" ? viewTx()
+    : t === "goals" ? viewGoals() : t === "settings" ? viewSettings()
       : t === "commit" ? viewCommit() : t === "save" ? viewSave() : viewStats();
-  v.innerHTML = (t === "stats" || t === "settings" || t === "income" || t === "commit" || t === "save" ? "" : monthBar()) + body;
+  v.innerHTML = (t === "home" || t === "tx" || t === "goals" ? monthBar() : "") + body;
   renderStorageLine();
   if (t === "settings") { const f = el("impFile"); if (f) f.addEventListener("change", importFile); }
-  if (t === "stats") { wireCharts(); mountAI(); }
-  if (t === "income") wireCharts();
+  if (t === "stats") { wireCharts(); if (state.ui.sv !== "inc") mountAI(); }
   const s = el("txSearch"); if (s) { s.addEventListener("input", debounce(e => { state.ui.q = e.target.value; const p = e.target.selectionStart; render(); const n = el("txSearch"); if (n) { n.focus(); try { n.setSelectionRange(p, p); } catch (_) { } } }, 260)); }
 }
 function debounce(fn, ms) { let t; return function () { const a = arguments, c = this; clearTimeout(t); t = setTimeout(() => fn.apply(c, a), ms); }; }
@@ -3989,15 +3996,24 @@ function commitTotals() {
     incomeM: incR.reduce((x, r) => x + repMonthly(r), 0), incR: incR
   };
 }
-/* دخل شهري للمقارنة: المسجّل فعلاً، وإلا اللي مكتوب في الإعدادات */
-function monthlyIncome() {
+/* متوسط الدخل المسجّل فعلاً في الحركات — بيتأثر بأي فلوس زيادة دخلت */
+function loggedIncome() {
   const mk = [];
   for (let i = 1; i <= 3; i++) { const m = mkShift(thisMK(), -i); if (totalsOf(m).inc > 0) mk.push(m); }
   if (mk.length) return mk.reduce((s, m) => s + totalsOf(m).inc, 0) / mk.length;
-  const t = totalsOf(thisMK()).inc;
-  if (t > 0) return t;
-  return +state.settings.income || 0;
+  return totalsOf(thisMK()).inc;
 }
+/* الدخل اللي الحسابات بتتبني عليه.
+   الأصل: الرقم اللي إنت كاتبه بنفسك — ده الثابت اللي بتعتمد عليه كل شهر.
+   المسجّل في الحركات بيبقى اختيار تاني، لأن أي فلوس زيادة دخلت بترفعه وتضلّل الحساب. */
+function monthlyIncome() {
+  const fixed = +state.settings.income || 0;
+  const logged = loggedIncome();
+  if (state.settings.incomeMode === "actual") return logged > 0 ? logged : fixed;
+  return fixed > 0 ? fixed : logged;
+}
+const incomeSrcLabel = () => (state.settings.incomeMode === "actual" && loggedIncome() > 0)
+  ? "من متوسط اللي اتسجّل" : "الرقم اللي إنت كاتبه";
 /* هل الالتزام ده اتدفع الشهر ده؟ */
 function repPaidThisMonth(rp) {
   const r = rangeOf("month", thisMK());
@@ -4019,6 +4035,41 @@ function commitRow(rp, opts) {
     value: nf(rp.amount), sub: opts.sub || ""
   });
 }
+/* بطاقة الدخل: تكتب رقمك وتشوف الفرق بينه وبين اللي اتسجّل */
+function incomeCard() {
+  const cur = esc(state.settings.currency);
+  const fixed = +state.settings.income || 0;
+  const logged = Math.round(loggedIncome());
+  const mode = state.settings.incomeMode === "actual" ? "actual" : "fixed";
+  const used = Math.round(monthlyIncome());
+  const diff = fixed > 0 && logged > 0 ? logged - fixed : 0;
+
+  let h = '<section class="grp"><div class="gh"><h3>دخلك الشهري</h3>' +
+    '<span class="sub2">' + incomeSrcLabel() + "</span></div>" +
+    '<div class="panel pad2">' +
+    '<div class="incrow"><input class="inp big" id="incFix" type="number" inputmode="decimal" placeholder="0" value="' +
+    (fixed > 0 ? fixed : "") + '" aria-label="دخلك الشهري الثابت">' +
+    '<button class="btn pri" data-act="saveInc">' + ico("check") + "حفظ</button></div>" +
+    '<p class="sub" style="margin:9px 0 0">اكتب اللي بيدخلك كل شهر بانتظام — المرتب وبس. الفلوس اللي بتيجي زيادة مرة ومرة لأ سجّلها حركة دخل عادي، بس ما تحطهاش هنا عشان ما تضلّلش الحساب.</p>';
+
+  if (logged > 0) {
+    h += '<div style="margin-top:13px;padding-top:12px;border-top:1px solid var(--line)">' +
+      '<div class="ftrow" style="padding:4px 0"><span>اللي اتسجّل فعلاً (متوسط)</span>' +
+      '<b style="font-family:var(--ff-display)"><span class="num">' + nf(logged) + "</span></b></div>" +
+      (Math.abs(diff) >= 1 && fixed > 0
+        ? '<p class="sub" style="margin:6px 0 0">' + (diff > 0
+          ? "اللي اتسجّل أعلى بـ " + nf(Math.abs(diff)) + " — غالباً فلوس زيادة دخلت. الحسابات ماشية على رقمك الثابت."
+          : "اللي اتسجّل أقل بـ " + nf(Math.abs(diff)) + " — يمكن فيه دخل ما سجلتهوش.") + "</p>"
+        : "") +
+      '<div class="segs" style="margin-top:11px">' +
+      '<button data-act="incMode" data-v="fixed" aria-pressed="' + (mode === "fixed") + '">احسب على رقمي</button>' +
+      '<button data-act="incMode" data-v="actual" aria-pressed="' + (mode === "actual") + '">احسب على المسجّل</button></div></div>';
+  }
+  h += "</div></section>";
+  if (used <= 0)
+    h += '<p class="sub" style="margin:-10px 2px 18px;color:var(--down)">من غير دخل مش هنقدر نحسبلك نسبة الالتزامات ولا خطة التوفير.</p>';
+  return h;
+}
 /* ---------- تاب الالتزامات ---------- */
 function viewCommit() {
   const C = commitTotals(), inc = monthlyIncome(), cur = esc(state.settings.currency);
@@ -4026,6 +4077,7 @@ function viewCommit() {
   const pct = inc > 0 ? C.monthly / inc * 100 : 0;
   let h = "";
 
+  h += incomeCard();
   h += '<div class="bigstat"><div class="lab">التزاماتك الثابتة كل شهر</div>' +
     '<div class="num2">' + nf(C.monthly) + '<span class="cu">' + cur + "</span></div>" +
     '<div class="meta">' +
@@ -4168,7 +4220,15 @@ function dripSpends(limit) {
     .sort((a, b) => b.perMonth - a.perMonth).slice(0, limit || 4);
 }
 /* ---------- تاب التوفير ---------- */
+const VVIEWS = [["plan", "الخطة"], ["limits", "الحدود"]];
 function viewSave() {
+  const vv = VVIEWS.some(x => x[0] === state.ui.vv) ? state.ui.vv : "plan";
+  const head = '<div class="sview"><div class="segs">' + VVIEWS.map(x =>
+    '<button data-act="vview" data-v="' + x[0] + '" aria-pressed="' + (vv === x[0]) + '">' + x[1] + "</button>").join("") + "</div></div>";
+  if (vv === "limits") return head + monthBar() + viewBudget();
+  return head + viewPlan();
+}
+function viewPlan() {
   const P = savePlan(), cur = esc(state.settings.currency);
   let h = "";
 
@@ -4304,7 +4364,7 @@ function applySavePlan() {
   P.cuts.forEach(x => { const c = state.categories.find(k => k.id === x.id); if (c) c.limit = x.to; });
   state.settings.monthCap = Math.max(0, Math.round(P.avgExp - P.planSaves));
   save("categories", "settings");
-  state.ui.tab = "budget"; render();
+  state.ui.tab = "save"; state.ui.vv = "limits"; render();
   window.scrollTo({ top: 0, behavior: "smooth" });
   toast("حطينا الحدود — حد الشهر " + nf(state.settings.monthCap, 0));
 }
@@ -4315,7 +4375,7 @@ function viewIncome() {
   const cur = esc(state.settings.currency);
   const net = T.inc - T.exp;
   const rate = T.inc > 0 ? (T.inc - T.exp) / T.inc * 100 : null;
-  let h = periodNav() + walletFilterBar();
+  let h = "";
 
   // المقارنة: عمودين جنب بعض
   const mx = Math.max(T.inc, T.exp, 1);
@@ -5477,7 +5537,13 @@ document.addEventListener("click", (ev) => {
         catch (e) { toast("الجهاز ده مش بيدعم البصمة، أو الطلب اتلغى"); }
       })();
       break;
-    case "tab": state.ui.tab = v; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
+    case "tab": {
+      const mv = TAB_MOVED[v];
+      if (mv) { state.ui.tab = mv[0]; if (mv[0] === "stats") state.ui.sv = mv[1]; else state.ui.vv = mv[1]; }
+      else state.ui.tab = v;
+      render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
+    }
+    case "vview": state.ui.vv = v; state.ui.tab = "save"; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
     case "mprev": state.ui.mk = mkShift(state.ui.mk, -1); render(); break;
     case "mnext": if (state.ui.mk < thisMK()) { state.ui.mk = mkShift(state.ui.mk, 1); render(); } break;
     case "goTx": state.ui.tab = "tx"; render(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
@@ -5815,6 +5881,14 @@ document.addEventListener("click", (ev) => {
     case "repType": sh.dataset.rtype = v; sh.querySelectorAll('[data-act="repType"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); sh.dataset.cat = ""; paintRepForm(); break;
     case "repNeed": sh.dataset.rneed = sh.dataset.rneed === v ? "" : v; paintRepForm(); break;
     case "applyPlan": applySavePlan(); break;
+    case "saveInc": {
+      const n = el("incFix"); if (!n) break;
+      state.settings.income = Math.max(0, Math.round((parseFloat(n.value) || 0) * 100) / 100);
+      save("settings"); render();
+      toast(state.settings.income > 0 ? "دخلك دلوقتي " + nf(state.settings.income) + " " + esc(state.settings.currency) : "شيلنا رقم الدخل");
+      break;
+    }
+    case "incMode": state.settings.incomeMode = v; save("settings"); render(); break;
     case "repEvery": sh.dataset.revery = v; sh.querySelectorAll('[data-act="repEvery"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); paintRepForm(); break;
     case "repWd": sh.dataset.rwd = v; paintRepForm(); break;
     case "repCat": sh.dataset.cat = v; paintRepForm(); break;
@@ -6001,11 +6075,11 @@ window.addEventListener("scroll", () => { el("topbar").classList.toggle("scrolle
 
 async function doReset() {
   const mks = [...new Set(state.txs.map(t => mkOf(t.date)))];
-  state.settings = { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "", lastCount: "" };
+  state.settings = { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "", lastCount: "", incomeMode: "fixed" };
   state.categories = JSON.parse(JSON.stringify(DEFAULT_CATS));
   state.wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
   state.txs = []; state.goals = []; state.debts = []; state.repeats = []; state.shortcuts = [];
-  state.ui = { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", statW: "all", sv: "sum", q: "" };
+  state.ui = { tab: "home", mk: thisMK(), day: todayISO(), year: todayISO().slice(0, 4), period: "month", filter: "all", wallet: "all", statW: "all", sv: "sum", vv: "plan", q: "" };
   writeLocal();
   if (Store.db) {
     try {
