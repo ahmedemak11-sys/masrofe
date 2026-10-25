@@ -284,6 +284,26 @@ textarea.inp{resize:vertical; min-height:62px}
 @keyframes rise{from{transform:translateY(22px); opacity:.6} to{transform:none; opacity:1}}
 @media(prefers-reduced-motion:reduce){ .sheet{animation:none} .bar > i{transition:none} }
 .sheet .grip{width:40px;height:4px;border-radius:99px;background:var(--line);margin:9px auto 4px}
+/* مودال منتصف الشاشة */
+.backdrop.center{align-items:center; padding:16px}
+.backdrop.center .sheet{border-radius:22px; border-bottom:1px solid var(--line); max-height:88vh;
+  padding-bottom:20px; animation:pop .26s cubic-bezier(.2,.9,.3,1)}
+.backdrop.center .sheet .grip{display:none}
+@keyframes pop{from{transform:scale(.96); opacity:0} to{transform:none; opacity:1}}
+@media(prefers-reduced-motion:reduce){ .backdrop.center .sheet{animation:none} }
+.wraphead{text-align:center; padding:2px 0 13px}
+.wraphead .wl{font-size:12.5px; color:var(--muted)}
+.wraphead h2{margin:3px 0 0; font-family:var(--ff-display); font-size:23px; font-weight:700; letter-spacing:-.02em}
+.wrapbox{background:var(--surface-2); border:1px solid var(--line); border-radius:16px; padding:12px 15px}
+.wrow{display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:5px 0; font-size:13.5px; color:var(--muted)}
+.wrow b{font-family:var(--ff-display); font-weight:600; font-size:15px; color:var(--ink); font-variant-numeric:tabular-nums}
+.wsep{height:1px; background:var(--line); margin:8px 0 4px}
+.wrapask{background:var(--surface-2); border:1px solid var(--line); border-radius:16px; padding:15px; margin-top:2px}
+.wsub{margin:18px 2px 8px; font-family:var(--ff-display); font-size:14.5px; font-weight:600}
+.wrapask h3{margin:0 0 7px; font-family:var(--ff-display); font-size:15.5px; font-weight:600;
+  display:flex; align-items:center; gap:8px}
+.wrapask h3 svg{width:18px;height:18px;color:var(--s4);flex:none}
+.wrapask .field{margin-bottom:12px}
 .sheet .shd{position:sticky; top:0; background:var(--surface); z-index:2; display:flex; align-items:center; gap:10px; padding:6px 0 12px}
 .sheet .shd h3{margin:0; font-family:var(--ff-display); font-size:17px; font-weight:600}
 .sheet .shd .x{margin-inline-start:auto}
@@ -664,8 +684,8 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
-const APP_VERSION = "2.7.0";
-const APP_BUILD = "2026-10-20";
+const APP_VERSION = "2.7.1";
+const APP_BUILD = "2026-10-25";
 
 /* ---------- helpers ---------- */
 const $ = (s, r) => (r || document).querySelector(s);
@@ -839,7 +859,7 @@ const DEFAULT_WALLETS = [
 const WALLET_ICONS = ["wallet", "safe", "bank", "card", "coins", "phone", "gift", "home"];
 
 const state = {
-  settings: { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "", lastCount: "" },
+  settings: { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "", lastCount: "", lastWrapMK: "" },
   wallets: JSON.parse(JSON.stringify(DEFAULT_WALLETS)),
   categories: JSON.parse(JSON.stringify(DEFAULT_CATS)),
   txs: [],
@@ -2910,7 +2930,17 @@ function openSheet(title, body, onMount) {
   sheetMount = onMount || null;
   if (sheetMount) sheetMount();
 }
-function closeSheet() { el("backdrop").hidden = true; el("sheet").innerHTML = ""; document.body.style.overflow = ""; sheetMount = null; }
+function closeSheet() {
+  el("backdrop").hidden = true; el("backdrop").classList.remove("center");
+  el("sheet").classList.remove("modal");
+  el("sheet").innerHTML = ""; document.body.style.overflow = ""; sheetMount = null;
+}
+/* زي الشيت بالظبط بس بيطلع في نص الشاشة — للحاجات اللي بتيجي من غير ما تطلبها */
+function openModal(title, body, onMount) {
+  openSheet(title, body, onMount);
+  el("backdrop").classList.add("center");
+  el("sheet").classList.add("modal");
+}
 
 function lastUsedWallet(catId) {
   const pool = state.txs.filter(t => t.type !== "transfer" && (!catId || t.catId === catId));
@@ -3405,6 +3435,162 @@ function paintWdTo() {
   if (n) n.innerHTML = sel === "_alloc"
     ? "الفلوس هتفضل في محفظة الادخار بس من غير ما تكون محجوزة للهدف ده."
     : "الفلوس هتخرج من الادخار وترجع لـ <b>" + esc(walletById(sel).name) + "</b> وتبقى متاحة للصرف.";
+}
+/* ================= ملخص آخر الشهر =================
+   أول ما الشهر يخلص، بنوريك حكاية الشهر كله ونعرض نحوّل الباقي للادخار. */
+function arCount(n, one, two, few, many) {
+  n = Math.round(n);
+  if (n === 1) return one;
+  if (n === 2) return two;
+  if (n >= 3 && n <= 10) return nf(n, 0) + " " + few;
+  return nf(n, 0) + " " + many;
+}
+const arTx = (n) => arCount(n, "حركة واحدة", "حركتين", "حركات", "حركة");
+/* رصيد المتاح للصرف قبل تاريخ معيّن — عشان نعرف كان معاك كام أول الشهر */
+function freeAt(iso) {
+  const ids = new Set(spendWallets().map(w => w.id));
+  let s = 0;
+  state.wallets.forEach(w => { if (ids.has(w.id)) s += +w.opening || 0; });
+  for (const t of state.txs) {
+    if (t.date >= iso) continue;
+    if (t.type === "transfer") {
+      if (ids.has(t.fromWallet)) s -= t.amount;
+      if (ids.has(t.toWallet)) s += t.amount;
+    } else if (ids.has(t.walletId)) {
+      s += t.type === "income" ? t.amount : -t.amount;
+    }
+  }
+  for (const d of state.debts) {
+    const sign = d.dir === "out" ? -1 : 1;
+    if ((d.date || "") < iso && ids.has(d.walletId)) s += sign * (+d.amount || 0);
+    (d.payments || []).forEach(pp => {
+      const w = pp.walletId || d.walletId;
+      if ((pp.date || d.date || "") < iso && ids.has(w)) s -= sign * (+pp.amount || 0);
+    });
+  }
+  return Math.round(s * 100) / 100;
+}
+/* صافي اللي اتحوّل للادخار جوه شهر */
+function savedInMonth(mk) {
+  const ids = new Set(saveWallets().map(w => w.id));
+  let s = 0;
+  for (const t of state.txs) {
+    if (t.type !== "transfer" || mkOf(t.date) !== mk) continue;
+    if (ids.has(t.toWallet)) s += t.amount;
+    if (ids.has(t.fromWallet)) s -= t.amount;
+  }
+  return Math.round(s * 100) / 100;
+}
+function monthWrap(mk) {
+  const r = rangeOf("month", mk);
+  const T = totalsOf(mk);
+  const start = freeAt(r.from);
+  const end = freeAt(shiftDay(r.to, 1));
+  const toSave = savedInMonth(mk);
+  const B = balanceNow();
+  const prev = mkShift(mk, -1), P = totalsOf(prev);
+  const cats = Object.entries(spendByRootIn(r, null)).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
+  const days = daysIn(mk);
+  return {
+    mk: mk, label: mkLabel(mk), start: start, end: end, inc: T.inc, exp: T.exp, toSave: toSave,
+    left: Math.round((end) * 100) / 100,
+    net: Math.round((T.inc - T.exp) * 100) / 100,
+    free: B.free, locked: B.locked,
+    perDay: T.exp / days, days: days,
+    cats: cats, prevExp: P.exp, nTx: state.txs.filter(t => mkOf(t.date) === mk && t.type === "expense").length,
+    canMove: Math.max(0, Math.min(Math.round(end * 100) / 100, B.free))
+  };
+}
+/* الشهر اللي محتاج يتعرض ملخصه — مرة واحدة بس */
+function wrapDue() {
+  const prev = mkShift(thisMK(), -1);
+  if ((state.settings.lastWrapMK || "") >= prev) return "";
+  if (!state.txs.some(t => mkOf(t.date) === prev)) return "";
+  return prev;
+}
+function wrapSeen(mk) {
+  if ((state.settings.lastWrapMK || "") < mk) { state.settings.lastWrapMK = mk; save("settings"); }
+}
+function sheetWrap(mk, manual) {
+  const W = monthWrap(mk), cur = esc(state.settings.currency);
+  const saves = saveWallets();
+  const line = (k, v, color, strong) =>
+    '<div class="wrow"><span>' + k + "</span>" +
+    '<b' + (color ? ' style="color:' + color + (strong ? ";font-size:17px" : "") + '"' : (strong ? ' style="font-size:17px"' : "")) + '>' +
+    '<span class="num">' + v + "</span></b></div>";
+
+  let h = '<p class="sub" style="margin:0 0 12px;text-align:center">الشهر خلص — دي حكايته في سطور.</p>';
+
+  h += '<div class="wrapbox">' +
+    line("كان معاك أول الشهر", nf(W.start)) +
+    (W.inc > 0 ? line("+ دخل", nf(W.inc), "var(--up)") : "") +
+    line("− صرفت", nf(W.exp), "var(--down)") +
+    (Math.abs(W.toSave) > 0.004 ? line((W.toSave > 0 ? "− حوّلت للادخار" : "+ سحبت من الادخار"), nf(Math.abs(W.toSave)), "var(--s4)") : "") +
+    '<div class="wsep"></div>' +
+    line("فضل معاك آخر الشهر", nf(W.left), W.left > 0 ? "var(--up)" : "var(--down)", true) +
+    "</div>";
+
+  h += '<p class="sub" style="margin:10px 2px 14px;text-align:center">' +
+    (W.exp > 0 ? "متوسط يومك كان <b style=\"color:var(--ink)\">" + nf(W.perDay, 0) + "</b> " + cur +
+      " على " + arTx(W.nTx) + (W.prevExp > 0 ? " · " + (W.exp > W.prevExp
+        ? "صرفت أكتر من " + mkLabel(mkShift(mk, -1)) + " بـ " + nf(W.exp - W.prevExp, 0)
+        : "صرفت أقل من " + mkLabel(mkShift(mk, -1)) + " بـ " + nf(W.prevExp - W.exp, 0)) : "") + "." : "ما كانش فيه صرف الشهر ده.") +
+    "</p>";
+
+  if (W.canMove > 0.004 && saves.length) {
+    h += '<div class="wrapask"><h3>' + ico("tabTarget") + "تحوّل الباقي للادخار؟</h3>" +
+      '<p class="sub" style="margin:0 0 12px">لو حوّلته هيختفي من « متاح للصرف » ويفضل محجوز لك. تقدر ترجّعه في أي وقت.</p>' +
+      '<div class="field"><label for="wpAmt">المبلغ</label>' +
+      '<input class="inp big" id="wpAmt" type="number" inputmode="decimal" value="' + W.canMove + '" max="' + W.canMove + '">' +
+      '<p class="sub" style="margin:7px 0 0">متاح معاك دلوقتي <b style="color:var(--ink)"><span class="num">' + nf(W.free) + "</span></b> " + cur + ".</p></div>" +
+      (saves.length > 1 ? '<div class="field"><label>يتحط فين؟</label><div class="chips" id="wpD"></div></div>' : "") +
+      (state.goals.length ? '<div class="field"><label>يتحسب لهدف؟</label><div class="chips" id="wpG"></div></div>' : "") +
+      '<button class="btn pri block" data-act="wrapMove" data-v="' + mk + '">' + ico("check") + "حوّل للادخار</button>" +
+      '<button class="btn ghost block" data-act="wrapSkip" data-v="' + mk + '" style="margin-top:8px">سيبها متاحة للصرف</button>' +
+      "</div>";
+  } else {
+    h += '<div class="wrapask">' +
+      (W.left <= 0.004
+        ? '<p class="sub" style="margin:0 0 12px;text-align:center">ما فضلش فلوس آخر الشهر، فمفيش حاجة نحوّلها دلوقتي.</p>'
+        : !saves.length
+          ? '<p class="sub" style="margin:0 0 12px;text-align:center">مفيش مكان ادخار عندك — ضيف واحد من « أماكن الفلوس » وساعتها نقدر نحوّلّك الباقي.</p>'
+          : '<p class="sub" style="margin:0 0 12px;text-align:center">المتاح معاك دلوقتي ' + nf(W.free) + " " + cur + "، فمفيش فايض نحوّله.</p>") +
+      '<button class="btn pri block" data-act="wrapSkip" data-v="' + mk + '">' + ico("check") + "تمام</button></div>";
+  }
+
+  if (W.cats.length) {
+    const mx = W.cats[0][1];
+    h += '<h3 class="wsub">فلوسك راحت فين</h3><div class="panel">' + W.cats.slice(0, 3).map(([id, v]) => {
+      const c = catById(id);
+      return rowEl({ icon: c.icon, iconBg: "color-mix(in srgb,var(--" + c.color + ") 14%, var(--surface))",
+        iconColor: "var(--" + c.color + ")", name: esc(c.name), value: nf(v),
+        sub: Math.round(v / W.exp * 100) + "%", cls: "rank",
+        fill: (v / mx * 100).toFixed(1), fillColor: "var(--" + c.color + ")" });
+    }).join("") + "</div>";
+  }
+
+  openModal("ملخص " + W.label, h, () => {
+    const sh = el("sheet");
+    sh.dataset.wmk = mk;
+    sh.dataset.dst = (saves[0] || {}).id || "";
+    sh.dataset.goal = "";
+    paintWrapPick();
+    const a = el("wpAmt"); if (a) setTimeout(() => { a.focus(); a.select(); }, 80);
+  });
+  if (!manual) wrapSeen(mk);
+}
+function paintWrapPick() {
+  const sh = el("sheet"), wb = walletBalances();
+  const d = el("wpD");
+  if (d) d.innerHTML = saveWallets().map(w =>
+    '<button class="chip" data-act="wpDst" data-v="' + w.id + '" aria-pressed="' + (w.id === sh.dataset.dst) + '" style="' +
+    (w.id === sh.dataset.dst ? "color:var(--" + w.color + ")" : "") + '">' +
+    '<span style="color:var(--' + w.color + ')">' + ico(w.icon) + "</span>" + esc(w.name) +
+    ' <span class="num" style="opacity:.6">' + nf(wb[w.id] || 0) + "</span></button>").join("");
+  const g = el("wpG");
+  if (g) g.innerHTML = '<button class="chip" data-act="wpGoal" data-v="" aria-pressed="' + (!sh.dataset.goal) + '">من غير هدف</button>' +
+    state.goals.map(x => '<button class="chip" data-act="wpGoal" data-v="' + x.id + '" aria-pressed="' + (x.id === sh.dataset.goal) + '">' +
+      ico("tabTarget") + esc(x.name) + "</button>").join("");
 }
 function sheetSaveMove(dir) {
   const B = balanceNow();
@@ -4064,6 +4250,9 @@ function viewSettings() {
     "</div>";
 
   h += '<h2 class="sec">بياناتك</h2><div class="card">' +
+    srow("wrapOpen", "cal", "ملخص الشهر اللي فات",
+      (function () { const mk = mkShift(thisMK(), -1); const T = totalsOf(mk);
+        return T.exp > 0 ? mkLabel(mk) + " · صرفت " + nf(T.exp) + " " + esc(s.currency) : "ما فيش حركات في " + mkLabel(mk); })()) +
     srow("stBackup", "down", "نسخة احتياطية", a === null ? "لسه ما خدتش نسخة" : a === 0 ? "آخر نسخة النهاردة" : "آخر نسخة من " + a + " يوم",
       a === null || a > 21 ? pill("warn", "خد نسخة") : pill("good", "تمام")) +
     srow("count", "scale", "عدّ فلوسك", (function () {
@@ -5546,6 +5735,44 @@ document.addEventListener("click", (ev) => {
       }
       break;
     }
+    case "wrapOpen": closeSheet(); setTimeout(() => sheetWrap(v || mkShift(thisMK(), -1), true), 160); break;
+    case "wpDst": sh.dataset.dst = v; paintWrapPick(); break;
+    case "wpGoal": sh.dataset.goal = v || ""; paintWrapPick(); break;
+    case "wrapSkip": wrapSeen(v); closeSheet(); render(); break;
+    case "wrapMove": {
+      const amt = Math.round((parseFloat(el("wpAmt").value) || 0) * 100) / 100;
+      if (!(amt > 0)) return toast("اكتب مبلغ");
+      const sw = state.wallets.find(w => w.id === sh.dataset.dst && isSaveW(w)) || saveWallets()[0];
+      if (!sw) return toast("مفيش مكان ادخار");
+      const B = balanceNow();
+      if (amt > B.free + 0.004) return toast("مش متاح غير " + money2(B.free));
+      // بنسحب من أكبر محفظة صرف، ولو مش كفاية بنكمّل من اللي بعدها
+      const wb = walletBalances();
+      const src = spendWallets().filter(w => (wb[w.id] || 0) > 0.004)
+        .sort((a, b) => (wb[b.id] || 0) - (wb[a.id] || 0));
+      let rest = amt;
+      const today = todayISO();
+      const g = state.goals.find(x => x.id === sh.dataset.goal);
+      const made = [];
+      for (const w of src) {
+        if (rest <= 0.004) break;
+        const take = Math.min(rest, Math.round((wb[w.id] || 0) * 100) / 100);
+        if (take <= 0.004) continue;
+        const tx = { id: uid("t"), type: "transfer", amount: take, fromWallet: w.id, toWallet: sw.id,
+          catId: "", walletId: "", date: today, note: "ادخار · ملخص " + mkLabel(v) + (g ? " · " + g.name : ""),
+          goalId: g ? g.id : undefined, at: Date.now() + made.length };
+        state.txs.push(tx); made.push(tx); rest = Math.round((rest - take) * 100) / 100;
+      }
+      if (!made.length) return toast("مفيش فلوس متاحة نحوّلها");
+      if (g) g.moves = (g.moves || []).concat(made.map(tx => ({ id: uid("mv"), date: today, amount: tx.amount,
+        kind: "transfer", from: tx.fromWallet, to: tx.toWallet, txId: tx.id, at: tx.at })));
+      wrapSeen(v);
+      save("m:" + mkOf(today));
+      if (g) save("goals");
+      closeSheet(); render();
+      toast("اتحوّل " + money2(amt - rest) + " للادخار" + (g ? " لهدف " + g.name : ""));
+      break;
+    }
     case "saveMove": sheetSaveMove(v); break;
     case "doSaveMove": {
       const amt = Math.round((parseFloat(el("smAmt").value) || 0) * 100) / 100;
@@ -5628,7 +5855,7 @@ window.addEventListener("scroll", () => { el("topbar").classList.toggle("scrolle
 
 async function doReset() {
   const mks = [...new Set(state.txs.map(t => mkOf(t.date)))];
-  state.settings = { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "", lastCount: "" };
+  state.settings = { name: "", currency: "ج.م", income: 0, savePct: 15, monthCap: 0, onboarded: false, lastBackup: "", lastCount: "", lastWrapMK: "" };
   state.categories = JSON.parse(JSON.stringify(DEFAULT_CATS));
   state.wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
   state.txs = []; state.goals = []; state.debts = []; state.repeats = []; state.shortcuts = [];
@@ -5670,8 +5897,19 @@ el("fab").innerHTML = ico("plus");
   bootBackup();
 })();
 
+/* الملخص بيطلع لوحده أول ما تفتح التطبيق في شهر جديد */
+function maybeWrap() {
+  try {
+    if (!state.settings.onboarded) return;
+    if (Lock.on && !Lock.unlocked) return;
+    if (!el("backdrop").hidden) return;        // في شاشة مفتوحة بالفعل
+    const mk = wrapDue();
+    if (mk) setTimeout(() => { if (el("backdrop").hidden) sheetWrap(mk); }, 700);
+  } catch (_) { }
+}
 function bootBackup() {
   try {
+    maybeWrap();
     AutoBk.init().then(() => render()).catch(() => { });
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState !== "hidden") return;
