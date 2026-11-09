@@ -3,21 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="مصروفي — تطبيق عربي لتتبع المصاريف وحدود الصرف والسلف وخطط الادخار. مقفول برمز وبصمة، وبيشتغل من غير نت.">
 <meta name="theme-color" content="#0D6470">
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="مصروفي">
-<meta name="mobile-web-app-capable" content="yes">
-<style>
-:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-body{margin:0;font-family:system-ui,sans-serif;font-size:14px;background:#fcfcfb}
-img{max-width:100%}
-[hidden]{display:none!important}
-</style>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>مصروفي</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
@@ -681,11 +673,32 @@ hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 <div class="updbar" id="updBar" hidden></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script type="module">
+/* تحميل Firebase من CDN جوجل. لو فشل، التطبيق بيكمّل شغال على الجهاز. */
+const FBV = "13.2.0";
+const BASE = "https://www.gstatic.com/firebasejs/" + FBV;
+try {
+  const [app, auth, fs] = await Promise.all([
+    import(BASE + "/firebase-app.js"),
+    import(BASE + "/firebase-auth.js"),
+    import(BASE + "/firebase-firestore.js")
+  ]);
+  window.FB = { app: app, auth: auth, fs: fs };
+} catch (e) {
+  window.FB_ERR = (e && e.message) || "مقدرناش نحمّل Firebase";
+}
+window.dispatchEvent(new Event("fb-ready"));
+</script>
+
+<!-- مفاتيح مشروعك في ملف لوحده. لو مش موجود أو فاضي، التطبيق
+     بيشتغل على الجهاز بس من غير تسجيل دخول. -->
+<script src="./firebase-config.js" onerror="window.FB_NOCFG=1"></script>
+
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
-const APP_VERSION = "2.7.1";
-const APP_BUILD = "2026-10-25";
+const APP_VERSION = "3.1.0";
+const APP_BUILD = "2026-11-09";
 
 /* ---------- helpers ---------- */
 const $ = (s, r) => (r || document).querySelector(s);
@@ -910,17 +923,22 @@ function migrate(d) {
   (d.goals || []).forEach(g => { if (!Array.isArray(g.moves)) g.moves = []; if (g.saved0 == null) g.saved0 = 0; });
   return d;
 }
-function applyData(d) {
+function applyData(d, mode) {
   if (!d) return false;
   migrate(d);
   if (d.settings) Object.assign(state.settings, d.settings);
   if (Array.isArray(d.wallets) && d.wallets.length) state.wallets = d.wallets;
   if (Array.isArray(d.categories) && d.categories.length) state.categories = d.categories;
-  if (Array.isArray(d.txs)) state.txs = d.txs;
-  if (Array.isArray(d.debts)) state.debts = d.debts;
-  if (Array.isArray(d.repeats)) state.repeats = d.repeats;
-  if (Array.isArray(d.shortcuts)) state.shortcuts = d.shortcuts;
-  if (Array.isArray(d.goals)) state.goals = d.goals;
+  const take = (key) => {
+    if (!Array.isArray(d[key])) return;
+    if (mode === "replace" || !state[key].length) { state[key] = d[key]; return; }
+    // دمج بالمعرّف: اللي جاي ياخد الأولوية، واللي عندنا ومش عندهم يفضل.
+    // ده بيمنع إن حركة سجّلتها وإحنا بنحمّل من السحابة تضيع.
+    const seen = new Set(d[key].map(x => x && x.id));
+    const mine = state[key].filter(x => x && x.id && !seen.has(x.id));
+    state[key] = d[key].concat(mine);
+  };
+  ["txs", "debts", "repeats", "shortcuts", "goals"].forEach(take);
   return true;
 }
 /* بند فرق الجرد لازم يكون موجود حتى للناس اللي عندهم نسخة قديمة */
@@ -969,7 +987,7 @@ function readLocal() {
     const raw = localStorage.getItem(LS); if (!raw) return false;
     const d = JSON.parse(raw);
     if (d && d.enc) return "encrypted";
-    return applyData(d);
+    return applyData(d, "replace");
   } catch (e) { return false; }
 }
 let localWriteChain = Promise.resolve();
@@ -977,7 +995,7 @@ function writeLocal() {
   const snap = JSON.parse(JSON.stringify(dataBundle()));
   localWriteChain = localWriteChain.then(async () => {
     try {
-      if (Lock.on && Lock.key) {
+      if (Lock.on && Lock.key && lockEncrypts()) {
         const blob = await encJSON(Lock.key, snap);
         localStorage.setItem(LS, JSON.stringify({ enc: 1, iv: blob.iv, ct: blob.ct }));
       } else {
@@ -990,8 +1008,8 @@ function writeLocal() {
 async function readLocalEncrypted(key) {
   const raw = localStorage.getItem(LS); if (!raw) return false;
   const d = JSON.parse(raw);
-  if (!d.enc) return applyData(d);
-  return applyData(await decJSON(key, d));
+  if (!d.enc) return applyData(d, "replace");
+  return applyData(await decJSON(key, d), "replace");
 }
 
 const dirty = new Set();
@@ -1000,12 +1018,13 @@ function save() {
   for (const k of arguments) dirty.add(k);
   writeLocal();
   try { AutoBk.schedule(); Snaps.schedule(); } catch (_) { }
-  if (!Store.db) return;
+  if (!Store.db && !(Cloud.on && Cloud.user)) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(flush, 450);
 }
 function flush() {
   const keys = [...dirty]; dirty.clear();
+  if (Cloud.on && Cloud.user && Cloud.ready && !Cloud.paused) { writing = writing.then(() => cloudWrite(keys)); return; }
   writing = writing.then(async () => {
     for (const k of keys) {
       try { await writeDoc(k); }
@@ -1037,6 +1056,475 @@ function degrade() {
   Store.db = null; Store.mode = "local";
   if (!Store.warned) { Store.warned = true; toast("الحفظ السحابي وقف — البيانات بتتسجل على الجهاز ده"); }
   const s = el("storLine"); if (s) renderStorageLine();
+}
+
+/* ================= Firebase: حساب واحد مشترك بينك وبين مراتك =================
+   البيانات كلها تحت households/<id>. كل مستند منفصل عشان البوت يقدر
+   يكتب حركة واحدة من غير ما يلمس الباقي. */
+const COLS = ["wallets", "categories", "debts", "repeats", "goals", "shortcuts"];
+
+const Cloud = {
+  on: false,            // Firebase متاح ومتهيّئ
+  ready: false,         // خلّص أول تحميل
+  user: null,
+  app: null, auth: null, db: null,
+  unsub: [],
+  paused: false,        // المستخدم أجّل الترحيل: نفضل على الجهاز
+  sawData: false,       // شفنا بيانات حقيقية من السحابة؟
+  seen: {},             // آخر نسخة مكتوبة من كل مستند، عشان ما نكتبش نفس الحاجة تاني
+  err: "",
+  booted: false,
+
+  who() {
+    const u = this.user;
+    if (!u) return "app";
+    return (u.displayName || (u.email || "").split("@")[0] || "app").slice(0, 60);
+  },
+  path(...parts) { return ["households", window.HOUSEHOLD || "main", ...parts].join("/"); }
+};
+
+/* ---------- تحويل بين شكل التطبيق وشكل المستند ---------- */
+/* الحركة في Firestore شكلها مفهوم لبني آدم (أسماء عربية) عشان البوت
+   يقدر يكتبها، ومعاها المعرّفات الداخلية عشان التطبيق يشتغل بسرعة. */
+function txToDoc(t) {
+  const c = t.catId ? catById(t.catId) : null;
+  const root = t.catId ? rootOf(t.catId) : null;
+  const srcW = t.type === "transfer" ? t.fromWallet : t.walletId;
+  const w = srcW ? walletById(srcW) : null;
+  const tw = t.toWallet ? walletById(t.toWallet) : null;
+  return {
+    id: t.id,
+    date: t.date,
+    at: +t.at || Date.now(),
+    amount: Math.round((+t.amount || 0) * 100) / 100,
+    type: t.type,
+    category: root ? root.name : "",
+    subCategory: (c && c.parent) ? c.name : "",
+    catId: t.catId || "",
+    method: w ? w.name : "",
+    walletId: srcW || "",
+    toMethod: tw ? tw.name : "",
+    toWalletId: t.toWallet || "",
+    notes: t.note || "",
+    createdBy: t.createdBy || Cloud.who(),
+    source: t.source || "app",
+    needsReview: !!t.needsReview,
+    adj: +t.adj || 0,
+    repId: t.repId || "",
+    scId: t.scId || "",
+    goalId: t.goalId || ""
+  };
+}
+/* العكس: من مستند لحركة. بيستحمّل مستند جاي من البوت ناقص المعرّفات. */
+function docToTx(d) {
+  const type = d.type === "opening" ? "opening" : d.type;
+  const isT = type === "transfer";
+  let catId = d.catId || "";
+  if (!catId && d.category) catId = resolveCatId(d.category, d.subCategory);
+  let wid = d.walletId || "";
+  if (!wid && d.method) wid = resolveWalletId(d.method);
+  let twid = d.toWalletId || "";
+  if (!twid && d.toMethod) twid = resolveWalletId(d.toMethod);
+  return {
+    id: d.id,
+    type: type,
+    amount: +d.amount || 0,
+    catId: isT ? "" : catId,
+    walletId: isT ? "" : wid,
+    fromWallet: isT ? wid : "",
+    toWallet: isT ? twid : "",
+    date: d.date,
+    note: d.notes || "",
+    at: +d.at || 0,
+    adj: +d.adj || 0,
+    repId: d.repId || "",
+    scId: d.scId || "",
+    goalId: d.goalId || "",
+    createdBy: d.createdBy || "",
+    source: d.source || "app",
+    needsReview: !!d.needsReview
+  };
+}
+/* البوت بيكتب أسماء عربية — بنحوّلها لمعرّفات. لو مش لاقيين، بنسيبها للمراجعة. */
+function resolveCatId(name, sub) {
+  const norm = (x) => String(x || "").trim();
+  const n = norm(name), sn = norm(sub);
+  if (sn) {
+    const kid = state.categories.find(c => c.parent && norm(c.name) === sn);
+    if (kid) return kid.id;
+  }
+  const inc = INCOME_CATS.find(c => norm(c.name) === n);
+  if (inc) return inc.id;
+  const root = state.categories.find(c => !c.parent && norm(c.name) === n);
+  if (root) return root.id;
+  const any = state.categories.find(c => norm(c.name) === n);
+  return any ? any.id : "";
+}
+function resolveWalletId(name) {
+  const n = String(name || "").trim();
+  const w = state.wallets.find(x => String(x.name).trim() === n);
+  return w ? w.id : "";
+}
+
+/* ---------- التهيئة ---------- */
+async function cloudInit() {
+  if (Cloud.booted) return Cloud.on;
+  Cloud.booted = true;
+  // جوه artifact بتاع claude بنفضل على التخزين القديم
+  if (window.claude) return false;
+  if (localOnlyOn()) return false;        // المستخدم اختار يفضل على الجهاز
+  const C = window.FIREBASE_CONFIG;
+  // ملف المفاتيح ناقص أو لسه بالقوالب: نشتغل على الجهاز من غير تسجيل دخول
+  if (!C || !C.apiKey || !C.projectId || String(C.apiKey).indexOf("ضع") === 0 || String(C.apiKey).indexOf("YOUR") === 0) return false;
+  if (!window.FB) { Cloud.err = window.FB_ERR || "المكتبة ما اتحمّلتش"; return false; }
+  try {
+    const { app, auth, fs } = window.FB;
+    Cloud.app = app.initializeApp(window.FIREBASE_CONFIG);
+    Cloud.auth = auth.getAuth(Cloud.app);
+    await auth.setPersistence(Cloud.auth, auth.browserLocalPersistence).catch(() => { });
+    // الكاش المحلي: ده اللي بيخلّي التطبيق يشتغل من غير نت ويتزامن لوحده
+    Cloud.db = fs.initializeFirestore(Cloud.app, {
+      localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() })
+    });
+    Cloud.on = true;
+    auth.onAuthStateChanged(Cloud.auth, (u) => {
+      const was = Cloud.user && Cloud.user.uid;
+      Cloud.user = u || null;
+      if (u && u.uid !== was) onSignedIn();
+      else if (!u) onSignedOut();
+    });
+    return true;
+  } catch (e) {
+    Cloud.err = (e && e.message) || "مقدرناش نوصل للسحابة";
+    Cloud.on = false;
+    return false;
+  }
+}
+
+/* ---------- الاستماع: البيانات بتوصل لوحدها ---------- */
+function cloudListen() {
+  const { fs } = window.FB;
+  cloudStop();
+  const touch = () => { if (!Cloud.ready) return; scheduleRepaint(); };
+
+  // الإعدادات
+  Cloud.unsub.push(fs.onSnapshot(fs.doc(Cloud.db, Cloud.path("meta", "settings")), (snap) => {
+    if (snap.exists()) { const d = snap.data(); delete d.__t; Object.assign(state.settings, d); }
+    touch();
+  }, cloudErr));
+
+  // القوايم
+  COLS.forEach(col => {
+    Cloud.unsub.push(fs.onSnapshot(fs.collection(Cloud.db, Cloud.path(col)), (snap) => {
+      const list = [];
+      snap.forEach(d => { const v = d.data(); delete v.__t; list.push(v); });
+      if (col === "wallets" || col === "categories") { if (list.length) state[col] = list; }
+      else if (!list.length && (state[col] || []).length && !Cloud.sawData) { /* تجاهل اللقطة الفاضية */ }
+      else state[col] = list;
+      Cloud.seen[col] = new Set(list.map(x => x.id));
+      touch();
+    }, cloudErr));
+  });
+
+  // الحركات
+  Cloud.unsub.push(fs.onSnapshot(fs.collection(Cloud.db, Cloud.path("transactions")), (snap) => {
+    const list = [];
+    snap.forEach(d => { try { list.push(docToTx(d.data())); } catch (_) { } });
+    // حزام أمان: لو جت لقطة فاضية وإحنا عندنا حركات ولسه ما شفناش
+    // بيانات من السحابة قبل كده، نتجاهلها بدل ما نمسح شغلك.
+    if (!list.length && state.txs.length && !Cloud.sawData) return;
+    if (list.length) Cloud.sawData = true;
+    state.txs = list;
+    Cloud.seen.txs = new Set(list.map(x => x.id));
+    touch();
+  }, cloudErr));
+}
+function cloudStop() { Cloud.unsub.forEach(f => { try { f(); } catch (_) { } }); Cloud.unsub = []; }
+function cloudErr(e) {
+  const code = (e && e.code) || "";
+  if (code === "permission-denied") {
+    Cloud.err = "الحساب ده مش مسموح له. راجع قواعد الأمان في Firebase وحط رقم حسابك (UID).";
+  } else Cloud.err = (e && e.message) || "خطأ في الاتصال";
+  renderStorageLine();
+  toast(Cloud.err);
+}
+
+/* إعادة الرسم بتتأجل لو في شاشة مفتوحة، عشان ما نقطعش عليك وإنت بتكتب */
+let repaintTimer = null;
+function scheduleRepaint() {
+  clearTimeout(repaintTimer);
+  repaintTimer = setTimeout(() => {
+    if (!el("backdrop").hidden) { scheduleRepaint(); return; }
+    writeLocal();
+    render(); renderStorageLine();
+  }, 120);
+}
+
+/* ---------- الكتابة ---------- */
+/* بنكتب اللي اتغيّر بس. المقارنة بنسخة نصية من المستند. */
+async function cloudWrite(keys) {
+  if (!Cloud.on || !Cloud.user || Cloud.paused) return;
+  const { fs } = window.FB;
+  const batch = fs.writeBatch(Cloud.db);
+  let n = 0;
+  const put = (path, data) => {
+    const sig = JSON.stringify(data);
+    if (Cloud.seen["sig:" + path] === sig) return;
+    Cloud.seen["sig:" + path] = sig;
+    batch.set(fs.doc(Cloud.db, path), Object.assign({}, data, { __t: fs.serverTimestamp() }));
+    n++;
+  };
+  const drop = (path) => { batch.delete(fs.doc(Cloud.db, path)); delete Cloud.seen["sig:" + path]; n++; };
+
+  for (const k of keys) {
+    if (k === "settings") { put(Cloud.path("meta", "settings"), clean(state.settings)); continue; }
+    if (COLS.includes(k)) {
+      const live = new Set();
+      (state[k] || []).forEach(item => { if (!item || !item.id) return; live.add(item.id); put(Cloud.path(k, item.id), clean(item)); });
+      (Cloud.seen[k] || new Set()).forEach(id => { if (!live.has(id)) drop(Cloud.path(k, id)); });
+      Cloud.seen[k] = live;
+      continue;
+    }
+    if (k.startsWith("m:")) {
+      const mk = k.slice(2);
+      const live = new Set();
+      state.txs.filter(t => mkOf(t.date) === mk).forEach(t => { live.add(t.id); put(Cloud.path("transactions", t.id), txToDoc(t)); });
+      // اللي اتمسح من الشهر ده
+      const prev = Cloud.seen["mon:" + mk] || new Set();
+      prev.forEach(id => { if (!live.has(id) && !state.txs.some(t => t.id === id)) drop(Cloud.path("transactions", id)); });
+      Cloud.seen["mon:" + mk] = live;
+      continue;
+    }
+  }
+  if (!n) return;
+  try { await batch.commit(); Cloud.err = ""; }
+  catch (e) { cloudErr(e); }
+}
+/* Firestore بيرفض undefined — بنشيلها، وبنشيل الدوال كمان */
+function clean(o) {
+  const out = Array.isArray(o) ? [] : {};
+  for (const k in o) {
+    const v = o[k];
+    if (v === undefined || typeof v === "function") continue;
+    out[k] = (v && typeof v === "object") ? clean(v) : v;
+  }
+  return out;
+}
+
+/* ================= تسجيل الدخول ================= */
+const Auth = { mode: "google", busy: false, err: "", note: "" };
+
+function viewAuth() {
+  const e = Auth.err, pwd = Auth.mode === "pwd";
+  return '<div class="lockwrap">' +
+    '<div class="lmark">' + ico("safe") + "</div>" +
+    "<h1>مصروفي</h1>" +
+    '<p>بياناتك محفوظة في حسابك وبتتزامن على أي جهاز. سجّل دخول عشان تكمّل.</p>' +
+    (pwd
+      ? '<div style="width:min(330px,88vw);text-align:right">' +
+        '<div class="field"><label for="auEmail">اسم الدخول</label>' +
+        '<input class="inp" id="auEmail" type="email" inputmode="email" autocomplete="username" dir="ltr" placeholder="sara@masroufy.app"></div>' +
+        '<div class="field"><label for="auPass">الباسورد</label>' +
+        '<input class="inp" id="auPass" type="password" autocomplete="current-password" dir="ltr"></div>' +
+        '<button class="btn pri block" data-act="auPwdGo"' + (Auth.busy ? " disabled" : "") + ">" +
+        ico("check") + (Auth.busy ? "بندخّلك…" : "ادخل") + "</button>" +
+        '<button class="btn ghost block" data-act="auMode" data-v="google" style="margin-top:9px">ارجع لتسجيل الدخول بجوجل</button>' +
+        "</div>"
+      : '<div style="width:min(330px,88vw)">' +
+        '<button class="btn pri block" data-act="auGoogle"' + (Auth.busy ? " disabled" : "") + ">" +
+        ico("spark") + (Auth.busy ? "بنفتح جوجل…" : "ادخل بحساب جوجل") + "</button>" +
+        '<button class="btn ghost block" data-act="auMode" data-v="pwd" style="margin-top:9px">ادخل باسم وباسورد</button>' +
+        '<hr class="sep" style="margin:18px 0 14px">' +
+        '<button class="btn ghost block" data-act="auLocal">' + ico("phone") + "كمّل على الجهاز ده بس</button>" +
+        '<p class="sub" style="margin:9px 0 0;line-height:1.7">من غير تسجيل دخول. بياناتك هتفضل على التليفون ده زي ما هي، ومش هتتزامن مع أجهزة تانية.</p>' +
+        "</div>") +
+    (e ? '<p class="lockerr" style="max-width:34ch">' + esc(e) + "</p>" : "") +
+    (Auth.note ? '<p class="sub" style="margin-top:14px;max-width:34ch">' + esc(Auth.note) + "</p>" : "") +
+    "</div>";
+}
+
+async function authGoogle() {
+  if (Auth.busy) return;
+  Auth.busy = true; Auth.err = ""; render();
+  try {
+    const { auth } = window.FB;
+    const p = new auth.GoogleAuthProvider();
+    p.setCustomParameters({ prompt: "select_account" });
+    await auth.signInWithPopup(Cloud.auth, p);
+  } catch (e) {
+    const c = (e && e.code) || "";
+    Auth.err = c === "auth/popup-blocked" ? "المتصفح منع النافذة — اسمح بالنوافذ المنبثقة وجرّب تاني"
+      : c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request" ? ""
+        : c === "auth/unauthorized-domain" ? "الموقع ده مش مضاف في Firebase — ضيفه في Authorized domains"
+          : (e && e.message) || "مقدرناش نسجّل الدخول";
+  }
+  Auth.busy = false; render();
+}
+async function authPwd() {
+  if (Auth.busy) return;
+  const em = (el("auEmail") || {}).value || "", pw = (el("auPass") || {}).value || "";
+  if (!em.trim() || !pw) { Auth.err = "اكتب اسم الدخول والباسورد"; return render(); }
+  Auth.busy = true; Auth.err = ""; render();
+  try {
+    const { auth } = window.FB;
+    await auth.signInWithEmailAndPassword(Cloud.auth, em.trim(), pw);
+  } catch (e) {
+    const c = (e && e.code) || "";
+    Auth.err = (c === "auth/invalid-credential" || c === "auth/wrong-password" || c === "auth/user-not-found")
+      ? "الاسم أو الباسورد غلط"
+      : c === "auth/too-many-requests" ? "محاولات كتير — استنى شوية وجرّب تاني"
+        : (e && e.message) || "مقدرناش نسجّل الدخول";
+  }
+  Auth.busy = false; render();
+}
+function localOnlyOn() { try { return localStorage.getItem(LS_LOCALONLY) === "1"; } catch (_) { return false; } }
+function goLocalOnly(quiet) {
+  try { localStorage.setItem(LS_LOCALONLY, "1"); } catch (_) { }
+  cloudStop();
+  Cloud.on = false; Cloud.user = null; Cloud.ready = true; Cloud.err = "";
+  connect();
+  render(); renderStorageLine(); bootBackup();
+  if (!quiet) toast("شغّالين على الجهاز ده. تقدر تربط حسابك بعدين من الإعدادات.");
+}
+function goCloudBack() {
+  try { localStorage.removeItem(LS_LOCALONLY); } catch (_) { }
+  location.reload();
+}
+async function authOut() {
+  try { cloudStop(); await window.FB.auth.signOut(Cloud.auth); } catch (_) { }
+  Cloud.ready = false; Cloud.user = null; render();
+}
+
+/* ---------- بعد الدخول ---------- */
+async function onSignedIn() {
+  Auth.err = ""; Cloud.ready = false;
+  render();
+  try {
+    const { fs } = window.FB;
+    // نشوف السحابة فاضية ولا لأ — ده بيحدد نرحّل ولا نقرا
+    const [sn, wn] = await Promise.all([
+      fs.getDocs(fs.collection(Cloud.db, Cloud.path("transactions"))),
+      fs.getDocs(fs.collection(Cloud.db, Cloud.path("wallets")))
+    ]);
+    const cloudEmpty = sn.empty && wn.empty;
+    const localHas = state.txs.length > 0 || state.settings.onboarded;
+    if (cloudEmpty && localHas) {
+      // بياناتك هنا والسحابة فاضية: ما نسمعش لحد ما ترفعها،
+      // عشان أول لقطة فاضية ما تمسحش اللي على الجهاز.
+      Cloud.ready = true; render();
+      return sheetMigrate();
+    }
+    if (cloudEmpty && !localHas) await seedCloud();
+    Cloud.ready = true;
+    cloudListen();
+    render(); renderStorageLine(); bootBackup();
+  } catch (e) {
+    if (e && e.code === "permission-denied") return authDenied();
+    cloudErr(e); Cloud.ready = true; render();
+  }
+}
+/* دخل بحساب مش مسموح له: نقوله بوضوح ونديله مخرج */
+function authDenied() {
+  cloudStop();
+  const em = (Cloud.user && (Cloud.user.email || Cloud.user.displayName)) || "";
+  Cloud.ready = true;
+  openModal("الحساب ده مش مضاف",
+    '<p class="sub" style="margin:0 0 14px;line-height:1.8">دخلت بـ <b style="color:var(--ink)">' + esc(em) + '</b>، ' +
+    "بس الحساب ده مش من الحسابات المسموح لها تشوف البيانات المشتركة.</p>" +
+    '<div class="wrapask">' +
+    '<button class="btn pri block" data-act="auLocal">' + ico("phone") + "كمّل على الجهاز ده بس</button>" +
+    '<p class="sub" style="margin:9px 0 14px;line-height:1.7">بياناتك اللي على التليفون ده هتشتغل عادي زي الأول، من غير تسجيل دخول.</p>' +
+    '<button class="btn ghost block" data-act="auOut">جرّب حساب تاني</button></div>');
+}
+function onSignedOut() { cloudStop(); Cloud.ready = false; render(); }
+
+/* أول مرة على حساب فاضي: نزرع التصنيفات والمحافظ الافتراضية */
+async function seedCloud() {
+  await cloudWrite(["settings", "wallets", "categories"]);
+  await seedIncomeCats();
+}
+/* فئات الوارد كانت ثوابت في الكود ومش متخزنة — لازم تتزرع عشان البوت يلاقيها */
+async function seedIncomeCats() {
+  if (!Cloud.on || !Cloud.user) return;
+  const { fs } = window.FB;
+  const b = fs.writeBatch(Cloud.db);
+  INCOME_CATS.forEach(c => {
+    b.set(fs.doc(Cloud.db, Cloud.path("categories", c.id)),
+      { id: c.id, name: c.name, icon: c.icon, color: c.color, parent: "", kind: "income", pct: 0, limit: 0, __t: fs.serverTimestamp() });
+  });
+  try { await b.commit(); } catch (e) { cloudErr(e); }
+}
+
+/* ================= ترحيل البيانات ================= */
+function migratePlan() {
+  const openings = state.wallets.filter(w => Math.abs(+w.opening || 0) > 0.004);
+  return {
+    txs: state.txs.length,
+    wallets: state.wallets.length,
+    cats: state.categories.length,
+    debts: state.debts.length,
+    repeats: state.repeats.length,
+    goals: state.goals.length,
+    shortcuts: state.shortcuts.length,
+    openings: openings.length,
+    months: [...new Set(state.txs.map(t => mkOf(t.date)))].length,
+    total: Math.round(balanceNow().total)
+  };
+}
+function sheetMigrate() {
+  const P = migratePlan(), cur = esc(state.settings.currency);
+  const row = (k, v) => v > 0 ? '<div class="wrow"><span>' + k + '</span><b><span class="num">' + nf(v, 0) + "</span></b></div>" : "";
+  openModal("نقل بياناتك",
+    '<p class="sub" style="margin:0 0 13px;text-align:center">بياناتك اللي على الجهاز ده هتترفع لحسابك. مش هيتمسح منها حاجة.</p>' +
+    '<div class="wrapbox">' +
+    row("حركة", P.txs) + row("مكان فلوس", P.wallets) + row("بند", P.cats) +
+    row("سلفة", P.debts) + row("التزام متكرر", P.repeats) + row("هدف ادخار", P.goals) +
+    row("اختصار", P.shortcuts) +
+    '<div class="wsep"></div>' +
+    '<div class="wrow"><span>إجمالي فلوسك</span><b style="font-size:17px"><span class="num">' + nf(P.total) + "</span> " + cur + "</b></div>" +
+    "</div>" +
+    (P.openings > 0 ? '<p class="sub" style="margin:11px 2px 0">الأرصدة الافتتاحية (' + nf(P.openings, 0) +
+      ') هتتحوّل لحركات من نوع « رصيد افتتاحي » عشان البوت يفهمها بعدين. الأرقام مش هتتغيّر.</p>' : "") +
+    '<div class="wrapask" style="margin-top:16px">' +
+    '<button class="btn pri block" data-act="migGo">' + ico("up") + "ارفع بياناتي</button>" +
+    '<button class="btn ghost block" data-act="migSkip" style="margin-top:8px">مش دلوقتي</button>' +
+    '<p class="sub" style="margin:11px 0 0">لو حصل أي حاجة غلط، نسختك الاحتياطية على الجهاز زي ما هي.</p>' +
+    "</div>");
+}
+async function runMigrate() {
+  const sh = el("sheet");
+  if (sh) sh.innerHTML = '<div class="empty" style="padding:40px 18px"><div class="eic">' + ico("up") + "</div><h4>بنرفع بياناتك…</h4><p>ثواني وتخلص. ما تقفلش الصفحة.</p></div>";
+  try {
+    // الرصيد الافتتاحي بيبقى حركة، عشان البوت والتقارير يشوفوه
+    state.wallets.forEach(w => {
+      const op = Math.round((+w.opening || 0) * 100) / 100;
+      if (Math.abs(op) < 0.005) return;
+      state.txs.push({
+        id: uid("t"), type: "opening", amount: Math.abs(op),
+        catId: "", walletId: w.id, fromWallet: "", toWallet: "",
+        date: earliestDate(), note: "رصيد افتتاحي — " + w.name,
+        at: 1, source: "app"
+      });
+      w.opening = 0;
+    });
+    await seedIncomeCats();
+    const keys = ["settings", ...COLS, ...[...new Set(state.txs.map(t => mkOf(t.date)))].map(m => "m:" + m)];
+    await cloudWrite(keys);
+    writeLocal();
+    closeSheet();
+    Cloud.ready = true; Cloud.paused = false;
+    cloudListen();
+    render(); renderStorageLine(); bootBackup();
+    toast("اترفعت " + nf(state.txs.length, 0) + " حركة — بياناتك بقت في حسابك");
+  } catch (e) {
+    closeSheet();
+    toast("الرفع وقف: " + ((e && e.message) || "خطأ"));
+  }
+}
+function earliestDate() {
+  let d = todayISO();
+  for (const t of state.txs) if (t.date && t.date < d) d = t.date;
+  return d;
 }
 
 async function connect() {
@@ -1194,7 +1682,7 @@ function walletBalances() {
       if (m[t.fromWallet] != null) m[t.fromWallet] -= t.amount;
       if (m[t.toWallet] != null) m[t.toWallet] += t.amount;
     } else if (m[t.walletId] != null) {
-      m[t.walletId] += t.type === "income" ? t.amount : -t.amount;
+      m[t.walletId] += (t.type === "income" || t.type === "opening") ? t.amount : -t.amount;
     }
   }
   // الديون بتحرّك الكاش بس، مش المصاريف
@@ -1553,18 +2041,39 @@ async function tryPin(pin) {
   return true;
 }
 /* البصمة: بتفك غلاف تاني للمفتاح متخزن على الجهاز */
+/* هل القفل بيشفّر البيانات؟ على السحابة لأ — البيانات محمية بتسجيل
+   الدخول وقواعد الأمان، والقفل بقى قفل شاشة بس. ومحليًا أيوة. */
+const lockEncrypts = () => !(Cloud.on && Cloud.user);
+
 async function attachBio(pin) {
   const credId = await bioRegister();
-  const salt = rndB64(16), devSecret = rndB64(32);
-  const devKey = await deriveKey(devSecret, salt, 120000);
+  if (!lockEncrypts()) {
+    // مفيش مفتاح بيتخزّن خالص. البصمة بتفتح الشاشة وبس.
+    Lock.cfg.bio = { id: credId, salt: null, wrap: null };
+    writeLockCfg(Lock.cfg);
+    return;
+  }
+  /* في الوضع المحلي لازم نخزّن حاجة نفك بيها التشفير، ومفيش طريقة
+     نشتق بيها مفتاح من البصمة في كل المتصفحات. فبنشتقه من معرّف
+     البصمة + ملح — أحسن من تخزين السر جنب المغلّف زي ما كان. */
+  const salt = rndB64(16);
+  const devKey = await deriveKey(credId, salt, 120000);
   const wrapped = await encJSON(devKey, { pin: pin });
-  Lock.cfg.bio = { id: credId, salt: salt, secret: devSecret, wrap: wrapped };
+  Lock.cfg.bio = { id: credId, salt: salt, wrap: wrapped };
   writeLockCfg(Lock.cfg);
 }
 async function unlockWithBio() {
   const b = Lock.cfg && Lock.cfg.bio; if (!b) return false;
   const ok = await bioVerify(b.id); if (!ok) return false;
-  const devKey = await deriveKey(b.secret, b.salt, 120000);
+  if (!b.wrap) { Lock.unlocked = true; LockUI.entry = ""; return true; }
+  if (b.secret) {                      // إعداد قديم — بنفكّه ونرقّيه ونشيل السر
+    const oldKey = await deriveKey(b.secret, b.salt, 120000);
+    const { pin: oldPin } = await decJSON(oldKey, b.wrap);
+    const okOld = await tryPin(oldPin);
+    if (okOld) { try { await attachBio(oldPin); } catch (_) { } }
+    return okOld;
+  }
+  const devKey = await deriveKey(b.id, b.salt, 120000);
   const { pin } = await decJSON(devKey, b.wrap);
   return tryPin(pin);
 }
@@ -2840,11 +3349,29 @@ function renderTabs() {
 }
 function renderStorageLine() {
   const s = el("storLine"); if (!s) return;
+  if (Cloud.on && Cloud.user) {
+    const who = esc(Cloud.user.displayName || Cloud.user.email || "");
+    const bad = !!Cloud.err;
+    s.innerHTML = '<span class="sd' + (bad ? " local" : "") + '"></span>' +
+      (bad ? esc(Cloud.err) : "محفوظ في حسابك — " + who);
+    return;
+  }
   const cloud = Store.mode === "cloud";
   s.innerHTML = '<span class="sd' + (cloud ? "" : " local") + '"></span>' + (cloud ? "محفوظ في حسابك — يفتح من أي جهاز" : "محفوظ على الجهاز ده بس");
 }
 function render() {
   const v = el("view");
+  if (Cloud.on && !Cloud.user) {
+    el("dock").hidden = true; el("btnAnalyzeTop").hidden = true; updBanner(false);
+    v.innerHTML = viewAuth();
+    return;
+  }
+  if (Cloud.on && Cloud.user && !Cloud.ready) {
+    el("dock").hidden = true; el("btnAnalyzeTop").hidden = true; updBanner(false);
+    v.innerHTML = '<div class="lockwrap"><div class="lmark">' + ico("safe") + '</div>' +
+      '<h1>بنجيب بياناتك…</h1><p>ثانية واحدة.</p></div>';
+    return;
+  }
   if (Lock.on && !Lock.unlocked) {
     el("dock").hidden = true; el("btnAnalyzeTop").hidden = true; updBanner(false);
     v.innerHTML = viewLock();
@@ -3457,7 +3984,7 @@ function freeAt(iso) {
       if (ids.has(t.fromWallet)) s -= t.amount;
       if (ids.has(t.toWallet)) s += t.amount;
     } else if (ids.has(t.walletId)) {
-      s += t.type === "income" ? t.amount : -t.amount;
+      s += (t.type === "income" || t.type === "opening") ? t.amount : -t.amount;
     }
   }
   for (const d of state.debts) {
@@ -4253,6 +4780,10 @@ function viewSettings() {
     srow("wrapOpen", "cal", "ملخص الشهر اللي فات",
       (function () { const mk = mkShift(thisMK(), -1); const T = totalsOf(mk);
         return T.exp > 0 ? mkLabel(mk) + " · صرفت " + nf(T.exp) + " " + esc(s.currency) : "ما فيش حركات في " + mkLabel(mk); })()) +
+    (localOnlyOn() ? srow("auCloud", "up", "اربط بحسابك",
+      "دلوقتي شغّال على الجهاز ده بس — دوس لو عايز تسجّل دخول وتتزامن") : "") +
+    ((Cloud.on && Cloud.user) ? srow("auOut", "x", "تسجيل الخروج",
+      esc(Cloud.user.email || Cloud.user.displayName || "")) : "") +
     srow("stBackup", "down", "نسخة احتياطية", a === null ? "لسه ما خدتش نسخة" : a === 0 ? "آخر نسخة النهاردة" : "آخر نسخة من " + a + " يوم",
       a === null || a > 21 ? pill("warn", "خد نسخة") : pill("good", "تمام")) +
     srow("count", "scale", "عدّ فلوسك", (function () {
@@ -4959,7 +5490,7 @@ function applyRestore(mode) {
   const touched = new Set(state.txs.map(t => mkOf(t.date)));
   migrate(d);
   if (mode === "replace") {
-    applyData(d);
+    applyData(d, "replace");
     state.settings.onboarded = true;
   } else {
     const known = new Set(state.txs.map(t => t.id));
@@ -4982,6 +5513,7 @@ function applyRestore(mode) {
 /* ================= التثبيت على الموبايل ================= */
 const Install = { prompt: null, dismissed: false };
 const LS_INST = "masroufy.install.hide";
+const LS_LOCALONLY = "masroufy.localonly";
 
 function isStandalone() {
   try {
@@ -5259,7 +5791,8 @@ document.addEventListener("click", (ev) => {
         '<button class="btn ghost block" data-act="closeSheet">رجعني أجرب الرمز</button></div>');
       break;
     case "wipeAndStart":
-      try { localStorage.removeItem(LS); localStorage.removeItem(LS_LOCK); } catch (_) { }
+      try { localStorage.removeItem(LS); localStorage.removeItem(LS_LOCK);
+      if (Cloud.on && Cloud.user) { try { authOut(); } catch (_) { } } } catch (_) { }
       Lock.on = false; Lock.key = null; Lock.cfg = null; Lock.unlocked = true;
       state.settings.onboarded = false; state.txs = []; state.goals = [];
       state.wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
@@ -5760,7 +6293,7 @@ document.addEventListener("click", (ev) => {
         if (take <= 0.004) continue;
         const tx = { id: uid("t"), type: "transfer", amount: take, fromWallet: w.id, toWallet: sw.id,
           catId: "", walletId: "", date: today, note: "ادخار · ملخص " + mkLabel(v) + (g ? " · " + g.name : ""),
-          goalId: g ? g.id : undefined, at: Date.now() + made.length };
+          goalId: g ? g.id : "", at: Date.now() + made.length };
         state.txs.push(tx); made.push(tx); rest = Math.round((rest - take) * 100) / 100;
       }
       if (!made.length) return toast("مفيش فلوس متاحة نحوّلها");
@@ -5773,6 +6306,19 @@ document.addEventListener("click", (ev) => {
       toast("اتحوّل " + money2(amt - rest) + " للادخار" + (g ? " لهدف " + g.name : ""));
       break;
     }
+    case "auGoogle": authGoogle(); break;
+    case "auPwdGo": authPwd(); break;
+    case "auMode": Auth.mode = v; Auth.err = ""; render(); break;
+    case "auOut": authOut(); break;
+    case "auLocal": closeSheet(); goLocalOnly(); break;
+    case "auCloud": goCloudBack(); break;
+    case "migGo": runMigrate(); break;
+    case "migSkip":
+      // اختار يأجّل: نفضل على الجهاز بالكامل — لا بنقرا من السحابة ولا بنكتب فيها
+      Cloud.paused = true; Cloud.ready = true;
+      closeSheet(); render(); renderStorageLine(); bootBackup();
+      toast("سيبنا بياناتك على الجهاز. ترفعها بعدين من الإعدادات.");
+      break;
     case "saveMove": sheetSaveMove(v); break;
     case "doSaveMove": {
       const amt = Math.round((parseFloat(el("smAmt").value) || 0) * 100) / 100;
@@ -5883,18 +6429,22 @@ el("fab").innerHTML = ico("plus");
 
 (function boot() {
   swSetup();
-  const cfg = readLockCfg();
-  if (cfg && hasCrypto()) {
-    Lock.on = true; Lock.cfg = cfg; Lock.unlocked = false;
-    LockUI.mode = "unlock";
-    render();
-    if (cfg.bio) setTimeout(() => { tryBio(true); }, 350);
-    return;
-  }
   readLocal();
+  const cfg = readLockCfg();
+  const locked = !!(cfg && hasCrypto());
+  if (locked) { Lock.on = true; Lock.cfg = cfg; Lock.unlocked = false; LockUI.mode = "unlock"; }
   render();
-  connect();
-  bootBackup();
+  if (locked && cfg.bio) setTimeout(() => { tryBio(true); }, 350);
+
+  const start = async () => {
+    const ok = await cloudInit();
+    if (ok) { render(); return; }          // onAuthStateChanged هيكمّل
+    connect();                              // المسار القديم: artifact أو محلي
+    if (!locked) bootBackup();
+    render(); renderStorageLine();
+  };
+  if (window.FB || window.FB_ERR) start();
+  else window.addEventListener("fb-ready", start, { once: true });
 })();
 
 /* الملخص بيطلع لوحده أول ما تفتح التطبيق في شهر جديد */
@@ -5932,5 +6482,7 @@ async function tryBio(auto) {
   } catch (e) { if (!auto) lockErr("البصمة مش شغالة دلوقتي — استخدم الرمز"); }
 }
 </script>
+
+</body></html>
 </body>
 </html>
