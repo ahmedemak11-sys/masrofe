@@ -1,6 +1,5 @@
-/* مصروفي — service worker
-   غيّر VERSION مع كل إصدار جديد: الكاش بيتبنى منه، والتطبيق بيعرف إن في تحديث. */
-const VERSION = "2.7.1";
+/* مصروفي — service worker */
+const VERSION = "3.1.0";
 const CACHE = "masroufy-" + VERSION;
 const CORE = [
   "./",
@@ -13,7 +12,6 @@ const CORE = [
 ];
 
 self.addEventListener("install", (e) => {
-  // مفيش skipWaiting تلقائي: بنستنى المستخدم يوافق على التحديث
   e.waitUntil(
     caches.open(CACHE).then((c) => Promise.allSettled(CORE.map((u) => c.add(u))))
   );
@@ -39,7 +37,6 @@ self.addEventListener("fetch", (e) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  // الصفحة نفسها: الشبكة الأول عشان التحديث يوصل بسرعة
   const isDoc = req.mode === "navigate" || url.pathname.endsWith("/") || url.pathname.endsWith("index.html");
 
   if (isDoc) {
@@ -52,6 +49,11 @@ self.addEventListener("fetch", (e) => {
         })
         .catch(() => caches.match("./index.html").then((hit) => hit || caches.match("./")))
     );
+    return;
+  }
+
+  if (url.pathname.endsWith("firebase-config.js")) {
+    e.respondWith(fetch(req, { cache: "no-store" }).catch(() => caches.match(req)));
     return;
   }
 
