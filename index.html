@@ -648,6 +648,19 @@ button.ins:active{background:var(--surface-2)}
 .statusline{display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--muted); padding:14px 2px 0; justify-content:center}
 .statusline .sd{width:7px;height:7px;border-radius:50%;background:var(--good)}
 .statusline .sd.local{background:var(--warn)}
+.statusline .linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--warn);text-decoration:underline;cursor:pointer}
+.syncwarn{display:flex;align-items:center;gap:11px;width:100%;text-align:right;margin:0 0 12px;padding:12px 14px;border-radius:16px;
+  border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);background:color-mix(in srgb,var(--warn) 12%,var(--card));color:var(--ink);font:inherit;cursor:pointer}
+.syncwarn .sw-i{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--warn);color:#fff}
+.syncwarn .sw-i svg{width:17px;height:17px}
+.syncwarn .sw-t{font-size:12.5px;line-height:1.6;color:var(--muted)}
+.syncwarn .sw-t b{display:block;font-size:14px;color:var(--ink)}
+.syncrow{padding:13px 0;border-top:1px solid var(--line)}
+.syncrow:first-of-type{border-top:0}
+.syncrow .sr-h{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.syncrow .sr-why{margin:6px 0 10px;font-size:12.5px;line-height:1.7;color:var(--warn)}
+.syncrow .sr-a{display:flex;gap:8px}
+.syncrow .sr-a .btn{flex:1}
 .aiout{white-space:pre-wrap; font-size:13.5px; line-height:1.75; color:var(--ink-2)}
 hr.sep{border:0; border-top:1px solid var(--line); margin:16px 0}
 </style>
@@ -697,7 +710,7 @@ window.dispatchEvent(new Event("fb-ready"));
 <script>
 /* ============================ مصروفي ============================ */
 "use strict";
-const APP_VERSION = "3.1.0";
+const APP_VERSION = "3.2.0";
 const APP_BUILD = "2026-11-09";
 
 /* ---------- helpers ---------- */
@@ -1016,15 +1029,17 @@ const dirty = new Set();
 let saveTimer = null, writing = Promise.resolve();
 function save() {
   for (const k of arguments) dirty.add(k);
+  syncCapture([...arguments]);          // فورًا ومتخزن — قبل أي انتظار
   writeLocal();
   try { AutoBk.schedule(); Snaps.schedule(); } catch (_) { }
   if (!Store.db && !(Cloud.on && Cloud.user)) return;
+  if (Cloud.on && Cloud.user) { dirty.clear(); syncFlush(); return; }   // الصندوق متخزن، نبعت على طول
   clearTimeout(saveTimer);
   saveTimer = setTimeout(flush, 450);
 }
 function flush() {
   const keys = [...dirty]; dirty.clear();
-  if (Cloud.on && Cloud.user && Cloud.ready && !Cloud.paused) { writing = writing.then(() => cloudWrite(keys)); return; }
+  if (Cloud.on && Cloud.user) { syncFlush(); return; }
   writing = writing.then(async () => {
     for (const k of keys) {
       try { await writeDoc(k); }
@@ -1095,7 +1110,7 @@ function txToDoc(t) {
   return {
     id: t.id,
     date: t.date,
-    at: +t.at || Date.now(),
+    at: +t.at || 0,   // ما نخترعش وقت: البصمة كانت بتتغيّر كل مرة والحركة تتعاد للأبد
     amount: Math.round((+t.amount || 0) * 100) / 100,
     type: t.type,
     category: root ? root.name : "",
@@ -1209,34 +1224,38 @@ function cloudListen() {
 
   // الإعدادات
   Cloud.unsub.push(fs.onSnapshot(fs.doc(Cloud.db, Cloud.path("meta", "settings")), (snap) => {
-    if (snap.exists()) { const d = snap.data(); delete d.__t; Object.assign(state.settings, d); }
-    touch();
+    if (snap.exists()) {
+      const d = snap.data(); delete d.__t;
+      if (!(snap.metadata && snap.metadata.hasPendingWrites)) Sync.shadow["meta/settings"] = hashOf(clean(d));
+      Object.assign(state.settings, d);
+      const mine = Sync.out["meta/settings"];
+      if (mine && mine.op === "set" && mine.local) Object.assign(state.settings, mine.local);
+    }
+    syncColReady("meta");
+    Sync.save(); touch(); syncFlush();
   }, cloudErr));
 
   // القوايم
   COLS.forEach(col => {
     Cloud.unsub.push(fs.onSnapshot(fs.collection(Cloud.db, Cloud.path(col)), (snap) => {
-      const list = [];
-      snap.forEach(d => { const v = d.data(); delete v.__t; list.push(v); });
-      if (col === "wallets" || col === "categories") { if (list.length) state[col] = list; }
-      else if (!list.length && (state[col] || []).length && !Cloud.sawData) { /* تجاهل اللقطة الفاضية */ }
-      else state[col] = list;
-      Cloud.seen[col] = new Set(list.map(x => x.id));
-      touch();
+      if (snap.empty && (state[col] || []).length && !Cloud.sawData) { touch(); return; }   // لقطة فاضية من الكاش
+      const server = syncShadow(col, snap, x => x, x => clean(x));
+      syncColReady(col);
+      const list = syncOverlay(col, server);
+      if (!((col === "wallets" || col === "categories") && !list.length)) state[col] = list;
+      Sync.save(); touch(); syncFlush();
     }, cloudErr));
   });
 
   // الحركات
   Cloud.unsub.push(fs.onSnapshot(fs.collection(Cloud.db, Cloud.path("transactions")), (snap) => {
-    const list = [];
-    snap.forEach(d => { try { list.push(docToTx(d.data())); } catch (_) { } });
-    // حزام أمان: لو جت لقطة فاضية وإحنا عندنا حركات ولسه ما شفناش
-    // بيانات من السحابة قبل كده، نتجاهلها بدل ما نمسح شغلك.
-    if (!list.length && state.txs.length && !Cloud.sawData) return;
-    if (list.length) Cloud.sawData = true;
-    state.txs = list;
-    Cloud.seen.txs = new Set(list.map(x => x.id));
-    touch();
+    // حزام أمان: لقطة فاضية وإحنا عندنا حركات ولسه ما شفناش بيانات من السحابة
+    if (snap.empty && state.txs.length && !Cloud.sawData) return;
+    const server = syncShadow("transactions", snap, docToTx, txDocOf);
+    syncColReady("transactions");          // بيلتقط اللي اتسجّل قبل أول لقطة
+    if (snap.size) Cloud.sawData = true;
+    state.txs = syncOverlay("transactions", server);
+    Sync.save(); touch(); syncFlush();
   }, cloudErr));
 }
 function cloudStop() { Cloud.unsub.forEach(f => { try { f(); } catch (_) { } }); Cloud.unsub = []; }
@@ -1260,46 +1279,245 @@ function scheduleRepaint() {
   }, 120);
 }
 
-/* ---------- الكتابة ---------- */
-/* بنكتب اللي اتغيّر بس. المقارنة بنسخة نصية من المستند. */
-async function cloudWrite(keys) {
-  if (!Cloud.on || !Cloud.user || Cloud.paused) return;
-  const { fs } = window.FB;
-  const batch = fs.writeBatch(Cloud.db);
-  let n = 0;
-  const put = (path, data) => {
-    const sig = JSON.stringify(data);
-    if (Cloud.seen["sig:" + path] === sig) return;
-    Cloud.seen["sig:" + path] = sig;
-    batch.set(fs.doc(Cloud.db, path), Object.assign({}, data, { __t: fs.serverTimestamp() }));
-    n++;
-  };
-  const drop = (path) => { batch.delete(fs.doc(Cloud.db, path)); delete Cloud.seen["sig:" + path]; n++; };
+/* ================= صندوق الصادر =================
+   قبل كده التطبيق كان بيعتبر السحابة هي الحقيقة: أي لقطة جاية منها
+   كانت بتمسح نسخة الجهاز. فأي تغيير ما لحقش يوصل — قفلت بسرعة، أو
+   حركتين ورا بعض، أو البوت كتب في نفس اللحظة، أو النت قاطع — كان بيضيع.
+   والمسح ما كانش بيوصل السيرفر لو كان أول حاجة تعملها بعد ما تفتح.
 
-  for (const k of keys) {
-    if (k === "settings") { put(Cloud.path("meta", "settings"), clean(state.settings)); continue; }
-    if (COLS.includes(k)) {
-      const live = new Set();
-      (state[k] || []).forEach(item => { if (!item || !item.id) return; live.add(item.id); put(Cloud.path(k, item.id), clean(item)); });
-      (Cloud.seen[k] || new Set()).forEach(id => { if (!live.has(id)) drop(Cloud.path(k, id)); });
-      Cloud.seen[k] = live;
-      continue;
-    }
-    if (k.startsWith("m:")) {
-      const mk = k.slice(2);
-      const live = new Set();
-      state.txs.filter(t => mkOf(t.date) === mk).forEach(t => { live.add(t.id); put(Cloud.path("transactions", t.id), txToDoc(t)); });
-      // اللي اتمسح من الشهر ده
-      const prev = Cloud.seen["mon:" + mk] || new Set();
-      prev.forEach(id => { if (!live.has(id) && !state.txs.some(t => t.id === id)) drop(Cloud.path("transactions", id)); });
-      Cloud.seen["mon:" + mk] = live;
-      continue;
-    }
-  }
-  if (!n) return;
-  try { await batch.commit(); Cloud.err = ""; }
-  catch (e) { cloudErr(e); }
+   دلوقتي: أي تغيير بيتسجّل هنا فورًا ومتخزن على الجهاز، ومش بيتشال
+   غير لما السحابة ترد إنها استلمت. واللقطات بتتدمج معاه بدل ما تمسحه. */
+const LS_SYNC = "masroufy.sync";
+const Sync = {
+  out: {},              // "col/id" -> { op, col, id, data, local, h, v, at, err }
+  shadow: {},           // "col/id" -> بصمة آخر نسخة السيرفر أكّدها
+  readyCols: new Set(), // المجموعات اللي ظلها اتملى من السيرفر ولو مرة
+  v: 0, sending: false, retryT: null,
+  waitKeys: new Set(), bootAt: Date.now(),
+  load() {
+    try {
+      const d = JSON.parse(localStorage.getItem(LS_SYNC) || "null");
+      if (!d) return;
+      this.out = d.out || {}; this.shadow = d.shadow || {}; this.v = +d.v || 0;
+      this.readyCols = new Set(d.ready || []);
+    } catch (_) { }
+  },
+  save() {
+    try {
+      localStorage.setItem(LS_SYNC, JSON.stringify({ out: this.out, shadow: this.shadow, v: this.v, ready: [...this.readyCols] }));
+    } catch (_) { }
+  },
+  count() { return Object.keys(this.out).length; },
+  errs() { return Object.values(this.out).filter(e => e.err); }
+};
+Sync.load();
+
+/* بصمة ثابتة: نفس المحتوى = نفس البصمة، مهما كان ترتيب الحقول */
+function stableStr(o) {
+  if (o === null || typeof o !== "object") return JSON.stringify(o === undefined ? null : o);
+  if (Array.isArray(o)) return "[" + o.map(stableStr).join(",") + "]";
+  return "{" + Object.keys(o).filter(k => k !== "__t" && o[k] !== undefined).sort()
+    .map(k => JSON.stringify(k) + ":" + stableStr(o[k])).join(",") + "}";
 }
+function hashOf(o) {
+  const str = stableStr(o);
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0).toString(36) + "." + str.length.toString(36);
+}
+
+/* نفس شروط firestore.rules — بنكشفها قبل ما نبعت عشان نقولك السبب الحقيقي */
+function txRuleWhy(d) {
+  if (!(typeof d.amount === "number" && d.amount > 0 && d.amount < 100000000)) return "المبلغ لازم يكون أكبر من صفر";
+  if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(String(d.date || ""))) return "التاريخ مش مظبوط";
+  if (["expense", "income", "transfer", "opening"].indexOf(d.type) < 0) return "نوع الحركة مش معروف";
+  if (typeof d.notes !== "string" || d.notes.length > 300) return "الملاحظة أطول من 300 حرف";
+  if (/[0-9][0-9 -]{10,}[0-9]/.test(d.notes)) return "الملاحظة فيها رقم طويل زي رقم كارت أو حساب — ده ممنوع يتسجّل";
+  if (typeof d.method !== "string" || d.method.length > 60) return "اسم مكان الفلوس طويل";
+  if (typeof d.createdBy !== "string" || d.createdBy.length > 60) return "اسم المستخدم طويل";
+  if (["app", "telegram-text", "telegram-voice", "telegram-photo"].indexOf(d.source) < 0) return "مصدر الحركة مش معروف";
+  if (d.type === "transfer" && (typeof d.toMethod !== "string" || d.toMethod.length > 60 || d.toMethod === d.method))
+    return "التحويل لازم يكون بين مكانين مختلفين";
+  return "";
+}
+
+const syncOn = () => !!(Cloud.on && Cloud.user && !Cloud.paused);
+const syncColOf = (k) => k === "settings" ? "meta" : String(k).startsWith("m:") ? "transactions" : k;
+const txDocOf = (t) => clean(txToDoc(t));
+
+/* بيقارن اللي على الجهاز باللي السيرفر عنده، وبيسجّل الفرق في الصندوق.
+   بيشتغل فورًا جوه save() — مفيش أي انتظار قبل ما التغيير يتحفظ. */
+function syncCapture(keys, onlyNewTx) {
+  if (!syncOn()) return;
+  const todo = [];
+  for (const k of keys) {
+    if (Sync.readyCols.has(syncColOf(k))) todo.push(k);
+    else Sync.waitKeys.add(k);           // ظل المجموعة دي لسه ما اتملاش — نستنى أول لقطة
+  }
+  if (!todo.length) return;
+  let changed = false;
+  const fresh = [];
+  const want = (path, col, id, data, local) => {
+    const h = hashOf(data);
+    const cur = Sync.out[path];
+    if (cur && cur.op === "set" && cur.h === h) return;
+    if (Sync.shadow[path] === h) { if (cur) { delete Sync.out[path]; changed = true; } return; }
+    const err = col === "transactions" ? txRuleWhy(data) : "";
+    Sync.out[path] = { op: "set", col, id, data, local: JSON.parse(JSON.stringify(local)), h, v: ++Sync.v, at: Date.now(), err };
+    if (err) fresh.push(err);
+    changed = true;
+  };
+  const gone = (path, col, id) => {
+    const cur = Sync.out[path];
+    if (cur && cur.op === "del") return;
+    if (!(path in Sync.shadow)) { if (cur) { delete Sync.out[path]; changed = true; } return; }
+    Sync.out[path] = { op: "del", col, id, v: ++Sync.v, at: Date.now(), err: "" };
+    changed = true;
+  };
+  const diff = (col, items, toDoc, filter) => {
+    const pre = col + "/", live = new Set();
+    for (const it of items) {
+      if (!it || !it.id) continue;
+      const p = pre + it.id;
+      live.add(p);
+      if (filter && !filter(it)) continue;
+      want(p, col, it.id, toDoc(it), it);
+    }
+    if (filter) return;                   // الحالة الأولى بعد التحديث: إضافات بس
+    const dead = new Set();
+    Object.keys(Sync.shadow).forEach(p => { if (p.startsWith(pre) && !live.has(p)) dead.add(p); });
+    Object.keys(Sync.out).forEach(p => { if (p.startsWith(pre) && !live.has(p)) dead.add(p); });
+    dead.forEach(p => gone(p, col, p.slice(pre.length)));
+  };
+  let txs = false;
+  for (const k of todo) {
+    if (k === "settings") want("meta/settings", "meta", "settings", clean(state.settings), state.settings);
+    else if (COLS.includes(k)) diff(k, state[k] || [], x => clean(x));
+    else if (String(k).startsWith("m:")) txs = true;
+  }
+  if (txs) diff("transactions", state.txs, txDocOf, onlyNewTx);
+  if (changed) Sync.save();
+  if (fresh.length) toast("⚠️ " + fresh[0] + ". الحركة متسجّلة على الجهاز ده بس لحد ما تعدّلها.");
+}
+
+/* لقطة من السيرفر: نحدّث الظل باللي اتأكد، ونركّب فوقه اللي لسه مستني */
+function syncShadow(col, snap, fromDoc, toDoc) {
+  const pre = col + "/", server = new Map(), pend = new Set();
+  snap.forEach(d => {
+    let raw; try { raw = d.data(); } catch (_) { return; }
+    if (!raw) return;
+    delete raw.__t;
+    const id = raw.id || d.id; if (!id) return;
+    if (!raw.id) raw.id = id;
+    let item; try { item = fromDoc(raw); } catch (_) { return; }
+    server.set(id, item);
+    if (d.metadata && d.metadata.hasPendingWrites) pend.add(id);
+  });
+  server.forEach((item, id) => { if (!pend.has(id)) Sync.shadow[pre + id] = hashOf(toDoc(item)); });
+  if (!(snap.metadata && snap.metadata.fromCache)) {
+    Object.keys(Sync.shadow).forEach(p => { if (p.startsWith(pre) && !server.has(p.slice(pre.length))) delete Sync.shadow[p]; });
+  }
+  return server;
+}
+function syncOverlay(col, server) {
+  Object.values(Sync.out).forEach(e => {
+    if (e.col !== col) return;
+    if (e.op === "del") server.delete(e.id);
+    else if (e.local) server.set(e.id, JSON.parse(JSON.stringify(e.local)));
+  });
+  return [...server.values()];
+}
+/* أول مرة على النسخة دي: لسه ماعندناش ظل للسيرفر. البيانات اللي على
+   الجهاز دلوقتي — قبل ما تقدر تلمس أي حاجة — هي آخر حاجة السيرفر بعتها
+   للنسخة القديمة، فبنعتبرها نقطة البداية. كده أي حاجة تسجّلها وهو لسه
+   بيحمّل (نت بطيء) تتلقط على طول، وأول لقطة حقيقية بتحط الظل الصح مكانه. */
+function syncBaseline() {
+  const cols = ["meta", "transactions", ...COLS].filter(c => !Sync.readyCols.has(c));
+  if (!cols.length) return;
+  cols.forEach(col => {
+    if (col === "meta") Sync.shadow["meta/settings"] = hashOf(clean(state.settings));
+    else if (col === "transactions") state.txs.forEach(t => { if (t && t.id) Sync.shadow["transactions/" + t.id] = hashOf(txDocOf(t)); });
+    else (state[col] || []).forEach(x => { if (x && x.id) Sync.shadow[col + "/" + x.id] = hashOf(clean(x)); });
+    Sync.readyCols.add(col);
+  });
+  Sync.save();
+}
+
+/* أول لقطة لمجموعة: ظلها بقى جاهز، فنلتقط اللي اتسجّل قبلها */
+function syncColReady(col) {
+  if (Sync.readyCols.has(col)) return;
+  Sync.readyCols.add(col);
+  const keys = [...Sync.waitKeys].filter(k => syncColOf(k) === col);
+  keys.forEach(k => Sync.waitKeys.delete(k));
+  if (!keys.length) return;
+  /* الحركات: بنلتقط الجديد بس. اللي على الجهاز ومش على السيرفر ممكن
+     يكون حد مسحه من جهاز تاني — ما نرجّعوش. */
+  if (col === "transactions") syncCapture(keys, t => (+t.at || 0) >= Sync.bootAt);
+  else syncCapture(keys);
+}
+
+/* بيبعت الصندوق. الدفعة اللي فيها مستند مرفوض بتتبعت واحدة واحدة،
+   عشان حركة بايظة واحدة ما توقفش الباقي. */
+async function syncFlush() {
+  if (!syncOn() || !Cloud.db || !window.FB || Sync.sending) return;
+  const todo = Object.entries(Sync.out).filter(([, e]) => !e.err).map(([p, e]) => [p, e]);
+  if (!todo.length) { renderStorageLine(); return; }
+  Sync.sending = true; renderStorageLine();
+  const { fs } = window.FB;
+  const ref = (p) => { const i = p.indexOf("/"); return fs.doc(Cloud.db, Cloud.path(p.slice(0, i), p.slice(i + 1))); };
+  const commit = async (list) => {
+    const b = fs.writeBatch(Cloud.db);
+    list.forEach(([p, e]) => e.op === "del" ? b.delete(ref(p)) : b.set(ref(p), Object.assign({}, e.data, { __t: fs.serverTimestamp() })));
+    try { await b.commit(); return ""; } catch (x) { return (x && x.code) || "error"; }
+  };
+  const done = (list) => list.forEach(([p, e]) => {
+    const cur = Sync.out[p];
+    if (!cur || cur.v !== e.v) return;           // اتغيّر تاني وإحنا بنبعت — يتبعت تاني
+    if (e.op === "del") delete Sync.shadow[p]; else Sync.shadow[p] = e.h;
+    delete Sync.out[p];
+  });
+  const refused = (c) => c === "permission-denied" || c === "invalid-argument" || c === "failed-precondition";
+  let net = false;
+  const newly = [];
+  try {
+    for (let i = 0; i < todo.length && !net; i += 400) {
+      const chunk = todo.slice(i, i + 400);
+      const r = await commit(chunk);
+      if (!r) { done(chunk); continue; }
+      if (!refused(r)) { net = true; break; }
+      for (const one of chunk) {
+        const r1 = await commit([one]);
+        if (!r1) { done([one]); continue; }
+        if (!refused(r1)) { net = true; break; }
+        const cur = Sync.out[one[0]];
+        if (cur && cur.v === one[1].v && !cur.err) {
+          cur.err = (cur.col === "transactions" && cur.data && txRuleWhy(cur.data)) || "السحابة رفضت الحفظ";
+          newly.push(cur.err);
+        }
+      }
+    }
+  } finally {
+    Sync.sending = false; Sync.save();
+  }
+  if (newly.length) toast("⚠️ " + newly[0] + ". متسجّلة على الجهاز ده بس.");
+  renderStorageLine();
+  if (newly.length && state.ui && state.ui.tab === "home") scheduleRepaint();
+  if (net) { clearTimeout(Sync.retryT); Sync.retryT = setTimeout(syncFlush, 5000); return; }
+  if (Object.values(Sync.out).some(e => !e.err)) setTimeout(syncFlush, 30);
+}
+/* للترحيل والزرع: بيستنى لحد ما الصندوق يفضى (أو يفضل فيه المرفوض بس) */
+async function syncFlushAll() {
+  for (let i = 0; i < 40; i++) {
+    while (Sync.sending) await new Promise(r => setTimeout(r, 40));
+    if (!Object.values(Sync.out).some(e => !e.err)) return true;
+    await syncFlush();
+    if (Object.values(Sync.out).some(e => !e.err)) await new Promise(r => setTimeout(r, 120));
+  }
+  return false;
+}
+/* متوافق مع الكود القديم */
+async function cloudWrite(keys) { syncCapture(keys); return syncFlushAll(); }
+
 /* Firestore بيرفض undefined — بنشيلها، وبنشيل الدوال كمان */
 function clean(o) {
   const out = Array.isArray(o) ? [] : {};
@@ -1415,6 +1633,7 @@ async function onSignedIn() {
       return sheetMigrate();
     }
     if (cloudEmpty && !localHas) await seedCloud();
+    syncBaseline();               // قبل ما الشاشة تسمحلك تلمس حاجة
     Cloud.ready = true;
     cloudListen();
     render(); renderStorageLine(); bootBackup();
@@ -1440,6 +1659,7 @@ function onSignedOut() { cloudStop(); Cloud.ready = false; render(); }
 
 /* أول مرة على حساب فاضي: نزرع التصنيفات والمحافظ الافتراضية */
 async function seedCloud() {
+  ["meta", "transactions", ...COLS].forEach(c => Sync.readyCols.add(c));   // السحابة فاضية
   await cloudWrite(["settings", "wallets", "categories"]);
   await seedIncomeCats();
 }
@@ -1508,9 +1728,13 @@ async function runMigrate() {
       w.opening = 0;
     });
     await seedIncomeCats();
+    // اتأكدنا إن السحابة فاضية، فالظل الفاضي مظبوط
+    ["meta", "transactions", ...COLS].forEach(c => Sync.readyCols.add(c));
     const keys = ["settings", ...COLS, ...[...new Set(state.txs.map(t => mkOf(t.date)))].map(m => "m:" + m)];
     await cloudWrite(keys);
     writeLocal();
+    const bad = Sync.errs().length;
+    if (bad) setTimeout(() => toast("⚠️ " + nf(bad, 0) + " حاجة ما اترفعتش — اضغط على التنبيه في الرئيسية"), 1800);
     closeSheet();
     Cloud.ready = true; Cloud.paused = false;
     cloudListen();
@@ -2331,7 +2555,7 @@ function catRowEl(c, amount, total, extra) {
 function viewHome() {
   const mk = thisMK(), T = totalsOf(mk), B = balanceNow(), ck = monthClock(mk), al = allowance(mk);
   const cur = esc(state.settings.currency);
-  let h = installBanner();
+  let h = installBanner() + syncAlert();
 
   // دفتر الرصيد: الإجمالي ثم توزيعه على الأماكن
   const wallets = state.wallets.slice().sort((a, b) => (isSaveW(a) ? 1 : 0) - (isSaveW(b) ? 1 : 0));
@@ -3347,13 +3571,57 @@ function viewOnboard() {
 function renderTabs() {
   el("tabbar").innerHTML = TABS.map(t => '<button role="tab" data-act="tab" data-v="' + t.id + '" aria-current="' + (state.ui.tab === t.id) + '">' + ico(t.ic) + "<span>" + t.name + "</span></button>").join("");
 }
+/* ---------- لو فيه حاجة السحابة رفضتها ----------
+   الحركة بتفضل على الجهاز وداخلة في الأرصدة، بس لازم تعرف إنها مش
+   في السحابة — لأن الجهاز التاني والبوت مش شايفينها. */
+function syncAlert() {
+  if (!(Cloud.on && Cloud.user)) return "";
+  const n = Sync.errs().length;
+  if (!n) return "";
+  return '<button class="syncwarn" data-act="syncIssues"><span class="sw-i">' + ico("alert") + '</span>' +
+    '<span class="sw-t"><b>' + (n === 1 ? "حركة مش متحفظة في السحابة" : nf(n, 0) + " حاجات مش متحفظة في السحابة") + '</b>' +
+    "موجودة على الجهاز ده بس — اضغط عشان تعرف ليه وتظبطها</span></button>";
+}
+function sheetSyncIssues() {
+  const list = Sync.errs();
+  if (!list.length) { closeSheet(); return toast("كله متحفظ في السحابة"); }
+  const cur = esc(state.settings.currency);
+  const rows = list.map(e => {
+    const t = e.col === "transactions" ? e.local : null;
+    const title = t ? (nf(t.amount) + " " + cur + (t.note ? " — " + esc(t.note) : "")) : esc(e.col + " · " + e.id);
+    const when = t && t.date ? fmtDate(t.date) : "";
+    return '<div class="syncrow"><div class="sr-h"><b>' + title + "</b>" + (when ? '<span class="sub">' + when + "</span>" : "") + "</div>" +
+      '<div class="sr-why">' + esc(e.err) + "</div>" +
+      '<div class="sr-a">' + (t ? '<button class="btn pri" data-act="syncFix" data-id="' + esc(e.id) + '">' + ico("edit") + "عدّلها</button>" : "") +
+      '<button class="btn ghost" data-act="syncDrop" data-id="' + esc(e.col + "/" + e.id) + '">امسحها</button></div></div>';
+  }).join("");
+  openSheet("مش متحفظة في السحابة",
+    '<p class="sub" style="margin:0 0 12px;line-height:1.8">الحاجات دي موجودة على الجهاز ده وداخلة في أرصدتك، ' +
+    "بس السحابة رفضتها — فالجهاز التاني والبوت مش شايفينها. عدّل السبب وهتتحفظ لوحدها.</p>" + rows);
+}
+function syncDrop(path) {
+  const e = Sync.out[path]; if (!e) return;
+  if (e.col === "transactions") state.txs = state.txs.filter(t => t.id !== e.id);
+  else if (COLS.includes(e.col)) state[e.col] = (state[e.col] || []).filter(x => x.id !== e.id);
+  delete Sync.out[path]; Sync.save();
+  save(e.col === "transactions" ? "m:" + thisMK() : e.col);
+  render();
+  if (Sync.errs().length) sheetSyncIssues(); else { closeSheet(); toast("اتمسحت"); }
+}
+
 function renderStorageLine() {
   const s = el("storLine"); if (!s) return;
   if (Cloud.on && Cloud.user) {
     const who = esc(Cloud.user.displayName || Cloud.user.email || "");
+    const errs = Sync.errs().length, wait = Sync.count() - errs;
+    if (errs) {
+      s.innerHTML = '<span class="sd local"></span><button class="linkbtn" data-act="syncIssues">' +
+        nf(errs, 0) + " حاجة مش متحفظة في السحابة — اعرف ليه</button>";
+      return;
+    }
     const bad = !!Cloud.err;
-    s.innerHTML = '<span class="sd' + (bad ? " local" : "") + '"></span>' +
-      (bad ? esc(Cloud.err) : "محفوظ في حسابك — " + who);
+    s.innerHTML = '<span class="sd' + (bad || wait ? " local" : "") + '"></span>' +
+      (bad ? esc(Cloud.err) : wait ? "بيتحفظ في السحابة… (" + nf(wait, 0) + ")" : "محفوظ في حسابك — " + who);
     return;
   }
   const cloud = Store.mode === "cloud";
@@ -5841,6 +6109,9 @@ document.addEventListener("click", (ev) => {
     case "closeSheet": closeSheet(); break;
     case "newTx": sheetTx(); break;
     case "editTx": sheetTx(id); break;
+    case "syncIssues": sheetSyncIssues(); break;
+    case "syncFix": closeSheet(); setTimeout(() => sheetTx(id), 260); break;
+    case "syncDrop": syncDrop(id); break;
     case "txType": sh.dataset.type = v; sh.querySelectorAll('[data-act="txType"]').forEach(x => x.setAttribute("aria-pressed", String(x.dataset.v === v))); paintTxForm(); break;
     case "pickCat":
       sh.dataset.cat = v;
