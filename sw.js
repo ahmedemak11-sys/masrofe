@@ -1,5 +1,5 @@
 /* مصروفي — service worker */
-const VERSION = "3.1.0";
+const VERSION = "3.2.0";
 const CACHE = "masroufy-" + VERSION;
 const CORE = [
   "./",
